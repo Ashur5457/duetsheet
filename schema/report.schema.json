@@ -1,0 +1,273 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ashur5457/duetsheet/blob/main/schema/report.schema.json",
+  "title": "Duetsheet report (report.json)",
+  "description": "A Duetsheet report: every document of the report, grouped by collection and keyed by document id. The same documents live in the Claude Artifact database in cloud mode (path <collection>/<id>). See AGENTS.md for the meaning of each field and the revision protocol for agents.",
+  "type": "object",
+  "required": ["schema", "report"],
+  "properties": {
+    "schema": { "type": "string", "pattern": "^duetsheet/0\\.[0-9]+$", "description": "Format version, for example duetsheet/0.4." },
+    "report": {
+      "type": "object",
+      "required": ["meta"],
+      "properties": { "meta": { "$ref": "#/$defs/meta" } }
+    },
+    "blocks": { "type": "object", "additionalProperties": { "$ref": "#/$defs/block" } },
+    "datasets": { "type": "object", "additionalProperties": { "$ref": "#/$defs/dataset" } },
+    "annotations": { "type": "object", "additionalProperties": { "$ref": "#/$defs/annotation" } },
+    "changes": { "type": "object", "additionalProperties": { "$ref": "#/$defs/change" } },
+    "rounds": { "type": "object", "additionalProperties": { "$ref": "#/$defs/round" } },
+    "style": {
+      "type": "object",
+      "properties": {
+        "profile": { "$ref": "#/$defs/styleProfile" },
+        "proposal": { "$ref": "#/$defs/styleProposal" }
+      }
+    },
+    "examples": { "type": "object", "additionalProperties": { "$ref": "#/$defs/example" } }
+  },
+  "$defs": {
+    "isoTime": { "type": "string", "format": "date-time" },
+    "assetId": { "type": "string", "pattern": "^[0-9a-f]{32}$", "description": "Artifact asset id, or in a project folder the name of assets/<id>.<ext> without the extension." },
+    "meta": {
+      "type": "object",
+      "required": ["title", "order"],
+      "properties": {
+        "title": { "type": "string" },
+        "order": { "type": "array", "items": { "type": "string" }, "description": "Block ids in reading order. Blocks missing from order are appended by createdAt." },
+        "schema": { "type": "string" },
+        "createdAt": { "$ref": "#/$defs/isoTime" }
+      }
+    },
+    "block": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "enum": ["text", "chart", "table", "image"] },
+        "title": { "type": "string" },
+        "caption": { "type": "string" },
+        "breakBefore": { "enum": ["auto", "page", "avoid"], "description": "auto: paginate automatically; page: start a new page; avoid: keep with the previous block." },
+        "createdAt": { "$ref": "#/$defs/isoTime" },
+        "updatedAt": { "$ref": "#/$defs/isoTime" },
+        "text": { "type": "string", "description": "For text blocks. Supports **bold**, *italic*, '- ' lists and blank-line paragraphs. Raw HTML is not rendered." },
+        "chart": {
+          "type": "object",
+          "required": ["kind", "dataset", "x", "y"],
+          "properties": {
+            "kind": { "enum": ["scatter", "line"] },
+            "dataset": { "type": "string", "description": "Dataset id." },
+            "x": { "type": "string", "description": "Column key." },
+            "y": { "type": "string", "description": "Column key." },
+            "color": { "type": ["string", "null"], "description": "Column key. 6 or fewer distinct values: categories (colour and marker shape); otherwise a numeric colour ramp." },
+            "xLabel": { "type": ["string", "null"] },
+            "yLabel": { "type": ["string", "null"] },
+            "logY": { "type": "boolean" },
+            "yMin": { "type": ["number", "null"] },
+            "yMax": { "type": ["number", "null"] }
+          }
+        },
+        "table": {
+          "type": "object",
+          "required": ["dataset"],
+          "properties": {
+            "dataset": { "type": "string" },
+            "sortBy": { "type": "string" },
+            "desc": { "type": "boolean" },
+            "limit": { "type": "integer", "minimum": 1, "maximum": 50 },
+            "columns": { "type": ["array", "null"], "items": { "type": "string" } }
+          }
+        },
+        "image": {
+          "type": "object",
+          "properties": {
+            "asset": { "$ref": "#/$defs/assetId" },
+            "src": { "type": "string", "pattern": "^data:image/", "description": "Inline image, used when no asset store is available." },
+            "mime": { "type": "string" },
+            "w": { "type": "number" },
+            "h": { "type": "number" },
+            "name": { "type": "string" },
+            "crop": {
+              "type": "object",
+              "properties": { "t": { "type": "number" }, "r": { "type": "number" }, "b": { "type": "number" }, "l": { "type": "number" } },
+              "description": "Percent of the image cut from each side, 0 to 45."
+            },
+            "width": { "type": "number", "minimum": 20, "maximum": 100, "description": "Percent of the page width." },
+            "source": {
+              "type": "object",
+              "description": "How the figure was made, so an agent can regenerate it.",
+              "properties": {
+                "tool": { "type": "string", "description": "For example Origin, Python (matplotlib), MATLAB, R (ggplot2)." },
+                "file": { "type": "string", "description": "Original file name, for example fig2.opju." },
+                "note": { "type": "string" },
+                "script": { "type": "string", "description": "The plotting script." },
+                "data": {
+                  "type": "object",
+                  "properties": { "asset": { "$ref": "#/$defs/assetId" }, "name": { "type": "string" }, "type": { "type": "string" } }
+                }
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        { "if": { "properties": { "type": { "const": "chart" } } }, "then": { "required": ["chart"] } },
+        { "if": { "properties": { "type": { "const": "table" } } }, "then": { "required": ["table"] } },
+        { "if": { "properties": { "type": { "const": "image" } } }, "then": { "required": ["image"] } }
+      ]
+    },
+    "dataset": {
+      "type": "object",
+      "required": ["id", "columns", "rows"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "columns": {
+          "type": "array",
+          "items": { "type": "object", "required": ["key", "label"], "properties": { "key": { "type": "string" }, "label": { "type": "string" } } },
+          "description": "The first column is normally id."
+        },
+        "rows": {
+          "type": "array",
+          "items": { "type": "object", "required": ["id"], "properties": { "id": { "type": "number" } } },
+          "description": "Every row has a unique numeric id; annotations refer to rows by it."
+        },
+        "source": {
+          "type": "object",
+          "description": "Where the rows came from. Set when data is imported from a file.",
+          "required": ["path", "sha256"],
+          "properties": {
+            "path": { "type": "string", "description": "Path inside the project folder, for example data/run12.csv." },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "size": { "type": "integer" },
+            "modified": { "$ref": "#/$defs/isoTime" },
+            "importedAt": { "$ref": "#/$defs/isoTime" },
+            "parser": { "type": "string", "description": "delimited, json, or the name of the tool that converted the file." }
+          }
+        }
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "required": ["id", "target", "status"],
+      "properties": {
+        "id": { "type": "string" },
+        "no": { "type": "integer" },
+        "target": {
+          "type": "object",
+          "required": ["kind", "blockId"],
+          "properties": {
+            "kind": { "enum": ["block", "point", "box", "lasso"] },
+            "blockId": { "type": "string" },
+            "quote": { "type": "string" },
+            "rowId": { "type": "number" },
+            "space": { "enum": ["data", "image"] },
+            "xKey": { "type": "string" },
+            "yKey": { "type": "string" },
+            "x": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+            "y": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+            "polygon": { "type": "array", "items": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 } },
+            "enclosed": { "type": "array", "items": { "type": "number" }, "description": "Row ids inside the region (charts only)." }
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tag ids such as add-trend-line. Reports from duetsheet/0.2 may contain the visible button text instead."
+        },
+        "text": { "type": "string" },
+        "status": { "enum": ["open", "done"] },
+        "reply": { "type": "string", "description": "The agent's answer." },
+        "createdAt": { "$ref": "#/$defs/isoTime" },
+        "resolvedAt": { "anyOf": [{ "$ref": "#/$defs/isoTime" }, { "type": "null" }] }
+      }
+    },
+    "change": {
+      "type": "object",
+      "required": ["id", "by", "at", "field"],
+      "properties": {
+        "id": { "type": "string" },
+        "by": { "enum": ["user", "claude"], "description": "claude stands for any AI agent." },
+        "at": { "$ref": "#/$defs/isoTime" },
+        "blockId": { "type": ["string", "null"] },
+        "datasetId": { "type": "string", "description": "For field dataset." },
+        "field": { "type": "string", "description": "A block field such as title, text, chart.logY or image.crop; style.<path>; order; add; delete; or dataset (a data import)." },
+        "before": {},
+        "after": {},
+        "name": { "type": "string", "description": "The block or dataset name at the time." },
+        "index": { "type": "integer" },
+        "revertible": { "type": "boolean" }
+      }
+    },
+    "round": {
+      "type": "object",
+      "required": ["id", "no", "by", "at"],
+      "properties": {
+        "id": { "type": "string" },
+        "no": { "type": "integer" },
+        "label": { "type": "string" },
+        "by": { "enum": ["user", "claude"] },
+        "at": { "$ref": "#/$defs/isoTime" }
+      }
+    },
+    "styleProfile": {
+      "type": "object",
+      "properties": {
+        "font": {
+          "type": "object",
+          "properties": { "family": { "type": "string" }, "size": { "type": "number", "description": "Tick labels, pt." }, "label": { "type": "number", "description": "Axis titles, pt." } }
+        },
+        "marker": { "type": "number" },
+        "line": { "type": "number" },
+        "ticks": { "enum": ["in", "out"] },
+        "frame": { "type": "boolean" },
+        "grid": { "type": "boolean" },
+        "palette": { "type": "array", "items": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" }, "maxItems": 6 },
+        "figure": { "type": "object", "properties": { "preset": { "enum": ["free", "acs1", "acs2"] } } },
+        "chartDefaults": {
+          "type": "object",
+          "properties": { "kind": { "enum": ["scatter", "line", null] }, "logY": { "type": ["boolean", "null"] } }
+        },
+        "dismissed": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "styleProposal": {
+      "type": "object",
+      "description": "Style changes suggested by an agent. The user reviews them in the Style tab; the page deletes this document after Apply or Cancel.",
+      "required": ["rows"],
+      "properties": {
+        "by": { "type": "string" },
+        "at": { "$ref": "#/$defs/isoTime" },
+        "note": { "type": "string" },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["field", "value"],
+            "properties": {
+              "field": { "enum": ["font.family", "font.size", "font.label", "marker", "line", "ticks", "frame", "grid", "palette", "figure.preset", "chartDefaults.kind", "chartDefaults.logY"] },
+              "value": {},
+              "conf": { "type": "number", "minimum": 0, "maximum": 1 },
+              "from": { "type": "string", "description": "Which files the suggestion is based on." }
+            }
+          }
+        }
+      }
+    },
+    "example": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string" },
+        "asset": { "$ref": "#/$defs/assetId" },
+        "src": { "type": "string" },
+        "mime": { "type": "string" },
+        "w": { "type": "number" },
+        "h": { "type": "number" },
+        "name": { "type": "string" },
+        "note": { "type": "string" },
+        "createdAt": { "$ref": "#/$defs/isoTime" }
+      }
+    }
+  }
+}

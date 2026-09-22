@@ -1,0 +1,16 @@
+# Example matplotlib style: single-column journal figures
+font.family: sans-serif
+font.sans-serif: Arial, Helvetica
+font.size: 7
+xtick.labelsize: 7
+ytick.labelsize: 7
+axes.labelsize: 8
+lines.linewidth: 1.2
+lines.markersize: 4
+xtick.direction: in
+ytick.direction: in
+axes.grid: False
+axes.spines.top: True
+axes.spines.right: True
+axes.prop_cycle: cycler('color', ['0072B2', 'D55E00', '009E73', 'CC79A7'])
+figure.figsize: 3.25, 2.4

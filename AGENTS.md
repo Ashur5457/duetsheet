@@ -1,22 +1,69 @@
 # AGENTS.md: working with a Duetsheet report
 
-This file tells an AI agent how to read human feedback in a Duetsheet report and how to revise the report so that every change stays visible, attributable, and reversible.
+This file is for AI agents (Claude Code, Claude on claude.ai, Codex, Gemini CLI, Cursor, or any LLM that can read and write files). It explains how a Duetsheet report is stored, how to read the human's feedback, and how to write or revise the report so that every change stays visible, attributable and reversible.
 
-Schema version: `duetsheet/0.3`. The data lives in the database of a Claude Artifact (collections and documents, JSON values). A full example is in [`examples/nimo-demo.json`](examples/nimo-demo.json).
+- Format version: `duetsheet/0.4`. Reports from `duetsheet/0.2` and `0.3` are read as they are; nothing needs to be migrated.
+- Formal definition: [`schema/report.schema.json`](schema/report.schema.json) (JSON Schema 2020-12).
+- Complete example: [`examples/demo-project/`](examples/demo-project/).
+- The interface can be shown in several languages, but the data never changes with it: field names, tag ids and enum values are always English. Write report content (titles, text, captions, replies) in the language the user works in, and reply to an annotation in its language.
 
-Reports created with `duetsheet/0.2` are read as they are; nothing needs to be migrated. The only difference is how annotation tags are stored (see `annotations` below).
+## Where a report lives
 
-The interface can be shown in several languages, but that never changes the data: field names, tag ids and enum values are always English. Report content (titles, text, captions, replies) is written in whatever language the user works in; reply in the language of the annotation.
+A report is a set of JSON documents. The same documents can live in three places:
+
+| Mode | Where | How the agent reads and writes |
+|---|---|---|
+| **Project folder** (Chrome, Edge) | `report.json` in a folder on disk | Read and write the file directly. The page open in the browser picks up your changes within about two seconds. |
+| **Claude Artifact** (claude.ai) | The Artifact database: document paths `<collection>/<id>` | Use the Artifact database tools (`read_db`, `write_db`) on the Artifact URL. |
+| **Report file** | A `*.report.json` file the user saved or sent you | Same format as `report.json`. Give the user back a file they can open with **Open report file**. |
+
+### Project folder layout
+
+```
+my-report/
+  report.json      the report (all documents)
+  data/            raw data: CSV, TSV, JSON (the user or you put files here)
+  habits/          the user's own example figures (SVG, PNG), .mplstyle files, profile.json
+  assets/          images and files uploaded in the page, named <asset id>.<ext>
+  exports/         files the page exports (styles, report copies, translation templates)
+  lang/            extra interface translations (optional)
+```
+
+`duetsheet.html` itself does not need to be in the folder; the user opens it and chooses the folder.
+
+### `report.json`
+
+```json
+{
+ "schema": "duetsheet/0.4",
+ "report":      { "meta": { "title": "...", "order": ["b-intro", "b-fig1"], "schema": "duetsheet/0.4", "createdAt": "ISO-8601" } },
+ "blocks":      { "b-intro": { ... }, "b-fig1": { ... } },
+ "datasets":    { "exp": { ... } },
+ "annotations": { "a...": { ... } },
+ "changes":     { "c...": { ... } },
+ "rounds":      { "r...": { ... } },
+ "style":       { "profile": { ... }, "proposal": { ... } },
+ "examples":    { "x...": { ... } }
+}
+```
+
+Every top-level key except `schema` is a collection; inside it, each key is a document id. The Artifact database path of a document is `<collection>/<id>`, for example `report/meta` or `blocks/b-fig1`. Empty collections may be left out.
+
+**Writing `report.json` safely** (the page may be open and saving at the same time):
+
+1. Read the file fresh right before you change it. Do not keep an old copy in memory across turns.
+2. Change only the documents you mean to change. Keep every other document, and any collection you do not know, exactly as it is.
+3. Write the whole file in one step (write a temporary file in the same folder, then rename it over `report.json`). The page merges by document: if you and the page change different documents at the same moment, both changes are kept. If both change the same document, the last writer wins.
+4. Keep it valid JSON with UTF-8 encoding. The page ignores a half-written or invalid file and tries again.
 
 ## Collections
 
 ### `report/meta`
-```json
-{ "title": "NIMO demo report", "order": ["b-intro", "b-fig1", "..."], "schema": "duetsheet/0.2", "createdAt": "ISO-8601" }
-```
-`order` is the block order. Blocks missing from `order` are appended by creation time.
+
+`{ "title", "order", "schema", "createdAt" }`. `order` is the block order; blocks missing from `order` are appended by `createdAt`.
 
 ### `blocks/{id}`
+
 Common fields:
 
 | Field | Type | Notes |
@@ -31,40 +78,36 @@ Common fields:
 Type-specific fields:
 
 - `text`: `text` (string). Supported markup: `**bold**`, `*italic*`, lines starting with `- ` form a list, a blank line starts a new paragraph. Raw HTML is not rendered.
-- `chart`: `chart` = `{ kind: "scatter" | "line", dataset, x, y, color, xLabel, yLabel, logY, yMin, yMax }`. `x`, `y`, `color` are column keys of the dataset. `color` with 6 or fewer distinct values is categorical (colour and marker shape); otherwise it is a numeric colour ramp. `null` means automatic.
+- `chart`: `chart` = `{ kind: "scatter" | "line", dataset, x, y, color, xLabel, yLabel, logY, yMin, yMax }`. `dataset` is a dataset id; `x`, `y`, `color` are column keys of that dataset. `color` with 6 or fewer distinct values is categorical (colour and marker shape); otherwise it is a numeric colour ramp. `null` means automatic.
 - `table`: `table` = `{ dataset, sortBy, desc, limit, columns? }`.
 - `image`: `image` = `{ asset | src, mime, w, h, name, crop: { t, r, b, l }, width, source }`.
-  - `asset` is a 32-character Artifact asset id (preferred; displayed from `/_blob/<id>`). Older reports may instead have `src`, a `data:image/...` URL.
+  - `asset` is a 32-character hex id. In an Artifact it is an asset id (displayed from `/_blob/<id>`); in a project folder the file is `assets/<id>.<ext>`. Older reports may instead have `src`, a `data:image/...` URL, which works everywhere.
   - `w`, `h` are the image's natural size (only the aspect ratio matters). `crop` values are percentages (0 to 45). `width` is a percentage of the page width (20 to 100).
-  - `source` = `{ tool, file, note, script, data }` describes how the figure was made: `tool` (for example `Origin`, `Python (matplotlib)`), the original `file` name, a free-text `note`, the plotting `script`, and `data` = `{ asset, name, type }` for an attached raw data file (CSV, TXT or JSON). Read the script and data before proposing changes to a figure.
+  - `source` = `{ tool, file, note, script, data }` describes how the figure was made: `tool` (for example `Origin`, `Python (matplotlib)`), the original `file` name, a free-text `note`, the plotting `script`, and `data` = `{ asset, name, type }` for an attached raw data file. Read the script and data before proposing changes to a figure.
   - `calibration` is reserved for a future version (mapping image pixels to data coordinates).
 
-Write a block as a whole document (`set`), not as a partial merge, so nested objects never keep stale keys.
+Write a block as a whole document, not as a partial merge, so nested objects never keep stale keys.
 
 ### `datasets/{id}`
-```json
-{ "id": "exp", "title": "...", "columns": [{ "key": "id", "label": "Run" }, { "key": "score", "label": "Score" }], "rows": [{ "id": 1, "score": 0.91 }] }
-```
-Every row needs a unique numeric `id`. Annotations refer to rows by this id.
 
-### `style/profile`
 ```json
-{ "font": { "family": "", "size": 8, "label": 9 }, "marker": 7, "line": 0.9, "ticks": "out" | "in", "frame": false, "grid": true,
-  "palette": ["#1F6F8B", "..."], "figure": { "preset": "free" | "acs1" | "acs2" }, "chartDefaults": { "kind": null, "logY": null }, "dismissed": [] }
+{ "id": "run12", "title": "run12",
+  "columns": [{ "key": "id", "label": "Run" }, { "key": "temp_c", "label": "temp_C" }, { "key": "yield", "label": "yield" }],
+  "rows": [{ "id": 1, "temp_c": 25, "yield": 0.34 }],
+  "source": { "path": "data/run12.csv", "sha256": "64 hex characters", "size": 167, "modified": "ISO-8601", "importedAt": "ISO-8601", "parser": "delimited" } }
 ```
-Sizes are in points at the chosen figure width (`free` = 6.4 in, `acs1` = 3.25 in, `acs2` = 7 in). An empty `palette` means the built-in colours. When you make figures in another tool for this report, follow this profile.
 
-### `examples/{id}`
-```json
-{ "id": "x...", "asset": "32-hex id", "mime": "image/svg+xml", "w": 312, "h": 230, "name": "fig2.svg", "note": "ACS submission", "createdAt": "ISO-8601" }
-```
-Example figures the user uploaded to show their preferred style. Use them as the reference when asked to match the user's style.
+- Every row needs a unique numeric `id`. Annotations refer to rows by this id.
+- Column keys are lowercase ASCII (`[a-z0-9_]`); the original header is kept as `label`, in any language.
+- `source` is present when the rows were imported from a file. `sha256` is the hash of the file's bytes, so anyone can check whether the file changed after the import. The page shows "changed since import" when it did.
 
 ### `annotations/{id}`
+
 ```json
 { "id": "a...", "no": 3, "target": { }, "tags": ["add-trend-line"], "text": "free text, may be empty",
   "status": "open" | "done", "reply": "", "createdAt": "ISO-8601", "resolvedAt": null }
 ```
+
 `target` is one of:
 
 | `kind` | Fields | Meaning |
@@ -76,7 +119,7 @@ Example figures the user uploaded to show their preferred style. Use them as the
 
 `space: "data"` means coordinates are in the chart's data units for the columns `xKey` and `yKey`, and `enclosed` lists the row ids inside the region. `space: "image"` means coordinates are normalised to the visible (cropped) image, from 0 to 1, with y pointing down.
 
-Tags come from preset buttons in the UI and are stored as stable ids, whatever the interface language:
+Tags come from preset buttons and are stored as stable ids, whatever the interface language:
 
 | Block type | Tag ids |
 |---|---|
@@ -88,21 +131,64 @@ Tags come from preset buttons in the UI and are stored as stable ids, whatever t
 Reports from `duetsheet/0.2` stored the button text instead, in the interface language of the time (for example `Add trend line` or its Chinese translation). Read such a tag by its meaning; do not rewrite old annotations just to change the tag format. A tag that is not in the table above is free text from the user.
 
 ### `changes/{id}`
+
 One document per changed field.
+
 ```json
 { "id": "c...", "by": "user" | "claude", "at": "ISO-8601", "blockId": "b-fig1", "field": "chart.logY",
   "before": false, "after": true, "name": "Figure 1 title at the time", "revertible": true }
 ```
-`field` is one of: `title`, `text`, `caption`, `breakBefore`, `chart.kind`, `chart.x`, `chart.y`, `chart.color`, `chart.xLabel`, `chart.yLabel`, `chart.yMin`, `chart.yMax`, `chart.logY`, `table.sortBy`, `table.desc`, `table.limit`, `image.width`, `image.crop`, `image.src`, `image.asset`, `image.source.tool`, `image.source.file`, `image.source.note`, `image.source.script`, `image.source.data`, `style.<path>` (with `blockId: null`, for example `style.font.size`), `order` (with `blockId: null`, values are arrays of block ids), `add`, `delete` (`before` holds the deleted block, `index` its position).
+
+`by: "claude"` stands for any AI agent. `field` is one of:
+
+- block fields: `title`, `text`, `caption`, `breakBefore`, `chart.dataset`, `chart.kind`, `chart.x`, `chart.y`, `chart.color`, `chart.xLabel`, `chart.yLabel`, `chart.yMin`, `chart.yMax`, `chart.logY`, `table.dataset`, `table.sortBy`, `table.desc`, `table.limit`, `image.width`, `image.crop`, `image.src`, `image.asset`, `image.source.tool`, `image.source.file`, `image.source.note`, `image.source.script`, `image.source.data`
+- `style.<path>` with `blockId: null`, for example `style.font.size`
+- `order` with `blockId: null`; values are arrays of block ids
+- `add`, `delete` (`before` holds the deleted block, `index` its position)
+- `dataset` with `blockId: null` and `datasetId`: a data import. `before` and `after` are `{ rows, columns, sha256 }` (`before` is `null` for a first import); `revertible: false`.
+
 For `image.src`, store short text markers such as `"old image"` / `"new image"` and `revertible: false` instead of the image data.
 
 ### `rounds/{id}`
+
 ```json
 { "id": "r...", "no": 4, "label": "Round 4", "by": "user" | "claude", "at": "ISO-8601" }
 ```
+
 A change belongs to the first round whose `at` is later than or equal to the change's `at`. Changes after the last round form the "current round".
 
-## Revision protocol for agents
+### `style/profile`
+
+```json
+{ "font": { "family": "", "size": 8, "label": 9 }, "marker": 7, "line": 0.9, "ticks": "out" | "in", "frame": false, "grid": true,
+  "palette": ["#1F6F8B", "..."], "figure": { "preset": "free" | "acs1" | "acs2" }, "chartDefaults": { "kind": null, "logY": null }, "dismissed": [] }
+```
+
+Sizes are in points at the chosen figure width (`free` = 6.4 in, `acs1` = 3.25 in, `acs2` = 7 in). An empty `palette` means the built-in colours. When you make figures in another tool for this report, follow this profile.
+
+### `style/proposal`
+
+Style changes you suggest. The user sees them in the Style tab, ticks the ones they want, and clicks **Apply**; the page then updates `style/profile`, records the changes, and deletes this document.
+
+```json
+{ "by": "claude", "at": "ISO-8601", "note": "Based on the 4 figures in habits/.",
+  "rows": [ { "field": "font.size", "value": 7, "conf": 0.9, "from": "fig1.svg, fig2.svg" },
+            { "field": "ticks", "value": "in", "conf": 0.6, "from": "photo.png (estimated)" } ] }
+```
+
+`field` is one of `font.family`, `font.size`, `font.label`, `marker`, `line`, `ticks`, `frame`, `grid`, `palette`, `figure.preset`, `chartDefaults.kind`, `chartDefaults.logY`. Rows with an unknown field or an invalid value are ignored. Rows with `conf` below 0.6 start unticked.
+
+### `examples/{id}`
+
+```json
+{ "id": "x...", "asset": "32-hex id", "mime": "image/svg+xml", "w": 312, "h": 230, "name": "fig2.svg", "note": "ACS submission", "createdAt": "ISO-8601" }
+```
+
+Example figures the user uploaded in the Style tab to show their preferred style.
+
+## Tasks
+
+### Revise the report from the user's annotations
 
 When the user asks you to "read the annotations and revise":
 
@@ -114,8 +200,33 @@ When the user asks you to "read the annotations and revise":
 6. Close your round: write a `rounds` document with `by: "claude"` and an `at` later than all of your changes.
 7. Summarise for the user which annotations you handled, which you left open, and why.
 
-Rules:
+### Import raw data from `data/`
+
+The page imports CSV, TSV and JSON files itself (Folder tab). Do it yourself when the user asks, or when the file needs work the page cannot do (Excel, instrument formats, several sheets, unit conversion):
+
+1. Leave the original file untouched. If it needs converting, write the converted table next to it in `data/` (for example `data/run12.xlsx` -> `data/run12.csv`) and import that file.
+2. Build the dataset: an `id` column with unique numbers, lowercase ASCII column keys, the original headers as labels. Do not round, filter, or correct values; if something looks wrong, ask.
+3. Set `source` to the file you imported: `path` (relative to the project folder), `sha256` of the file bytes, `size`, `modified`, `importedAt`, and `parser` (for example `delimited`, `json`, or `pandas.read_excel`).
+4. Write a `changes` document with `field: "dataset"`, `datasetId`, `by: "claude"`, `before` / `after` as `{ rows, columns, sha256 }`, and `revertible: false`.
+
+### Learn the user's figure habits from `habits/`
+
+1. Read what is there: SVG figures (exact fonts, sizes, line widths, colours, figure width), `.mplstyle` files, plotting scripts (for example matplotlib `rcParams`), `profile.json` (habits the user saved before), and PNG/JPG figures (look at them and estimate).
+2. Prefer what most files agree on. Tell the user when files disagree.
+3. Write your suggestions to `style/proposal` with a `conf` and a `from` for each row. Do not write `style/profile` directly: the user confirms in the Style tab.
+4. Personal habits can follow the user across projects. The page saves them as `habits/profile.json` (**Save current style as my habits**). If the user keeps a personal copy (for example `~/.duetsheet/profile.json`), copy it into `habits/` of a new project when they ask.
+
+### Write a new report
+
+1. Create `report.json` with `report/meta`, the `datasets` (with `source` when they come from files) and the `blocks`. Charts and tables reference datasets by id and columns by key; every number in the text should come from a dataset.
+2. Put figures made in other tools in `assets/<id>.<ext>` (32-hex id) and reference them from image blocks, with `source` telling how they were made.
+3. Close a first round with `by: "claude"` so the user's review starts a new round.
+4. Tell the user to open the folder in Duetsheet (Chrome or Edge: **Open project folder**).
+
+## Rules
+
 - Never edit or delete the user's `changes` or `rounds`.
 - Never change data values in `datasets` to make a figure look better. If data is wrong, say so and ask.
-- Keep each document under about 250 kB. The Artifact database allows about 5,000 documents per report.
 - Keep reported numbers traceable: if you add a number to text, it should come from a dataset or be explained in the reply.
+- In an Artifact, keep each document under about 250 kB; the database allows about 5,000 documents per report. In a project folder there is no fixed limit, but keep `report.json` reasonable (the page keeps it all in memory): put large raw files in `data/` and import only the columns the report needs.
+- Stored values are ids and English enums; never store interface text in a translated form.

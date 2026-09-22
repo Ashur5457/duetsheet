@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="234pt" height="175pt" viewBox="0 0 234 175">
+ <rect width="234" height="175" fill="#ffffff"/>
+ <g font-family="Arial" font-size="7px" fill="#000000">
+  <text x="30" y="165">0</text><text x="120" y="165">2</text><text x="210" y="165">4</text>
+  <text x="20" y="150">0</text><text x="20" y="90">0.5</text><text x="20" y="30">1</text>
+ </g>
+ <text x="120" y="174" font-family="Arial" font-size="8px" text-anchor="middle">Additive A (wt%)</text>
+ <path d="M32 150 H222 M32 150 V20" stroke="#000000" stroke-width="0.8" fill="none"/>
+ <path d="M32 140 L80 120 L130 60 L180 40 L222 35" stroke="#0072B2" stroke-width="1.2" fill="none"/>
+ <path d="M32 145 L80 135 L130 110 L180 90 L222 80" stroke="#D55E00" stroke-width="1.2" fill="none"/>
+</svg>

@@ -60,6 +60,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .langbox{max-width:560px;font-size:14px}
 .langbox ol{padding-left:1.3em;margin:6px 0 12px}
+.langbox ol li{margin:0 0 6px}
 .langbox ul{list-style:none;padding:0;margin:6px 0}
 .langbox li.cl{display:flex;gap:10px;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--line)}
 .langbox h4{margin:14px 0 4px;font-size:13px;font-weight:500;color:var(--muted)}
@@ -70,11 +71,20 @@ button,input,select,textarea{font:inherit;color:inherit}
 .btn:disabled{opacity:.45;cursor:default}
 
 /* layout */
-.wrap{max-width:1500px;margin:0 auto;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:26px;align-items:start}
+.wrap{max-width:1500px;margin:0 auto;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:26px;align-items:start}
 body.nopanel .wrap{grid-template-columns:minmax(0,1fr)}
 body.nopanel #panel{display:none}
 main{min-width:0}
-#note-db{background:var(--hl-fill);border:1px solid var(--hl-stroke);border-radius:8px;padding:8px 12px;margin:0 0 14px;font-size:13.5px}
+#note-db{background:var(--hl-fill);border:1px solid var(--hl-stroke);border-radius:8px;padding:8px 12px;margin:0 0 14px;font-size:13.5px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+#note-db.saved{background:var(--ok-fill);border-color:var(--ok)}
+#note-text{flex:1 1 320px}
+#note-acts{display:flex;flex-wrap:wrap;gap:6px}
+.flist{list-style:none;margin:6px 0 8px;padding:0}
+.flist li{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line);font-size:13px}
+.flist .fname{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;overflow-wrap:anywhere}
+.flist .fstat{color:var(--muted);font-size:12px;flex:1 1 120px}
+.flist .fstat.stale{color:var(--c2);font-weight:500}
+.flist .btn{margin-left:auto}
 
 /* page (view) */
 .page{width:var(--pw);height:var(--ph);margin:0 auto;background:var(--paper);border-radius:6px;
@@ -177,7 +187,8 @@ details.set summary{cursor:pointer;font-size:13px;color:var(--accent)}
 .filters button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:2px 11px;font-size:13px;cursor:pointer}
 .filters button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .tabs{display:flex;border-bottom:1px solid var(--line);margin:-4px 0 12px}
-.tabs button{border:0;background:none;padding:6px 12px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs{flex-wrap:wrap}
+.tabs button{border:0;background:none;padding:6px 9px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;flex:0 0 auto;font-size:14.5px}
 .tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:500}
 .cbox{margin-top:12px;padding:10px 12px;background:var(--soft);border-radius:8px;border:1px solid var(--line)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
@@ -273,12 +284,13 @@ details.round summary{cursor:pointer;font-size:13.5px}
   </div>
   <span class="hint" id="hint"></span>
   <select id="lang" aria-label="Language"></select>
+  <button type="button" class="btn" id="helpBtn" aria-label="Help">?</button>
   <button type="button" class="btn" id="togglePanel">Panel</button>
 </div></header>
 
 <div class="wrap">
 <main>
-  <p id="note-db" hidden></p>
+  <div id="note-db" hidden><span id="note-text"></span><span id="note-acts"></span></div>
   <section id="view" aria-label="View">
     <div id="pagehost"></div>
     <div class="pager">
@@ -305,6 +317,7 @@ details.round summary{cursor:pointer;font-size:13.5px}
     <button type="button" role="tab" data-tab="annos" aria-selected="true">Comments</button>
     <button type="button" role="tab" data-tab="changes" aria-selected="false">Changes</button>
     <button type="button" role="tab" data-tab="style" aria-selected="false">Style</button>
+    <button type="button" role="tab" data-tab="folder" aria-selected="false" hidden>Folder</button>
   </div>
   <div id="tab-annos">
     <div class="filters" id="filters">
@@ -327,6 +340,7 @@ details.round summary{cursor:pointer;font-size:13.5px}
     </div>
   </div>
   <div id="tab-style" hidden></div>
+  <div id="tab-folder" hidden></div>
 </aside>
 </div>
 <div id="measure" aria-hidden="true"></div>
@@ -334,6 +348,7 @@ details.round summary{cursor:pointer;font-size:13.5px}
   <div class="mbox"><div class="mhead"><strong id="mtitle"></strong><button type="button" class="btn small" id="mclose">Close</button></div><div id="mbody"></div></div>
 </div>
 <input type="file" id="langfile" accept=".json,application/json" hidden>
+<input type="file" id="reportfile" accept=".json,application/json" hidden>
 <div id="tip" hidden></div>
 <div id="toast" hidden></div>
 
@@ -500,7 +515,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Failed to read cloud data (": "讀取雲端資料失敗（",
  "unknown": "未知",
  "). Please reload.": "），請重新整理。",
- "Cloud storage is not available. Edits and comments stay in this tab only and are lost on reload. Open the report from its claude.ai link while signed in.": "目前連不到雲端儲存，修改和註記只會留在這個分頁，重新整理就會消失。請用 claude.ai 上的連結開啟並登入。",
  "Failed to initialise cloud data (": "初始化雲端資料失敗（",
  "). Showing local mode.": "），先以本機模式顯示。",
  "Title": "標題",
@@ -569,7 +583,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Data file attached: ": "已附上數據檔：",
  "Replace data file": "更換數據檔",
  "Attach raw data (CSV, TXT, JSON)": "附上原始數據（CSV、TXT、JSON）",
- "Uploading data files requires opening the report from its claude.ai link.": "上傳數據檔需要以雲端模式開啟。",
  "Only CSV, TXT and JSON files are supported.": "只支援 CSV、TXT、JSON 檔。",
  "File too large: SVG up to 2 MB, other files up to 20 MB.": "檔案太大：SVG 上限 2 MB，其他檔案 20 MB。",
  "This file type is not supported.": "不支援這種檔案格式。",
@@ -658,7 +671,84 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "This browser cannot keep the language after a reload.": "這個瀏覽器無法在重新整理後保留這個語言。",
  "Loaded {name}: {n} sentences": "已載入 {name}：{n} 句",
  " ({b} skipped: placeholders do not match)": "（略過 {b} 句：{} 裡的名稱不一致）",
- "This is not a valid Duetsheet translation file.": "這不是有效的 Duetsheet 翻譯檔。"
+ "This is not a valid Duetsheet translation file.": "這不是有效的 Duetsheet 翻譯檔。",
+ "Folder": "資料夾",
+ "Project folder": "專案資料夾",
+ "\"{name}\". The report is saved to report.json automatically. An agent can read and edit the same folder (see AGENTS.md).": "「{name}」。報告會自動存到 report.json。agent 可以讀寫同一個資料夾（見 AGENTS.md）。",
+ "Project folder \"{name}\": changes are saved to report.json automatically.": "專案資料夾「{name}」：修改會自動存到 report.json。",
+ "Saving…": "儲存中…",
+ "All changes saved.": "所有修改都已儲存。",
+ "Could not save ({m}).": "無法儲存（{m}）。",
+ "Open another folder": "開啟其他資料夾",
+ "Save a copy": "另存一份",
+ "Not saved: changes are lost when you close this tab. Open a project folder to save automatically, or save the report as a file.": "尚未儲存：關掉這個分頁後修改就會消失。請開啟專案資料夾自動儲存，或把報告存成檔案。",
+ "Not saved: changes are lost when you close this tab. This browser cannot open folders (use Chrome or Edge), but you can save the report as a file and open it again later.": "尚未儲存：關掉這個分頁後修改就會消失。這個瀏覽器無法開啟資料夾（請用 Chrome 或 Edge），但可以把報告存成檔案，之後再開啟。",
+ "Open project folder": "開啟專案資料夾",
+ "Reopen \"{name}\"": "重新開啟「{name}」",
+ "Open report file": "開啟報告檔",
+ "Save report file": "儲存報告檔",
+ "Opened folder {name}": "已開啟資料夾 {name}",
+ "Opened {file}": "已開啟 {file}",
+ "Could not open the folder ({m}).": "無法開啟資料夾（{m}）。",
+ "Permission to use the folder was not granted.": "沒有取得使用這個資料夾的權限。",
+ "This folder has no report.json yet. Save the report that is open now into it? Cancel starts an empty report.": "這個資料夾還沒有 report.json。要把目前開著的報告存進去嗎？按「取消」會開始一份空白報告。",
+ "Put raw data files in the data/ folder and example figures in habits/, then use the Folder tab. Or ask your agent to write the report into report.json (see AGENTS.md).": "把原始數據檔放進 data/ 資料夾、把範例圖放進 habits/，再到「資料夾」分頁操作。也可以請 agent 直接把報告寫進 report.json（見 AGENTS.md）。",
+ "This is not a Duetsheet report file.": "這不是 Duetsheet 報告檔。",
+ "Replace the report that is open now with {file}?": "要用 {file} 取代目前開著的報告嗎？",
+ "report.json changed on disk; the page has been updated.": "report.json 在磁碟上被修改了，頁面已經更新。",
+ "Saved to {p}": "已存到 {p}",
+ "Refresh": "重新整理",
+ "Raw data (data/)": "原始數據（data/）",
+ "No files yet. Put CSV, TSV or JSON files in the data/ folder, then click Refresh.": "還沒有檔案。把 CSV、TSV 或 JSON 檔放進 data/ 資料夾，再按「重新整理」。",
+ "not imported": "尚未匯入",
+ "changed since import": "匯入後已變更",
+ "imported as \"{t}\", {n} rows": "已匯入為「{t}」，{n} 列",
+ "Import": "匯入",
+ "Update": "更新",
+ "Each import records the file path and a fingerprint (SHA-256), so you can see when the file changes. Excel files: save them as CSV, or ask your agent.": "每次匯入都會記錄檔案路徑和指紋（SHA-256），檔案一改就看得出來。Excel 檔請另存成 CSV，或請 agent 處理。",
+ "Imported {file}: {n} rows, {c} columns.": "已匯入 {file}：{n} 列、{c} 欄。",
+ "Could not read {file}.": "無法讀取 {file}。",
+ "{file} is not valid JSON.": "{file} 不是有效的 JSON。",
+ "{file}: the JSON must be a list of objects, or an object with \"columns\" and \"rows\".": "{file}：JSON 必須是物件的清單，或是含有 \"columns\" 和 \"rows\" 的物件。",
+ "{file} needs a header row and at least one data row.": "{file} 需要一列欄位名稱，和至少一列數據。",
+ "Too many rows ({n}). The limit is {max}.": "列數太多（{n}），上限是 {max}。",
+ "Row": "列",
+ "Source data changed since import": "來源數據在匯入後已變更",
+ "Dataset": "資料集",
+ "Imported data": "匯入數據",
+ "Data": "數據",
+ "{n} rows, {c} columns": "{n} 列、{c} 欄",
+ "To attach data files, open a project folder or use the claude.ai link.": "要附上數據檔，請開啟專案資料夾，或用 claude.ai 上的連結開啟。",
+ "Figure habits (habits/)": "作圖習慣（habits/）",
+ "{svg} SVG, {mpl} matplotlib style and {ras} PNG/JPG files.": "{svg} 個 SVG、{mpl} 個 matplotlib 樣式檔、{ras} 個 PNG/JPG 檔。",
+ "Your saved habits (profile.json) are there too.": "也有你存下的習慣檔（profile.json）。",
+ "PNG and JPG files cannot be measured here. Ask your agent to look at them, or export them as SVG.": "PNG、JPG 檔無法在這裡測量。請 agent 看圖，或改存成 SVG。",
+ "Learn my habits": "學習我的習慣",
+ "Save current style as my habits": "把目前樣式存成我的習慣",
+ "Saved habits go to habits/profile.json. Copy that file into the habits/ folder of your next project to start from the same style.": "習慣會存到 habits/profile.json。把這個檔案複製到下一個專案的 habits/ 資料夾，就能從同樣的樣式開始。",
+ "{k} of {n} files: {files}": "{n} 個檔案中有 {k} 個：{files}",
+ "Your habits already match the current style. Nothing to change.": "你的習慣和目前樣式一致，沒有需要修改的項目。",
+ "No SVG, .mplstyle or profile.json files in habits/.": "habits/ 裡沒有 SVG、.mplstyle 或 profile.json 檔。",
+ "(from a matplotlib style file)": "（來自 matplotlib 樣式檔）",
+ "(from your files)": "（根據你的檔案）",
+ "(from your saved habits)": "（來自你存下的習慣）",
+ "(Claude, {p}% confidence)": "（Claude，可信度 {p}%）",
+ "Claude suggests these style changes": "Claude 建議這些樣式修改",
+ "Help": "說明",
+ "Welcome to Duetsheet": "歡迎使用 Duetsheet",
+ "Duetsheet is a report that you and an AI agent revise together. Every change is recorded with who made it.": "Duetsheet 是你和 AI agent 一起修改的報告。每一筆修改都會記下是誰改的。",
+ "Read.": "閱讀。",
+ "View shows the report as pages. Turn pages with the arrow keys.": "「閱覽」模式把報告顯示成一頁一頁，用方向鍵翻頁。",
+ "Review.": "審閱。",
+ "In Edit, change text and charts directly. Under each block, write a comment or pick a tag. On a chart, click a point or draw a box or a lasso.": "在「編輯」模式直接修改文字和圖表。每個方塊下方可以寫意見或選標籤；在圖表上可以點一個資料點，或框選、圈選一塊範圍。",
+ "Keep track.": "追蹤修改。",
+ "The Changes tab lists every change, by you or by the agent. Click \"Finish this round\" when you are done.": "「修改紀錄」分頁列出你和 agent 的每一筆修改。改完後按「完成這一輪修改」。",
+ "Hand it to your agent.": "交給 agent。",
+ "Go back to Claude and ask it to read the annotations and revise the report.": "回到 Claude，請它讀取註記並修改報告。",
+ "Open a project folder. Your agent (Claude Code, Codex, Gemini CLI, ...) edits report.json in the same folder, following AGENTS.md.": "開啟專案資料夾。你的 agent（Claude Code、Codex、Gemini CLI 等）會依照 AGENTS.md 修改同一個資料夾裡的 report.json。",
+ "Tutorial with screenshots": "圖文教學",
+ "AGENTS.md (for agents)": "AGENTS.md（給 agent 看的說明）",
+ "Got it": "知道了"
 },
 "zh-Hans": {
  "_name": "简体中文",
@@ -819,7 +909,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Failed to read cloud data (": "读取云端数据失败（",
  "unknown": "未知",
  "). Please reload.": "），请刷新页面。",
- "Cloud storage is not available. Edits and comments stay in this tab only and are lost on reload. Open the report from its claude.ai link while signed in.": "目前连不上云端存储，修改和批注只会留在这个标签页，刷新后就会消失。请登录后通过 claude.ai 上的链接打开。",
  "Failed to initialise cloud data (": "初始化云端数据失败（",
  "). Showing local mode.": "），暂以本地模式显示。",
  "Title": "标题",
@@ -888,7 +977,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Data file attached: ": "已附上数据文件：",
  "Replace data file": "更换数据文件",
  "Attach raw data (CSV, TXT, JSON)": "附上原始数据（CSV、TXT、JSON）",
- "Uploading data files requires opening the report from its claude.ai link.": "上传数据文件需要通过 claude.ai 上的链接打开报告。",
  "Only CSV, TXT and JSON files are supported.": "只支持 CSV、TXT、JSON 文件。",
  "File too large: SVG up to 2 MB, other files up to 20 MB.": "文件太大：SVG 上限 2 MB，其他文件 20 MB。",
  "This file type is not supported.": "不支持这种文件格式。",
@@ -977,7 +1065,84 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "This browser cannot keep the language after a reload.": "此浏览器无法在刷新后保留这个语言。",
  "Loaded {name}: {n} sentences": "已加载 {name}：{n} 句",
  " ({b} skipped: placeholders do not match)": "（跳过 {b} 句：{} 中的名称不一致）",
- "This is not a valid Duetsheet translation file.": "这不是有效的 Duetsheet 翻译文件。"
+ "This is not a valid Duetsheet translation file.": "这不是有效的 Duetsheet 翻译文件。",
+ "Folder": "文件夹",
+ "Project folder": "项目文件夹",
+ "\"{name}\". The report is saved to report.json automatically. An agent can read and edit the same folder (see AGENTS.md).": "“{name}”。报告会自动保存到 report.json。agent 可以读写同一个文件夹（见 AGENTS.md）。",
+ "Project folder \"{name}\": changes are saved to report.json automatically.": "项目文件夹“{name}”：修改会自动保存到 report.json。",
+ "Saving…": "保存中…",
+ "All changes saved.": "所有修改均已保存。",
+ "Could not save ({m}).": "无法保存（{m}）。",
+ "Open another folder": "打开其他文件夹",
+ "Save a copy": "另存一份",
+ "Not saved: changes are lost when you close this tab. Open a project folder to save automatically, or save the report as a file.": "尚未保存：关闭此标签页后修改会丢失。请打开项目文件夹自动保存，或将报告保存为文件。",
+ "Not saved: changes are lost when you close this tab. This browser cannot open folders (use Chrome or Edge), but you can save the report as a file and open it again later.": "尚未保存：关闭此标签页后修改会丢失。此浏览器无法打开文件夹（请使用 Chrome 或 Edge），但可以将报告保存为文件，以后再打开。",
+ "Open project folder": "打开项目文件夹",
+ "Reopen \"{name}\"": "重新打开“{name}”",
+ "Open report file": "打开报告文件",
+ "Save report file": "保存报告文件",
+ "Opened folder {name}": "已打开文件夹 {name}",
+ "Opened {file}": "已打开 {file}",
+ "Could not open the folder ({m}).": "无法打开文件夹（{m}）。",
+ "Permission to use the folder was not granted.": "没有获得使用该文件夹的权限。",
+ "This folder has no report.json yet. Save the report that is open now into it? Cancel starts an empty report.": "此文件夹还没有 report.json。要把当前打开的报告保存进去吗？点击“取消”将新建一份空白报告。",
+ "Put raw data files in the data/ folder and example figures in habits/, then use the Folder tab. Or ask your agent to write the report into report.json (see AGENTS.md).": "把原始数据文件放进 data/ 文件夹、把示例图放进 habits/，然后在“文件夹”标签页中操作。也可以让 agent 直接把报告写进 report.json（见 AGENTS.md）。",
+ "This is not a Duetsheet report file.": "这不是 Duetsheet 报告文件。",
+ "Replace the report that is open now with {file}?": "要用 {file} 替换当前打开的报告吗？",
+ "report.json changed on disk; the page has been updated.": "report.json 在磁盘上被修改，页面已更新。",
+ "Saved to {p}": "已保存到 {p}",
+ "Refresh": "刷新",
+ "Raw data (data/)": "原始数据（data/）",
+ "No files yet. Put CSV, TSV or JSON files in the data/ folder, then click Refresh.": "还没有文件。把 CSV、TSV 或 JSON 文件放进 data/ 文件夹，然后点击“刷新”。",
+ "not imported": "尚未导入",
+ "changed since import": "导入后已更改",
+ "imported as \"{t}\", {n} rows": "已导入为“{t}”，{n} 行",
+ "Import": "导入",
+ "Update": "更新",
+ "Each import records the file path and a fingerprint (SHA-256), so you can see when the file changes. Excel files: save them as CSV, or ask your agent.": "每次导入都会记录文件路径和指纹（SHA-256），文件一改就能看出来。Excel 文件请另存为 CSV，或交给 agent 处理。",
+ "Imported {file}: {n} rows, {c} columns.": "已导入 {file}：{n} 行、{c} 列。",
+ "Could not read {file}.": "无法读取 {file}。",
+ "{file} is not valid JSON.": "{file} 不是有效的 JSON。",
+ "{file}: the JSON must be a list of objects, or an object with \"columns\" and \"rows\".": "{file}：JSON 必须是对象列表，或包含 \"columns\" 和 \"rows\" 的对象。",
+ "{file} needs a header row and at least one data row.": "{file} 需要一行列名和至少一行数据。",
+ "Too many rows ({n}). The limit is {max}.": "行数太多（{n}），上限为 {max}。",
+ "Row": "行",
+ "Source data changed since import": "源数据在导入后已更改",
+ "Dataset": "数据集",
+ "Imported data": "导入数据",
+ "Data": "数据",
+ "{n} rows, {c} columns": "{n} 行、{c} 列",
+ "To attach data files, open a project folder or use the claude.ai link.": "要附上数据文件，请打开项目文件夹，或通过 claude.ai 上的链接打开。",
+ "Figure habits (habits/)": "作图习惯（habits/）",
+ "{svg} SVG, {mpl} matplotlib style and {ras} PNG/JPG files.": "{svg} 个 SVG、{mpl} 个 matplotlib 样式文件、{ras} 个 PNG/JPG 文件。",
+ "Your saved habits (profile.json) are there too.": "还有你保存的习惯文件（profile.json）。",
+ "PNG and JPG files cannot be measured here. Ask your agent to look at them, or export them as SVG.": "PNG、JPG 文件无法在这里测量。请让 agent 看图，或改存为 SVG。",
+ "Learn my habits": "学习我的习惯",
+ "Save current style as my habits": "把当前样式保存为我的习惯",
+ "Saved habits go to habits/profile.json. Copy that file into the habits/ folder of your next project to start from the same style.": "习惯会保存到 habits/profile.json。把这个文件复制到下一个项目的 habits/ 文件夹，就能从同样的样式开始。",
+ "{k} of {n} files: {files}": "{n} 个文件中有 {k} 个：{files}",
+ "Your habits already match the current style. Nothing to change.": "你的习惯与当前样式一致，没有需要修改的项目。",
+ "No SVG, .mplstyle or profile.json files in habits/.": "habits/ 中没有 SVG、.mplstyle 或 profile.json 文件。",
+ "(from a matplotlib style file)": "（来自 matplotlib 样式文件）",
+ "(from your files)": "（根据你的文件）",
+ "(from your saved habits)": "（来自你保存的习惯）",
+ "(Claude, {p}% confidence)": "（Claude，可信度 {p}%）",
+ "Claude suggests these style changes": "Claude 建议这些样式修改",
+ "Help": "帮助",
+ "Welcome to Duetsheet": "欢迎使用 Duetsheet",
+ "Duetsheet is a report that you and an AI agent revise together. Every change is recorded with who made it.": "Duetsheet 是你和 AI agent 一起修改的报告。每一处修改都会记下是谁改的。",
+ "Read.": "阅读。",
+ "View shows the report as pages. Turn pages with the arrow keys.": "“浏览”模式把报告显示为一页一页，用方向键翻页。",
+ "Review.": "审阅。",
+ "In Edit, change text and charts directly. Under each block, write a comment or pick a tag. On a chart, click a point or draw a box or a lasso.": "在“编辑”模式中直接修改文字和图表。每个区块下方可以写意见或选标签；在图表上可以点击一个数据点，或框选、圈选一块范围。",
+ "Keep track.": "跟踪修改。",
+ "The Changes tab lists every change, by you or by the agent. Click \"Finish this round\" when you are done.": "“修改记录”标签页列出你和 agent 的每一处修改。改完后点击“完成本轮修改”。",
+ "Hand it to your agent.": "交给 agent。",
+ "Go back to Claude and ask it to read the annotations and revise the report.": "回到 Claude，让它读取批注并修改报告。",
+ "Open a project folder. Your agent (Claude Code, Codex, Gemini CLI, ...) edits report.json in the same folder, following AGENTS.md.": "打开项目文件夹。你的 agent（Claude Code、Codex、Gemini CLI 等）会按照 AGENTS.md 修改同一个文件夹中的 report.json。",
+ "Tutorial with screenshots": "图文教程",
+ "AGENTS.md (for agents)": "AGENTS.md（写给 agent 的说明）",
+ "Got it": "知道了"
 },
 "ja": {
  "_name": "日本語",
@@ -1124,8 +1289,8 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "No completed rounds yet. Click \"Finish this round\" above to move the current changes into history.": "完了したラウンドはまだありません。上の「このラウンドを完了」を押すと、現在の変更が履歴に移ります。",
  "Round {n}, {who}, {time}: {sum}": "ラウンド {n}、{who}、{time}：{sum}",
  "Panel (comments {a}, changes {b})": "パネル（コメント {a}、変更 {b}）",
- "Comments ({n})": "コメント（{n}）",
- "Changes ({n})": "変更履歴（{n}）",
+ "Comments ({n})": "コメント ({n})",
+ "Changes ({n})": "変更 ({n})",
  "Current": "現在",
  "No changes yet.": "変更はまだありません。",
  "Change timeline": "変更のタイムライン",
@@ -1138,7 +1303,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Failed to read cloud data (": "クラウドのデータを読み込めませんでした（",
  "unknown": "不明",
  "). Please reload.": "）。ページを再読み込みしてください。",
- "Cloud storage is not available. Edits and comments stay in this tab only and are lost on reload. Open the report from its claude.ai link while signed in.": "クラウド保存を利用できません。編集とコメントはこのタブにだけ残り、再読み込みすると消えます。ログインした状態で claude.ai のリンクから開いてください。",
  "Failed to initialise cloud data (": "クラウドのデータを初期化できませんでした（",
  "). Showing local mode.": "）。ローカルモードで表示します。",
  "Title": "タイトル",
@@ -1207,7 +1371,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Data file attached: ": "データファイルを添付しました：",
  "Replace data file": "データファイルを差し替え",
  "Attach raw data (CSV, TXT, JSON)": "元データを添付（CSV、TXT、JSON）",
- "Uploading data files requires opening the report from its claude.ai link.": "データファイルのアップロードには、claude.ai のリンクからレポートを開く必要があります。",
  "Only CSV, TXT and JSON files are supported.": "対応しているのは CSV、TXT、JSON ファイルのみです。",
  "File too large: SVG up to 2 MB, other files up to 20 MB.": "ファイルが大きすぎます：SVG は 2 MB まで、その他は 20 MB までです。",
  "This file type is not supported.": "この形式のファイルには対応していません。",
@@ -1296,7 +1459,84 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "This browser cannot keep the language after a reload.": "このブラウザでは、再読み込み後に言語を保持できません。",
  "Loaded {name}: {n} sentences": "{name} を読み込みました：{n} 文",
  " ({b} skipped: placeholders do not match)": "（{b} 文をスキップ：{} 内の名前が一致しません）",
- "This is not a valid Duetsheet translation file.": "有効な Duetsheet 翻訳ファイルではありません。"
+ "This is not a valid Duetsheet translation file.": "有効な Duetsheet 翻訳ファイルではありません。",
+ "Folder": "フォルダ",
+ "Project folder": "プロジェクトフォルダ",
+ "\"{name}\". The report is saved to report.json automatically. An agent can read and edit the same folder (see AGENTS.md).": "「{name}」。レポートは report.json に自動保存されます。agent も同じフォルダを読み書きできます（AGENTS.md 参照）。",
+ "Project folder \"{name}\": changes are saved to report.json automatically.": "プロジェクトフォルダ「{name}」：変更は report.json に自動保存されます。",
+ "Saving…": "保存中…",
+ "All changes saved.": "すべての変更を保存しました。",
+ "Could not save ({m}).": "保存できませんでした（{m}）。",
+ "Open another folder": "別のフォルダを開く",
+ "Save a copy": "コピーを保存",
+ "Not saved: changes are lost when you close this tab. Open a project folder to save automatically, or save the report as a file.": "未保存：このタブを閉じると変更は失われます。プロジェクトフォルダを開いて自動保存するか、レポートをファイルに保存してください。",
+ "Not saved: changes are lost when you close this tab. This browser cannot open folders (use Chrome or Edge), but you can save the report as a file and open it again later.": "未保存：このタブを閉じると変更は失われます。このブラウザではフォルダを開けません（Chrome か Edge を使ってください）が、レポートをファイルに保存して後で開くことはできます。",
+ "Open project folder": "プロジェクトフォルダを開く",
+ "Reopen \"{name}\"": "「{name}」を開き直す",
+ "Open report file": "レポートファイルを開く",
+ "Save report file": "レポートファイルを保存",
+ "Opened folder {name}": "フォルダ {name} を開きました",
+ "Opened {file}": "{file} を開きました",
+ "Could not open the folder ({m}).": "フォルダを開けませんでした（{m}）。",
+ "Permission to use the folder was not granted.": "フォルダの使用が許可されませんでした。",
+ "This folder has no report.json yet. Save the report that is open now into it? Cancel starts an empty report.": "このフォルダにはまだ report.json がありません。いま開いているレポートを保存しますか？「キャンセル」を押すと空のレポートから始めます。",
+ "Put raw data files in the data/ folder and example figures in habits/, then use the Folder tab. Or ask your agent to write the report into report.json (see AGENTS.md).": "元データを data/ フォルダに、見本の図を habits/ に入れてから「フォルダ」タブを使ってください。agent にレポートを report.json へ直接書いてもらうこともできます（AGENTS.md 参照）。",
+ "This is not a Duetsheet report file.": "Duetsheet のレポートファイルではありません。",
+ "Replace the report that is open now with {file}?": "いま開いているレポートを {file} で置き換えますか？",
+ "report.json changed on disk; the page has been updated.": "ディスク上の report.json が変更されたため、ページを更新しました。",
+ "Saved to {p}": "{p} に保存しました",
+ "Refresh": "再読み込み",
+ "Raw data (data/)": "元データ（data/）",
+ "No files yet. Put CSV, TSV or JSON files in the data/ folder, then click Refresh.": "ファイルはまだありません。data/ フォルダに CSV・TSV・JSON ファイルを入れて「再読み込み」を押してください。",
+ "not imported": "未取り込み",
+ "changed since import": "取り込み後に変更あり",
+ "imported as \"{t}\", {n} rows": "「{t}」として取り込み済み、{n} 行",
+ "Import": "取り込む",
+ "Update": "更新",
+ "Each import records the file path and a fingerprint (SHA-256), so you can see when the file changes. Excel files: save them as CSV, or ask your agent.": "取り込むたびにファイルのパスと指紋（SHA-256）を記録するので、ファイルが変わるとわかります。Excel ファイルは CSV で保存するか、agent に頼んでください。",
+ "Imported {file}: {n} rows, {c} columns.": "{file} を取り込みました：{n} 行、{c} 列。",
+ "Could not read {file}.": "{file} を読み込めませんでした。",
+ "{file} is not valid JSON.": "{file} は有効な JSON ではありません。",
+ "{file}: the JSON must be a list of objects, or an object with \"columns\" and \"rows\".": "{file}：JSON はオブジェクトの配列か、\"columns\" と \"rows\" を持つオブジェクトである必要があります。",
+ "{file} needs a header row and at least one data row.": "{file} には見出し行と 1 行以上のデータが必要です。",
+ "Too many rows ({n}). The limit is {max}.": "行が多すぎます（{n}）。上限は {max} 行です。",
+ "Row": "行",
+ "Source data changed since import": "取り込み後に元データが変更されています",
+ "Dataset": "データセット",
+ "Imported data": "取り込んだデータ",
+ "Data": "データ",
+ "{n} rows, {c} columns": "{n} 行、{c} 列",
+ "To attach data files, open a project folder or use the claude.ai link.": "データファイルを添付するには、プロジェクトフォルダを開くか、claude.ai のリンクから開いてください。",
+ "Figure habits (habits/)": "作図の習慣（habits/）",
+ "{svg} SVG, {mpl} matplotlib style and {ras} PNG/JPG files.": "SVG {svg} 件、matplotlib スタイル {mpl} 件、PNG/JPG {ras} 件。",
+ "Your saved habits (profile.json) are there too.": "保存した習慣（profile.json）もあります。",
+ "PNG and JPG files cannot be measured here. Ask your agent to look at them, or export them as SVG.": "PNG・JPG ファイルはここでは測定できません。agent に見てもらうか、SVG で書き出してください。",
+ "Learn my habits": "習慣を学習",
+ "Save current style as my habits": "現在のスタイルを習慣として保存",
+ "Saved habits go to habits/profile.json. Copy that file into the habits/ folder of your next project to start from the same style.": "習慣は habits/profile.json に保存されます。次のプロジェクトの habits/ フォルダにこのファイルをコピーすれば、同じスタイルから始められます。",
+ "{k} of {n} files: {files}": "{n} ファイル中 {k} ファイル：{files}",
+ "Your habits already match the current style. Nothing to change.": "習慣は現在のスタイルと一致しています。変更する項目はありません。",
+ "No SVG, .mplstyle or profile.json files in habits/.": "habits/ に SVG、.mplstyle、profile.json のファイルがありません。",
+ "(from a matplotlib style file)": "（matplotlib スタイルファイルから）",
+ "(from your files)": "（あなたのファイルから）",
+ "(from your saved habits)": "（保存した習慣から）",
+ "(Claude, {p}% confidence)": "（Claude、確信度 {p}%）",
+ "Claude suggests these style changes": "Claude からのスタイル変更の提案",
+ "Help": "ヘルプ",
+ "Welcome to Duetsheet": "Duetsheet へようこそ",
+ "Duetsheet is a report that you and an AI agent revise together. Every change is recorded with who made it.": "Duetsheet は、あなたと AI agent が一緒に手直しするレポートです。すべての変更が、誰が行ったかとともに記録されます。",
+ "Read.": "読む。",
+ "View shows the report as pages. Turn pages with the arrow keys.": "「閲覧」ではレポートをページ単位で表示します。矢印キーでページをめくります。",
+ "Review.": "確認する。",
+ "In Edit, change text and charts directly. Under each block, write a comment or pick a tag. On a chart, click a point or draw a box or a lasso.": "「編集」ではテキストやグラフを直接変更できます。各ブロックの下にコメントを書くかタグを選び、グラフでは点をクリックするか、矩形やなげなわで範囲を描きます。",
+ "Keep track.": "記録を追う。",
+ "The Changes tab lists every change, by you or by the agent. Click \"Finish this round\" when you are done.": "「変更履歴」タブには、あなたと agent のすべての変更が並びます。終わったら「このラウンドを完了」を押します。",
+ "Hand it to your agent.": "agent に渡す。",
+ "Go back to Claude and ask it to read the annotations and revise the report.": "Claude に戻り、コメントを読んでレポートを修正するよう頼みます。",
+ "Open a project folder. Your agent (Claude Code, Codex, Gemini CLI, ...) edits report.json in the same folder, following AGENTS.md.": "プロジェクトフォルダを開きます。agent（Claude Code、Codex、Gemini CLI など）が AGENTS.md に従って同じフォルダの report.json を編集します。",
+ "Tutorial with screenshots": "画像付きチュートリアル",
+ "AGENTS.md (for agents)": "AGENTS.md（agent 向けの説明）",
+ "Got it": "わかりました"
 },
 "ko": {
  "_name": "한국어",
@@ -1457,7 +1697,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Failed to read cloud data (": "클라우드 데이터를 읽지 못했습니다 (",
  "unknown": "알 수 없음",
  "). Please reload.": "). 페이지를 새로 고치세요.",
- "Cloud storage is not available. Edits and comments stay in this tab only and are lost on reload. Open the report from its claude.ai link while signed in.": "클라우드 저장소를 사용할 수 없습니다. 편집과 주석은 이 탭에만 남고 새로 고치면 사라집니다. 로그인한 상태에서 claude.ai 링크로 보고서를 여세요.",
  "Failed to initialise cloud data (": "클라우드 데이터를 초기화하지 못했습니다 (",
  "). Showing local mode.": "). 로컬 모드로 표시합니다.",
  "Title": "제목",
@@ -1526,7 +1765,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Data file attached: ": "데이터 파일을 첨부했습니다: ",
  "Replace data file": "데이터 파일 교체",
  "Attach raw data (CSV, TXT, JSON)": "원본 데이터 첨부 (CSV, TXT, JSON)",
- "Uploading data files requires opening the report from its claude.ai link.": "데이터 파일을 올리려면 claude.ai 링크로 보고서를 열어야 합니다.",
  "Only CSV, TXT and JSON files are supported.": "CSV, TXT, JSON 파일만 지원합니다.",
  "File too large: SVG up to 2 MB, other files up to 20 MB.": "파일이 너무 큽니다: SVG는 2 MB, 다른 파일은 20 MB까지입니다.",
  "This file type is not supported.": "지원하지 않는 파일 형식입니다.",
@@ -1615,7 +1853,84 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "This browser cannot keep the language after a reload.": "이 브라우저는 새로 고친 뒤 언어를 유지할 수 없습니다.",
  "Loaded {name}: {n} sentences": "{name}을(를) 불러왔습니다: {n}문장",
  " ({b} skipped: placeholders do not match)": " ({b}문장 건너뜀: {} 안의 이름이 일치하지 않음)",
- "This is not a valid Duetsheet translation file.": "올바른 Duetsheet 번역 파일이 아닙니다."
+ "This is not a valid Duetsheet translation file.": "올바른 Duetsheet 번역 파일이 아닙니다.",
+ "Folder": "폴더",
+ "Project folder": "프로젝트 폴더",
+ "\"{name}\". The report is saved to report.json automatically. An agent can read and edit the same folder (see AGENTS.md).": "\"{name}\". 보고서는 report.json에 자동 저장됩니다. agent도 같은 폴더를 읽고 편집할 수 있습니다 (AGENTS.md 참고).",
+ "Project folder \"{name}\": changes are saved to report.json automatically.": "프로젝트 폴더 \"{name}\": 변경 사항은 report.json에 자동 저장됩니다.",
+ "Saving…": "저장 중…",
+ "All changes saved.": "모든 변경 사항을 저장했습니다.",
+ "Could not save ({m}).": "저장하지 못했습니다 ({m}).",
+ "Open another folder": "다른 폴더 열기",
+ "Save a copy": "사본 저장",
+ "Not saved: changes are lost when you close this tab. Open a project folder to save automatically, or save the report as a file.": "저장되지 않음: 이 탭을 닫으면 변경 사항이 사라집니다. 프로젝트 폴더를 열어 자동 저장하거나 보고서를 파일로 저장하세요.",
+ "Not saved: changes are lost when you close this tab. This browser cannot open folders (use Chrome or Edge), but you can save the report as a file and open it again later.": "저장되지 않음: 이 탭을 닫으면 변경 사항이 사라집니다. 이 브라우저는 폴더를 열 수 없지만(Chrome이나 Edge를 사용하세요), 보고서를 파일로 저장했다가 나중에 다시 열 수 있습니다.",
+ "Open project folder": "프로젝트 폴더 열기",
+ "Reopen \"{name}\"": "\"{name}\" 다시 열기",
+ "Open report file": "보고서 파일 열기",
+ "Save report file": "보고서 파일 저장",
+ "Opened folder {name}": "{name} 폴더를 열었습니다",
+ "Opened {file}": "{file}을(를) 열었습니다",
+ "Could not open the folder ({m}).": "폴더를 열지 못했습니다 ({m}).",
+ "Permission to use the folder was not granted.": "폴더 사용 권한을 받지 못했습니다.",
+ "This folder has no report.json yet. Save the report that is open now into it? Cancel starts an empty report.": "이 폴더에는 아직 report.json이 없습니다. 지금 열려 있는 보고서를 저장할까요? 취소하면 빈 보고서로 시작합니다.",
+ "Put raw data files in the data/ folder and example figures in habits/, then use the Folder tab. Or ask your agent to write the report into report.json (see AGENTS.md).": "원본 데이터 파일은 data/ 폴더에, 예시 그림은 habits/에 넣은 뒤 '폴더' 탭을 사용하세요. agent에게 보고서를 report.json에 직접 쓰도록 요청할 수도 있습니다 (AGENTS.md 참고).",
+ "This is not a Duetsheet report file.": "Duetsheet 보고서 파일이 아닙니다.",
+ "Replace the report that is open now with {file}?": "지금 열려 있는 보고서를 {file}(으)로 바꿀까요?",
+ "report.json changed on disk; the page has been updated.": "디스크의 report.json이 바뀌어 페이지를 갱신했습니다.",
+ "Saved to {p}": "{p}에 저장했습니다",
+ "Refresh": "새로 고침",
+ "Raw data (data/)": "원본 데이터 (data/)",
+ "No files yet. Put CSV, TSV or JSON files in the data/ folder, then click Refresh.": "아직 파일이 없습니다. data/ 폴더에 CSV, TSV, JSON 파일을 넣고 '새로 고침'을 누르세요.",
+ "not imported": "가져오지 않음",
+ "changed since import": "가져온 뒤 변경됨",
+ "imported as \"{t}\", {n} rows": "\"{t}\"(으)로 가져옴, {n}행",
+ "Import": "가져오기",
+ "Update": "업데이트",
+ "Each import records the file path and a fingerprint (SHA-256), so you can see when the file changes. Excel files: save them as CSV, or ask your agent.": "가져올 때마다 파일 경로와 지문(SHA-256)을 기록하므로 파일이 바뀌면 알 수 있습니다. Excel 파일은 CSV로 저장하거나 agent에게 맡기세요.",
+ "Imported {file}: {n} rows, {c} columns.": "{file}을(를) 가져왔습니다: {n}행, {c}열.",
+ "Could not read {file}.": "{file}을(를) 읽지 못했습니다.",
+ "{file} is not valid JSON.": "{file}은(는) 올바른 JSON이 아닙니다.",
+ "{file}: the JSON must be a list of objects, or an object with \"columns\" and \"rows\".": "{file}: JSON은 객체의 목록이거나 \"columns\"와 \"rows\"가 있는 객체여야 합니다.",
+ "{file} needs a header row and at least one data row.": "{file}에는 제목 행과 데이터 행이 하나 이상 있어야 합니다.",
+ "Too many rows ({n}). The limit is {max}.": "행이 너무 많습니다 ({n}). 한도는 {max}행입니다.",
+ "Row": "행",
+ "Source data changed since import": "가져온 뒤 원본 데이터가 바뀌었습니다",
+ "Dataset": "데이터셋",
+ "Imported data": "가져온 데이터",
+ "Data": "데이터",
+ "{n} rows, {c} columns": "{n}행, {c}열",
+ "To attach data files, open a project folder or use the claude.ai link.": "데이터 파일을 첨부하려면 프로젝트 폴더를 열거나 claude.ai 링크로 여세요.",
+ "Figure habits (habits/)": "그래프 습관 (habits/)",
+ "{svg} SVG, {mpl} matplotlib style and {ras} PNG/JPG files.": "SVG {svg}개, matplotlib 스타일 {mpl}개, PNG/JPG {ras}개 파일.",
+ "Your saved habits (profile.json) are there too.": "저장해 둔 습관(profile.json)도 있습니다.",
+ "PNG and JPG files cannot be measured here. Ask your agent to look at them, or export them as SVG.": "PNG와 JPG 파일은 여기서 측정할 수 없습니다. agent에게 보여 주거나 SVG로 내보내세요.",
+ "Learn my habits": "내 습관 배우기",
+ "Save current style as my habits": "현재 스타일을 내 습관으로 저장",
+ "Saved habits go to habits/profile.json. Copy that file into the habits/ folder of your next project to start from the same style.": "습관은 habits/profile.json에 저장됩니다. 다음 프로젝트의 habits/ 폴더에 이 파일을 복사하면 같은 스타일로 시작할 수 있습니다.",
+ "{k} of {n} files: {files}": "{n}개 파일 중 {k}개: {files}",
+ "Your habits already match the current style. Nothing to change.": "습관이 이미 현재 스타일과 같습니다. 바꿀 항목이 없습니다.",
+ "No SVG, .mplstyle or profile.json files in habits/.": "habits/에 SVG, .mplstyle, profile.json 파일이 없습니다.",
+ "(from a matplotlib style file)": "(matplotlib 스타일 파일 기준)",
+ "(from your files)": "(사용자 파일 기준)",
+ "(from your saved habits)": "(저장한 습관 기준)",
+ "(Claude, {p}% confidence)": "(Claude, 신뢰도 {p}%)",
+ "Claude suggests these style changes": "Claude가 제안하는 스타일 변경",
+ "Help": "도움말",
+ "Welcome to Duetsheet": "Duetsheet에 오신 것을 환영합니다",
+ "Duetsheet is a report that you and an AI agent revise together. Every change is recorded with who made it.": "Duetsheet는 사용자와 AI agent가 함께 고치는 보고서입니다. 모든 변경은 누가 했는지와 함께 기록됩니다.",
+ "Read.": "읽기.",
+ "View shows the report as pages. Turn pages with the arrow keys.": "'보기'에서는 보고서를 페이지 단위로 보여 줍니다. 화살표 키로 페이지를 넘기세요.",
+ "Review.": "검토.",
+ "In Edit, change text and charts directly. Under each block, write a comment or pick a tag. On a chart, click a point or draw a box or a lasso.": "'편집'에서 텍스트와 차트를 바로 고칩니다. 각 블록 아래에 의견을 쓰거나 태그를 고르고, 차트에서는 점을 클릭하거나 사각형·올가미로 범위를 그립니다.",
+ "Keep track.": "기록 확인.",
+ "The Changes tab lists every change, by you or by the agent. Click \"Finish this round\" when you are done.": "'변경 기록' 탭에 사용자와 agent의 모든 변경이 나옵니다. 다 끝나면 \"이번 라운드 완료\"를 누르세요.",
+ "Hand it to your agent.": "agent에게 넘기기.",
+ "Go back to Claude and ask it to read the annotations and revise the report.": "Claude로 돌아가 주석을 읽고 보고서를 고치도록 요청하세요.",
+ "Open a project folder. Your agent (Claude Code, Codex, Gemini CLI, ...) edits report.json in the same folder, following AGENTS.md.": "프로젝트 폴더를 여세요. agent(Claude Code, Codex, Gemini CLI 등)가 AGENTS.md에 따라 같은 폴더의 report.json을 편집합니다.",
+ "Tutorial with screenshots": "그림이 있는 튜토리얼",
+ "AGENTS.md (for agents)": "AGENTS.md (agent용 설명)",
+ "Got it": "확인"
 },
 "es": {
  "_name": "Español",
@@ -1776,7 +2091,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Failed to read cloud data (": "No se pudieron leer los datos en la nube (",
  "unknown": "desconocido",
  "). Please reload.": "). Vuelve a cargar la página.",
- "Cloud storage is not available. Edits and comments stay in this tab only and are lost on reload. Open the report from its claude.ai link while signed in.": "El almacenamiento en la nube no está disponible. Los cambios y comentarios solo quedan en esta pestaña y se pierden al recargar. Abre el informe desde su enlace de claude.ai con la sesión iniciada.",
  "Failed to initialise cloud data (": "No se pudieron inicializar los datos en la nube (",
  "). Showing local mode.": "). Se muestra el modo local.",
  "Title": "Título",
@@ -1845,7 +2159,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Data file attached: ": "Archivo de datos adjunto: ",
  "Replace data file": "Reemplazar archivo de datos",
  "Attach raw data (CSV, TXT, JSON)": "Adjuntar datos originales (CSV, TXT, JSON)",
- "Uploading data files requires opening the report from its claude.ai link.": "Para subir archivos de datos, abre el informe desde su enlace de claude.ai.",
  "Only CSV, TXT and JSON files are supported.": "Solo se admiten archivos CSV, TXT y JSON.",
  "File too large: SVG up to 2 MB, other files up to 20 MB.": "Archivo demasiado grande: SVG hasta 2 MB, otros archivos hasta 20 MB.",
  "This file type is not supported.": "Este tipo de archivo no es compatible.",
@@ -1934,7 +2247,84 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "This browser cannot keep the language after a reload.": "Este navegador no puede conservar el idioma al recargar.",
  "Loaded {name}: {n} sentences": "{name} cargado: {n} frases",
  " ({b} skipped: placeholders do not match)": " ({b} omitidas: los nombres entre {} no coinciden)",
- "This is not a valid Duetsheet translation file.": "No es un archivo de traducción de Duetsheet válido."
+ "This is not a valid Duetsheet translation file.": "No es un archivo de traducción de Duetsheet válido.",
+ "Folder": "Carpeta",
+ "Project folder": "Carpeta del proyecto",
+ "\"{name}\". The report is saved to report.json automatically. An agent can read and edit the same folder (see AGENTS.md).": "\"{name}\". El informe se guarda automáticamente en report.json. Un agente puede leer y editar la misma carpeta (consulta AGENTS.md).",
+ "Project folder \"{name}\": changes are saved to report.json automatically.": "Carpeta del proyecto \"{name}\": los cambios se guardan automáticamente en report.json.",
+ "Saving…": "Guardando…",
+ "All changes saved.": "Todos los cambios guardados.",
+ "Could not save ({m}).": "No se pudo guardar ({m}).",
+ "Open another folder": "Abrir otra carpeta",
+ "Save a copy": "Guardar una copia",
+ "Not saved: changes are lost when you close this tab. Open a project folder to save automatically, or save the report as a file.": "Sin guardar: los cambios se pierden al cerrar esta pestaña. Abre una carpeta de proyecto para guardar automáticamente o guarda el informe como archivo.",
+ "Not saved: changes are lost when you close this tab. This browser cannot open folders (use Chrome or Edge), but you can save the report as a file and open it again later.": "Sin guardar: los cambios se pierden al cerrar esta pestaña. Este navegador no puede abrir carpetas (usa Chrome o Edge), pero puedes guardar el informe como archivo y abrirlo más tarde.",
+ "Open project folder": "Abrir carpeta del proyecto",
+ "Reopen \"{name}\"": "Volver a abrir \"{name}\"",
+ "Open report file": "Abrir archivo de informe",
+ "Save report file": "Guardar archivo de informe",
+ "Opened folder {name}": "Carpeta {name} abierta",
+ "Opened {file}": "{file} abierto",
+ "Could not open the folder ({m}).": "No se pudo abrir la carpeta ({m}).",
+ "Permission to use the folder was not granted.": "No se concedió permiso para usar la carpeta.",
+ "This folder has no report.json yet. Save the report that is open now into it? Cancel starts an empty report.": "Esta carpeta todavía no tiene report.json. ¿Guardar en ella el informe abierto? Cancelar empieza un informe vacío.",
+ "Put raw data files in the data/ folder and example figures in habits/, then use the Folder tab. Or ask your agent to write the report into report.json (see AGENTS.md).": "Pon los archivos de datos en la carpeta data/ y las figuras de ejemplo en habits/, y usa la pestaña Carpeta. O pide a tu agente que escriba el informe en report.json (consulta AGENTS.md).",
+ "This is not a Duetsheet report file.": "No es un archivo de informe de Duetsheet.",
+ "Replace the report that is open now with {file}?": "¿Reemplazar el informe abierto por {file}?",
+ "report.json changed on disk; the page has been updated.": "report.json cambió en el disco; la página se ha actualizado.",
+ "Saved to {p}": "Guardado en {p}",
+ "Refresh": "Actualizar",
+ "Raw data (data/)": "Datos originales (data/)",
+ "No files yet. Put CSV, TSV or JSON files in the data/ folder, then click Refresh.": "Todavía no hay archivos. Pon archivos CSV, TSV o JSON en la carpeta data/ y haz clic en Actualizar.",
+ "not imported": "sin importar",
+ "changed since import": "cambió desde la importación",
+ "imported as \"{t}\", {n} rows": "importado como \"{t}\", {n} filas",
+ "Import": "Importar",
+ "Update": "Actualizar",
+ "Each import records the file path and a fingerprint (SHA-256), so you can see when the file changes. Excel files: save them as CSV, or ask your agent.": "Cada importación registra la ruta del archivo y una huella (SHA-256), así se nota cuándo cambia el archivo. Archivos de Excel: guárdalos como CSV o pídeselo a tu agente.",
+ "Imported {file}: {n} rows, {c} columns.": "{file} importado: {n} filas, {c} columnas.",
+ "Could not read {file}.": "No se pudo leer {file}.",
+ "{file} is not valid JSON.": "{file} no es un JSON válido.",
+ "{file}: the JSON must be a list of objects, or an object with \"columns\" and \"rows\".": "{file}: el JSON debe ser una lista de objetos o un objeto con \"columns\" y \"rows\".",
+ "{file} needs a header row and at least one data row.": "{file} necesita una fila de encabezado y al menos una fila de datos.",
+ "Too many rows ({n}). The limit is {max}.": "Demasiadas filas ({n}). El límite es {max}.",
+ "Row": "Fila",
+ "Source data changed since import": "Los datos de origen cambiaron desde la importación",
+ "Dataset": "Conjunto de datos",
+ "Imported data": "Datos importados",
+ "Data": "Datos",
+ "{n} rows, {c} columns": "{n} filas, {c} columnas",
+ "To attach data files, open a project folder or use the claude.ai link.": "Para adjuntar archivos de datos, abre una carpeta de proyecto o usa el enlace de claude.ai.",
+ "Figure habits (habits/)": "Hábitos de figuras (habits/)",
+ "{svg} SVG, {mpl} matplotlib style and {ras} PNG/JPG files.": "{svg} SVG, {mpl} estilos de matplotlib y {ras} archivos PNG/JPG.",
+ "Your saved habits (profile.json) are there too.": "También están tus hábitos guardados (profile.json).",
+ "PNG and JPG files cannot be measured here. Ask your agent to look at them, or export them as SVG.": "Los archivos PNG y JPG no se pueden medir aquí. Pide a tu agente que los mire o expórtalos como SVG.",
+ "Learn my habits": "Aprender mis hábitos",
+ "Save current style as my habits": "Guardar el estilo actual como mis hábitos",
+ "Saved habits go to habits/profile.json. Copy that file into the habits/ folder of your next project to start from the same style.": "Los hábitos se guardan en habits/profile.json. Copia ese archivo en la carpeta habits/ de tu próximo proyecto para empezar con el mismo estilo.",
+ "{k} of {n} files: {files}": "{k} de {n} archivos: {files}",
+ "Your habits already match the current style. Nothing to change.": "Tus hábitos ya coinciden con el estilo actual. No hay nada que cambiar.",
+ "No SVG, .mplstyle or profile.json files in habits/.": "No hay archivos SVG, .mplstyle ni profile.json en habits/.",
+ "(from a matplotlib style file)": "(de un archivo de estilo de matplotlib)",
+ "(from your files)": "(de tus archivos)",
+ "(from your saved habits)": "(de tus hábitos guardados)",
+ "(Claude, {p}% confidence)": "(Claude, {p} % de confianza)",
+ "Claude suggests these style changes": "Claude sugiere estos cambios de estilo",
+ "Help": "Ayuda",
+ "Welcome to Duetsheet": "Te damos la bienvenida a Duetsheet",
+ "Duetsheet is a report that you and an AI agent revise together. Every change is recorded with who made it.": "Duetsheet es un informe que revisas junto con un agente de IA. Cada cambio queda registrado con quién lo hizo.",
+ "Read.": "Leer.",
+ "View shows the report as pages. Turn pages with the arrow keys.": "Lectura muestra el informe por páginas. Pasa de página con las flechas del teclado.",
+ "Review.": "Revisar.",
+ "In Edit, change text and charts directly. Under each block, write a comment or pick a tag. On a chart, click a point or draw a box or a lasso.": "En Edición, cambia textos y gráficos directamente. Debajo de cada bloque, escribe un comentario o elige una etiqueta. En un gráfico, haz clic en un punto o dibuja un rectángulo o un lazo.",
+ "Keep track.": "Seguir los cambios.",
+ "The Changes tab lists every change, by you or by the agent. Click \"Finish this round\" when you are done.": "La pestaña Cambios muestra cada cambio, tuyo o del agente. Cuando termines, haz clic en \"Terminar esta ronda\".",
+ "Hand it to your agent.": "Pasárselo al agente.",
+ "Go back to Claude and ask it to read the annotations and revise the report.": "Vuelve a Claude y pídele que lea los comentarios y revise el informe.",
+ "Open a project folder. Your agent (Claude Code, Codex, Gemini CLI, ...) edits report.json in the same folder, following AGENTS.md.": "Abre una carpeta de proyecto. Tu agente (Claude Code, Codex, Gemini CLI, ...) edita report.json en la misma carpeta siguiendo AGENTS.md.",
+ "Tutorial with screenshots": "Tutorial con capturas",
+ "AGENTS.md (for agents)": "AGENTS.md (para agentes)",
+ "Got it": "Entendido"
 }
 }
 </script>
@@ -2005,8 +2395,8 @@ function applyStatic(){
 }
 function renderLangMenu(){const s=$('#lang');if(!s)return;
   s.replaceChildren(...allLangs().map(c=>h('option',{value:c,text:langName(c)})),h('option',{value:'__add',text:tr('Add your language…')}));s.value=LANG}
-function switchLang(code){setLangTable(code);try{localStorage.setItem(LANG_KEY,code)}catch(e){}
-  applyStatic();$('#hint').textContent=tr(HINT[S.mode]);render()}
+function switchLang(code){leaveField();setLangTable(code);try{localStorage.setItem(LANG_KEY,code)}catch(e){}
+  applyStatic();$('#hint').textContent=tr(HINT[S.mode]);renderLocalBar();render()}
 const masterKeys=()=>Object.keys(I18N['zh-Hant']||{}).filter(k=>!k.startsWith('_'));
 const englishOf=k=>/^[a-z]+\|/.test(k)?k.slice(k.indexOf('|')+1):k;
 const placeholders=s=>[...new Set([...String(s).matchAll(/\{(\w+)\}/g)].map(m=>m[1]))].sort().join();
@@ -2044,7 +2434,8 @@ function openLangDialog(){
   openModal(tr('Add your language'),[box]);
 }
 async function saveTextFile(name,text,type){
-  if(S.caps.downloads){try{await S.caps.downloads.save({filename:name,data:text});toast(tr('Downloaded'));return}catch(e){if(e&&e.code==='declined')return}}
+  if(S.caps.downloads){try{const r=await S.caps.downloads.save({filename:name,data:text});toast(r&&r.path?tr('Saved to {p}',{p:r.path}):tr('Downloaded'));return}
+    catch(e){if(e&&e.code==='declined')return;if(S.cloud){toast(tr('Download is not available here. Copy from the text box below.'));return}}}
   const a=h('a',{href:URL.createObjectURL(new Blob([text],{type:type||'text/plain'})),download:name});document.body.append(a);a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);
 }
@@ -2092,18 +2483,19 @@ function seedBlocks(){
 }
 
 /* ---------- In-memory database: same interface when cloud storage is unavailable ---------- */
-function memDB(){
-  const docs=new Map(),subs=new Set();const fire=()=>setTimeout(()=>subs.forEach(f=>f()));
+function memDB(initial,onWrite){
+  const docs=new Map(Object.entries(initial||{})),subs=new Set();const fire=()=>setTimeout(()=>subs.forEach(f=>f()));
+  const touch=p=>{fire();if(onWrite)onWrite(p)};
   const snap=p=>{const d=docs.get(p);return{id:p.split('/').pop(),exists:!!d,data:()=>d?JSON.parse(JSON.stringify(d)):undefined,metadata:{}}};
   const docRef=p=>({id:p.split('/').pop(),path:p,
     async get(){return snap(p)},
-    async set(d){docs.set(p,JSON.parse(JSON.stringify(d)));fire()},
-    async update(d){if(!docs.has(p))throw{code:'invalid_argument'};docs.set(p,{...docs.get(p),...JSON.parse(JSON.stringify(d))});fire()},
-    async delete(){docs.delete(p);fire()},
+    async set(d){docs.set(p,JSON.parse(JSON.stringify(d)));touch(p)},
+    async update(d){if(!docs.has(p))throw{code:'invalid_argument'};docs.set(p,{...docs.get(p),...JSON.parse(JSON.stringify(d))});touch(p)},
+    async delete(){docs.delete(p);touch(p)},
     onSnapshot(next){const f=()=>next(snap(p));subs.add(f);setTimeout(f);return()=>subs.delete(f)}});
   const col=c=>{const q={orderBy(){return q},limit(){return q},doc:id=>docRef(c+'/'+id),
     onSnapshot(next){const f=()=>{const ds=[...docs.keys()].filter(k=>k.startsWith(c+'/')&&k.split('/').length===c.split('/').length+1).map(snap);next({docs:ds,size:ds.length,empty:!ds.length})};subs.add(f);setTimeout(f);return()=>subs.delete(f)}};return q};
-  return {doc:docRef,collection:col};
+  return{doc:docRef,collection:col,dump:()=>Object.fromEntries(docs),load(o){docs.clear();Object.entries(o).forEach(([k,v])=>docs.set(k,v));fire()}};
 }
 
 /* ---------- State ---------- */
@@ -2111,7 +2503,8 @@ const S={mode:'view',page:0,tab:'annos',filter:'all',showHist:false,histRound:nu
   meta:null,blocks:new Map(),datasets:new Map(),annos:[],changes:[],rounds:[],
   pages:[],starts:new Map(),heights:new Map(),geo:{},
   drafts:new Map(),draw:null,lastSel:{},deferred:false,cloud:false,openSet:null,
-  style:null,examples:[],caps:{},assetURL:new Map(),proposal:null,learning:false};
+  style:null,examples:[],caps:{},assetURL:new Map(),proposal:null,learning:false,
+  agentProposal:null,folder:null,lastFolder:null,folderFiles:null,stale:new Set(),saveState:'',saveError:'',initError:''};
 let db=null;
 
 /* ---------- Sizes ---------- */
@@ -2358,7 +2751,12 @@ function editForm(b){
   if(S.openSet===b.id)det.open=true;
   det.addEventListener('toggle',()=>{S.openSet=det.open?b.id:(S.openSet===b.id?null:S.openSet)});
   const L=(t,ctrl)=>h('label',{},[t,ctrl]);
+  const dsPick=(cur,onPick)=>{const sel=h('select',{onchange:e=>{const d=S.datasets.get(e.target.value);if(d)onPick(d)}},
+    [...S.datasets.values()].map(d=>h('option',{value:d.id,text:d.title||d.id})));sel.value=cur;return L(tr('Dataset'),sel)};
+  const numKeys=d=>d.columns.map(c=>c.key).filter(k=>d.rows.some(r=>typeof r[k]==='number'));
+  const firstKey=d=>numKeys(d).find(k=>k!=='id')||'id',lastKey=d=>numKeys(d).slice(-1)[0]||d.columns[d.columns.length-1].key;
   if(b.type==='chart'){const c=b.chart,ds=S.datasets.get(c.dataset);const up=patch=>saveBlock({...b,chart:{...c,...patch}});
+    if(S.datasets.size>1||!ds)form.append(dsPick(c.dataset,d=>up({dataset:d.id,x:firstKey(d),y:lastKey(d),color:null,xLabel:null,yLabel:null})));
     if(ds){
       const kind=h('select',{onchange:e=>up({kind:e.target.value})},[h('option',{value:'scatter',text:tr('Scatter')}),h('option',{value:'line',text:tr('Line')})]);kind.value=c.kind;
       form.append(L(tr('Chart type'),kind),L(tr('X column'),selectField(ds,c.x,v=>up({x:v}))),L(tr('Y column'),selectField(ds,c.y,v=>up({y:v}))),L(tr('Colour by'),selectField(ds,c.color,v=>up({color:v||null}),true)),
@@ -2369,6 +2767,7 @@ function editForm(b){
       const lg=h('input',{type:'checkbox',onchange:e=>up({logY:e.target.checked})});lg.checked=!!c.logY;
       form.append(h('label',{class:'chk'},[lg,tr('Log scale for Y')]));}
   }else if(b.type==='table'){const t=b.table,ds=S.datasets.get(t.dataset);const up=patch=>saveBlock({...b,table:{...t,...patch}});
+    if(S.datasets.size>1||!ds)form.append(dsPick(t.dataset,d=>up({dataset:d.id,sortBy:lastKey(d),columns:null})));
     if(ds){const dsc=h('input',{type:'checkbox',onchange:e=>up({desc:e.target.checked})});dsc.checked=!!t.desc;
       form.append(L(tr('Sort by'),selectField(ds,t.sortBy,v=>up({sortBy:v}))),L(tr('Rows shown'),h('input',{type:'number',min:'1',max:'50',value:t.limit||5,onchange:e=>up({limit:clamp(+e.target.value||5,1,50)})})),h('label',{class:'chk'},[dsc,tr('Descending')]));}
   }else if(b.type==='image'){const im=b.image||{},cr=im.crop||{t:0,r:0,b:0,l:0};const up=patch=>saveBlock({...b,image:{...im,...patch}});
@@ -2395,11 +2794,12 @@ async function drop(path){try{await db.doc(path).delete()}catch(e){toast(writeEr
 
 /* ---------- Change log: field definitions ---------- */
 const FIELDS=['title','text','caption','breakBefore',
-  'chart.kind','chart.x','chart.y','chart.color','chart.xLabel','chart.yLabel','chart.yMin','chart.yMax','chart.logY',
-  'table.sortBy','table.desc','table.limit','image.width','image.crop','image.src','image.asset',
+  'chart.dataset','chart.kind','chart.x','chart.y','chart.color','chart.xLabel','chart.yLabel','chart.yMin','chart.yMax','chart.logY',
+  'table.dataset','table.sortBy','table.desc','table.limit','image.width','image.crop','image.src','image.asset',
   'image.source.tool','image.source.file','image.source.note','image.source.script','image.source.data'];
 const STYLE_FIELDS=['font.family','font.size','font.label','marker','line','ticks','frame','grid','palette','figure.preset','chartDefaults.kind','chartDefaults.logY'];
 const FIELD_LABEL={title:'Title',text:'Text',caption:'Caption',breakBefore:'Page break',
+  'chart.dataset':'Dataset','table.dataset':'Dataset',dataset:'Imported data',
   'chart.kind':'Chart type','chart.x':'X column','chart.y':'Y column','chart.color':'Colour by','chart.xLabel':'X axis label','chart.yLabel':'Y axis label',
   'chart.yMin':'Y min','chart.yMax':'Y max','chart.logY':'Y scale',
   'table.sortBy':'Sort by','table.desc':'Sort direction','table.limit':'Rows shown',
@@ -2411,8 +2811,10 @@ const FIELD_LABEL={title:'Title',text:'Text',caption:'Caption',breakBefore:'Page
 const fieldLabel=f=>FIELD_LABEL[f]?trc('field',FIELD_LABEL[f]):f;
 const TEXTLIKE=new Set(['title','text','caption','chart.xLabel','chart.yLabel','image.source.file','image.source.note','image.source.script','style.font.family']);
 function category(f){if(f==='title'||f==='text'||f==='caption')return tr('Text');if(f.startsWith('chart.'))return tr('Chart');if(f.startsWith('table.'))return tr('Table');
-  if(f.startsWith('image.'))return tr('Image');if(f.startsWith('style.'))return tr('Style');if(f==='breakBefore')return tr('Page break');if(f==='order')return tr('Order');return tr('Add/delete')}
+  if(f.startsWith('image.'))return tr('Image');if(f.startsWith('style.'))return tr('Style');if(f==='breakBefore')return tr('Page break');if(f==='order')return tr('Order');if(f==='dataset')return tr('Data');return tr('Add/delete')}
 function valueText(f,v,blockId){
+  if(f==='dataset')return v?tr('{n} rows, {c} columns',{n:v.rows,c:v.columns}):tr('(none)');
+  if(f==='chart.dataset'||f==='table.dataset'){const d=S.datasets.get(v);return d?(d.title||d.id):String(v??'')}
   if((v==null||v==='')&&f==='style.font.family')return tr('Page default');
   if(v==null||v==='')return f==='chart.color'?tr('(none)'):f.startsWith('chart.y')||f.endsWith('Label')?tr('Auto'):tr('(empty)');
   if(f==='chart.kind'||f==='style.chartDefaults.kind')return v==='line'?tr('Line'):tr('Scatter');
@@ -2532,7 +2934,7 @@ function sourceBox(b){
   const dataRow=h('p',{class:'cap'});
   if(src.data&&src.data.name)dataRow.append(tr('Data file attached: ')+src.data.name+' ');
   if(S.caps.assets)dataRow.append(h('button',{type:'button',class:'btn small',text:src.data?tr('Replace data file'):tr('Attach raw data (CSV, TXT, JSON)'),onclick:()=>pickData(b.id)}));
-  else if(!src.data)dataRow.append(tr('Uploading data files requires opening the report from its claude.ai link.'));
+  else if(!src.data)dataRow.append(tr('To attach data files, open a project folder or use the claude.ai link.'));
   box.append(dataRow);
   return box;
 }
@@ -2633,7 +3035,9 @@ async function submitDraft(id){
   if(!text&&!d.tags.length){toast(tr('Write a comment or pick a tag first'));return}
   const no=S.annos.reduce((m,a)=>Math.max(m,a.no||0),0)+1;
   const a={id:uid('a'),no,target:d.target||{kind:'block',blockId:id},tags:[...d.tags],text,status:'open',reply:'',createdAt:now()};
-  S.drafts.delete(id);S.annos=[...S.annos,a];render();
+  S.drafts.delete(id);S.annos=[...S.annos,a];
+  const box=document.activeElement,again=!!box&&box.dataset&&box.dataset.fid===fid({id},'comment'); // sent with Ctrl+Enter: keep typing in a fresh box
+  if(again)box.blur();render();if(again){const n=$(`[data-fid="${CSS.escape(fid({id},'comment'))}"]`);if(n)n.focus({preventScroll:true})}
   await put('annotations/'+a.id,a);toast(tr('Comment sent #')+no);
 }
 function renderEdit(){
@@ -2649,6 +3053,7 @@ function renderEdit(){
     card.append(h('div',{class:'chead'},[
       h('span',{class:'hdl',title:tr('Drag to reorder'),text:'⠿'}),h('span',{text:typeName(b.type)}),
       tooTall?h('span',{class:'warn',text:tr('Taller than one page; it will shrink or scroll in view mode')}):null,
+      S.stale.has((b.chart||b.table||{}).dataset)?h('span',{class:'warn',text:tr('Source data changed since import')}):null,
       h('span',{class:'sp'}),
       h('button',{type:'button',class:'btn small',text:tr('Up'),disabled:i===0?'':null,onclick:()=>move(b.id,-1)}),
       h('button',{type:'button',class:'btn small',text:tr('Down'),disabled:i===blocks.length-1?'':null,onclick:()=>move(b.id,1)}),
@@ -2762,9 +3167,10 @@ function renderPanel(){
   const open=S.annos.filter(a=>a.status!=='done').length,curN=currentChanges().length;
   $('#togglePanel').textContent=tr('Panel (comments {a}, changes {b})',{a:open,b:curN});
   $$('#tabs button').forEach(b=>{b.setAttribute('aria-selected',String(b.dataset.tab===S.tab));
-    b.textContent=b.dataset.tab==='annos'?tr('Comments ({n})',{n:open}):b.dataset.tab==='changes'?tr('Changes ({n})',{n:curN}):tr('Style')});
-  $('#tab-annos').hidden=S.tab!=='annos';$('#tab-changes').hidden=S.tab!=='changes';$('#tab-style').hidden=S.tab!=='style';
-  if(S.tab==='annos')renderAnnos();else if(S.tab==='changes')renderChanges();else renderStyle();
+    b.textContent=b.dataset.tab==='annos'?tr('Comments ({n})',{n:open}):b.dataset.tab==='changes'?tr('Changes ({n})',{n:curN}):b.dataset.tab==='folder'?tr('Folder'):tr('Style')});
+  if(S.tab==='folder'&&!S.folder)S.tab='annos';$('#tabs button[data-tab=folder]').hidden=!S.folder;
+  ['annos','changes','style','folder'].forEach(t=>{$('#tab-'+t).hidden=S.tab!==t});
+  if(S.tab==='annos')renderAnnos();else if(S.tab==='changes')renderChanges();else if(S.tab==='folder')renderFolder();else renderStyle();
 }
 
 
@@ -2818,8 +3224,7 @@ function renderStyle(){
   box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Defaults for new charts')}),h('div',{class:'form'},[L2(tr('Chart type'),dk),h('label',{class:'chk'},[dl,tr('Log scale for Y')])])]));
   // export
   const outTa=h('textarea',{class:'expout',readonly:'',hidden:''});
-  const exportBtn=(label,fname,maker)=>h('button',{type:'button',class:'btn small',text:label,onclick:async()=>{const text=maker();outTa.value=text;outTa.hidden=false;
-    if(S.caps.downloads){try{await S.caps.downloads.save({filename:fname,data:text});toast(tr('Downloaded'))}catch(e){if(e&&e.code!=='declined')toast(tr('Download is not available here. Copy from the text box below.'))}}}});
+  const exportBtn=(label,fname,maker)=>h('button',{type:'button',class:'btn small',text:label,onclick:async()=>{const text=maker();outTa.value=text;outTa.hidden=false;await saveTextFile(fname,text)}});
   box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Export')}),
     h('div',{class:'crow'},[exportBtn(tr('matplotlib style'),'duetsheet-style.mplstyle.txt',()=>mplstyle(styleNow())),exportBtn(tr('Style JSON'),'duetsheet-style.json',()=>JSON.stringify(styleExport(styleNow()),null,2))]),
     h('p',{class:'cap',text:tr('After downloading, remove the .txt extension and apply it with plt.style.use("duetsheet-style.mplstyle").')}),outTa]));
@@ -2834,7 +3239,7 @@ function renderStyle(){
   exSec.append(list);
   exSec.append(h('div',{class:'crow'},[h('button',{type:'button',class:'btn small',text:tr('Upload example'),onclick:()=>{pickTarget='__example';$('#imgfile').value='';$('#imgfile').click()}}),
     h('span',{class:'sp'}),h('button',{type:'button',class:'btn small primary',text:S.learning?tr('Analysing…'):tr('Learn from examples'),disabled:S.learning||!S.examples.length?'':null,onclick:learnFromExamples})]));
-  if(S.proposal)exSec.append(proposalView());
+  const pv=proposalView();if(pv)exSec.append(pv);
   box.append(exSec);
 }
 function toHex(c){if(/^#[0-9a-f]{6}$/i.test(c))return c.toUpperCase();const cv=document.createElement('canvas').getContext('2d');cv.fillStyle=c;const v=cv.fillStyle;return /^#[0-9a-f]{6}$/i.test(v)?v.toUpperCase():'#1F6F8B'}
@@ -2915,15 +3320,22 @@ async function learnFromExamples(){
   }catch(e){const c=e&&e.code;toast(c==='not_granted'||c==='sampling_disabled'?tr('Permission to use Claude was not granted.'):c==='rate_limited'?tr('Too many requests. Please try again shortly.'):c==='invalid_json'?tr('Could not read Claude\'s reply. Please try again.'):tr('Analysis failed. Please try again.'))}
   finally{S.learning=false;renderPanel()}
 }
+function proposalNote(r){const pct=Math.round((r.conf||0)*100),from=r.from?' '+r.from:'';
+  if(r.source==='svg')return tr('(exact, from SVG)')+from;if(r.source==='mplstyle')return tr('(from a matplotlib style file)')+from;
+  if(r.source==='files')return tr('(from your files)')+from;
+  if(r.source==='profile')return tr('(from your saved habits)');if(r.source==='agent')return tr('(Claude, {p}% confidence)',{p:pct})+from;
+  return tr('(Claude estimate, {p}% confidence)',{p:pct})}
 function proposalView(){
-  const rows=S.proposal;if(!rows||!rows.length)return null;const st=styleNow();
+  const agent=!(S.proposal&&S.proposal.length)&&!!S.agentProposal;const rows=agent?S.agentProposal.rows:S.proposal;if(!rows||!rows.length)return null;const st=styleNow();
+  const done=()=>{if(agent){S.agentProposal=null;drop('style/proposal')}else S.proposal=null};
   const tb=h('table',{class:'prop'},[h('thead',{},[h('tr',{},[h('th',{text:''}),h('th',{text:tr('Setting')}),h('th',{text:tr('Current')}),h('th',{text:tr('Suggested')})])]),
     h('tbody',{},rows.map(r=>{const cb=h('input',{type:'checkbox'});cb.checked=r.on;cb.onchange=()=>{r.on=cb.checked};
       return h('tr',{},[h('td',{},[cb]),h('td',{text:fieldLabel('style.'+r.field)}),h('td',{text:valueText('style.'+r.field,getPath(st,r.field))}),
-        h('td',{},[document.createTextNode(valueText('style.'+r.field,r.value)+' '),h('span',{class:'conf',text:r.source==='svg'?tr('(exact, from SVG)'):tr('(Claude estimate, {p}% confidence)',{p:Math.round((r.conf||0)*100)})})])])}))]);
-  return h('div',{},[h('p',{class:'sum',text:tr('Suggested style changes')}),tb,h('div',{class:'crow'},[
-    h('button',{type:'button',class:'btn small',text:tr('Cancel'),onclick:()=>{S.proposal=null;renderPanel()}}),h('span',{class:'sp'}),
-    h('button',{type:'button',class:'btn small primary',text:tr('Apply selected'),onclick:()=>{const n=clone(styleNow());rows.filter(r=>r.on).forEach(r=>setPath(n,r.field,clone(r.value)));S.proposal=null;saveStyle(n);toast(tr('Style applied'))}})])]);
+        h('td',{},[document.createTextNode(valueText('style.'+r.field,r.value)+' '),h('span',{class:'conf',text:proposalNote(r)})])])}))]);
+  return h('div',{},[h('p',{class:'sum',text:agent?tr('Claude suggests these style changes'):tr('Suggested style changes')}),
+    agent&&S.agentProposal.note?h('p',{class:'cap',text:S.agentProposal.note}):null,tb,h('div',{class:'crow'},[
+    h('button',{type:'button',class:'btn small',text:tr('Cancel'),onclick:()=>{done();renderPanel()}}),h('span',{class:'sp'}),
+    h('button',{type:'button',class:'btn small primary',text:tr('Apply selected'),onclick:()=>{const n=clone(styleNow());rows.filter(r=>r.on).forEach(r=>setPath(n,r.field,clone(r.value)));done();saveStyle(n);toast(tr('Style applied'))}})])]);
 }
 
 /* ---------- Timeline ---------- */
@@ -2939,6 +3351,7 @@ function buildTimeline(scale){
   S.changes.forEach(c=>{if(c.blockId&&!S.blocks.has(c.blockId))addLane(c.blockId)});
   if(S.changes.some(c=>c.field==='order'))addLane('__order');
   if(S.changes.some(c=>c.field.startsWith('style.')))addLane('__style');
+  if(S.changes.some(c=>c.field==='dataset'))addLane('__data');
   if(!laneIds.length)return h('p',{class:'empty',text:tr('No changes yet.')});
   const LW=112,CW=46,LH=26,TOP=8,BOT=34;const W=LW+cols.length*CW+8,H=TOP+laneIds.length*LH+BOT;
   if(scale==null){const avail=($('#tlwrap').clientWidth||300)-10;scale=clamp(avail/W,1,1.8)}
@@ -2950,12 +3363,12 @@ function buildTimeline(scale){
     if(c.sub){const s2=el('text',{x:x+CW/2,y:H-BOT+27,class:'tk','text-anchor':'middle'},svg);s2.textContent=c.sub}});
   laneIds.forEach((id,li)=>{const y=TOP+li*LH+LH/2;
     el('line',{x1:LW,x2:W-8,y1:y,y2:y,class:'gl'},svg);
-    const nm=id==='__order'?tr('Block order'):id==='__style'?tr('Style'):blockName(id);const t=el('text',{x:LW-6,y:y+4,class:'tk tllane','text-anchor':'end'},svg);
+    const nm=id==='__order'?tr('Block order'):id==='__style'?tr('Style'):id==='__data'?tr('Data'):blockName(id);const t=el('text',{x:LW-6,y:y+4,class:'tk tllane','text-anchor':'end'},svg);
     t.textContent=nm.length>8?nm.slice(0,8)+'…':nm;const tt=el('title',{},t);tt.textContent=nm;
-    if(id!=='__order'&&id!=='__style')t.addEventListener('click',()=>{closeModal();jumpTo(id)})});
+    if(!id.startsWith('__'))t.addEventListener('click',()=>{closeModal();jumpTo(id)})});
   const cells=new Map();
   const put2=(lane,col,key,item)=>{const k=lane+'|'+col;if(!cells.has(k))cells.set(k,new Map());const m=cells.get(k);if(!m.has(key))m.set(key,[]);m.get(key).push(item)};
-  S.changes.forEach(c=>{const lane=c.field==='order'?'__order':c.field.startsWith('style.')?'__style':c.blockId;if(!laneIds.includes(lane))return;put2(lane,colFor(c.at),(c.by||'user')+'|'+category(c.field),c)});
+  S.changes.forEach(c=>{const lane=c.field==='order'?'__order':c.field.startsWith('style.')?'__style':c.field==='dataset'?'__data':c.blockId;if(!laneIds.includes(lane))return;put2(lane,colFor(c.at),(c.by||'user')+'|'+category(c.field),c)});
   S.annos.forEach(a=>{const lane=a.target&&a.target.blockId;if(!laneIds.includes(lane))return;put2(lane,colFor(a.createdAt),'anno|'+(a.status==='done'?'done':'open'),a)});
   cells.forEach((m,k)=>{const[lane,col]=k.split('|');const li=laneIds.indexOf(lane),ci=+col;const cy=TOP+li*LH+LH/2,cx0=LW+ci*CW+CW/2;
     const keys=[...m.keys()];keys.forEach((key,j)=>{const items=m.get(key);const cx=cx0+(j-(keys.length-1)/2)*11;const g=el('g',{class:'glyph'},svg);
@@ -3058,6 +3471,8 @@ document.addEventListener('pointermove',e=>{
 });
 
 /* ---------- Main render ---------- */
+// Leave the text field being edited (this also saves it), so an explicit action can redraw the page right away
+function leaveField(){if(editingNow())document.activeElement.blur()}
 function editingNow(){const a=document.activeElement;return a&&a.closest&&a.closest('#flow,#tab-style')&&/^(TEXTAREA|INPUT)$/.test(a.tagName)&&a.type!=='checkbox'}
 function render(){
   if(!S.meta)return;
@@ -3075,7 +3490,7 @@ document.addEventListener('focusout',()=>setTimeout(()=>{if(S.deferred&&!editing
 
 /* ---------- Modes and buttons ---------- */
 const HINT={view:'Use the arrow keys or the buttons below to turn pages.',edit:'Edit directly; drag ⠿ to reorder; click the divider between blocks to change page breaks; leave comments under each block.'};
-function setMode(m){S.mode=m;document.body.dataset.mode=m;if(S.draw){S.draw=null;document.body.dataset.draw=''}
+function setMode(m){leaveField();S.mode=m;document.body.dataset.mode=m;if(S.draw){S.draw=null;document.body.dataset.draw=''}
   $$('#modes button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===m)));
   document.body.classList.toggle('nopanel',m==='view'&&!S.panelInView);
   $('#hint').textContent=tr(HINT[m]);render()}
@@ -3099,13 +3514,313 @@ document.addEventListener('keydown',e=>{
 });
 let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(render,150)});
 
+/* ---------- Local project folder ---------- */
+// In browsers with the File System Access API (Chrome, Edge) a report can live in a folder on disk:
+//   report.json  the report: { "schema": ..., "<collection>": { "<id>": document } }
+//   assets/      uploaded images and files, named <asset id>.<ext>
+//   data/        raw data put there by the user or an agent; imported into datasets with their source recorded
+//   habits/      example figures, .mplstyle files and profile.json, used to learn the user's figure style
+//   exports/     files the page exports (styles, report copies, translation templates)
+//   lang/        extra interface translations
+// An agent can edit report.json while the page is open: the page reloads it, and merges by document when both wrote.
+const FS_OK=typeof window.showDirectoryPicker==='function';
+const REPORT_FILE='report.json',SCHEMA='duetsheet/0.4';
+const DATA_EXT=/\.(csv|tsv|txt|json)$/i,HABIT_EXT=/\.(svg|mplstyle|png|jpe?g|webp|gif|json)$/i;
+const ASSET_EXT={'image/svg+xml':'svg','image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/gif':'gif','text/csv':'csv','text/plain':'txt','application/json':'json'};
+function docsFromReport(j){
+  if(!j||typeof j!=='object'||Array.isArray(j))throw{code:'bad_report'};
+  const out={};
+  for(const[c,docs]of Object.entries(j)){if(c==='schema'||!docs||typeof docs!=='object'||Array.isArray(docs))continue;
+    for(const[id,d]of Object.entries(docs))if(d&&typeof d==='object'&&!Array.isArray(d))out[c+'/'+id]=d}
+  if(!out['report/meta'])throw{code:'bad_report'};
+  return out;
+}
+function reportFromDocs(docs){const j={schema:SCHEMA};
+  Object.keys(docs).sort().forEach(p=>{const i=p.indexOf('/'),c=p.slice(0,i);(j[c]||(j[c]={}))[p.slice(i+1)]=docs[p]});return j}
+function reportFromState(){ // the report as shown now, in report.json form (same in every storage mode)
+  const d={'report/meta':S.meta};
+  S.blocks.forEach((b,id)=>{d['blocks/'+id]=b});S.datasets.forEach((x,id)=>{d['datasets/'+id]=x});
+  S.annos.forEach(a=>{d['annotations/'+a.id]=a});S.changes.forEach(c=>{d['changes/'+c.id]=c});S.rounds.forEach(r=>{d['rounds/'+r.id]=r});
+  S.examples.forEach(x=>{d['examples/'+x.id]=x});if(S.style)d['style/profile']=S.style;
+  return reportFromDocs(d);
+}
+const hex=buf=>[...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+const hexId=()=>hex(crypto.getRandomValues(new Uint8Array(16)));
+const sha256=async buf=>hex(await crypto.subtle.digest('SHA-256',buf));
+async function subdir(dir,name,create){try{return await dir.getDirectoryHandle(name,{create:!!create})}catch(e){return null}}
+async function listFiles(d,re){const out=[];if(!d)return out;
+  for await(const[name,hd]of d.entries())if(hd.kind==='file'&&(!re||re.test(name)))out.push(hd);
+  return out.sort((a,b)=>a.name<b.name?-1:1)}
+async function writeFile(d,name,data){const fh=await d.getFileHandle(name,{create:true});const w=await fh.createWritable();await w.write(data);await w.close();return fh}
+const idb={ // remembers the last folder between visits (the browser asks again for permission)
+  open(){return this.p||(this.p=new Promise((res,rej)=>{const r=indexedDB.open('duetsheet',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}))},
+  async run(mode,fn){const d=await this.open();return new Promise((res,rej)=>{const t=d.transaction('kv',mode);const q=fn(t.objectStore('kv'));t.oncomplete=()=>res(q.result);t.onerror=()=>rej(t.error)})},
+  get(k){return this.run('readonly',s=>s.get(k))},set(k,v){return this.run('readwrite',s=>s.put(v,k))}};
+
+async function folderDB(dir,seedDocs){
+  let fh=null,known=0,docs=null;
+  try{fh=await dir.getFileHandle(REPORT_FILE);const f=await fh.getFile();docs=docsFromReport(JSON.parse(await f.text()));known=f.lastModified}
+  catch(e){if(!(e&&e.name==='NotFoundError'))throw e}
+  const dirty=new Set();let timer=null,busy=false;
+  const mem=memDB(docs||seedDocs||{},p=>{dirty.add(p);setSave('pending');clearTimeout(timer);timer=setTimeout(flush,400)});
+  async function flush(){
+    if(busy){clearTimeout(timer);timer=setTimeout(flush,200);return}
+    if(!dirty.size)return;busy=true;const mine=new Set(dirty);dirty.clear();
+    try{fh=fh||await dir.getFileHandle(REPORT_FILE,{create:true});
+      const f=await fh.getFile();let all=mem.dump();
+      if(f.size&&f.lastModified!==known){ // someone else wrote the file since we read it: keep their documents, put ours on top
+        const next=docsFromReport(JSON.parse(await f.text()));mine.forEach(p=>{if(p in all)next[p]=all[p];else delete next[p]});all=next;mem.load(all)}
+      await writeFile(dir,REPORT_FILE,JSON.stringify(reportFromDocs(all),null,1)+'\n');
+      known=(await fh.getFile()).lastModified;setSave(dirty.size?'pending':'saved')}
+    catch(e){mine.forEach(p=>dirty.add(p));setSave('error',e)}
+    finally{busy=false}
+  }
+  async function poll(){
+    if(busy||dirty.size)return;
+    try{fh=fh||await dir.getFileHandle(REPORT_FILE);const f=await fh.getFile();if(f.lastModified===known)return;
+      const next=docsFromReport(JSON.parse(await f.text()));known=f.lastModified;await loadAssetURLs(dir);mem.load(next);
+      toast(tr('report.json changed on disk; the page has been updated.'));refreshFolderFiles()}
+    catch(e){} // missing or half-written file: try again on the next tick
+  }
+  const iv=setInterval(poll,1500);
+  if(!docs){dirty.add('report/meta');await flush()} // a new folder gets its report.json right away
+  return{...mem,name:dir.name,dir,flush,pending:()=>dirty.size>0||busy,close(){clearInterval(iv);clearTimeout(timer)}};
+}
+async function loadAssetURLs(dir){
+  for(const fh of await listFiles(await subdir(dir,'assets'))){const id=fh.name.replace(/\.[^.]+$/,'');
+    if(ASSET_ID.test(id)&&!S.assetURL.has(id))S.assetURL.set(id,URL.createObjectURL(await fh.getFile()))}}
+function folderCaps(dir){return{
+  assets:{async upload(blob,opt){const type=(opt&&opt.type)||blob.type||'application/octet-stream',id=hexId();
+      await writeFile(await subdir(dir,'assets',true),id+'.'+(ASSET_EXT[type]||'bin'),blob);return{id,url:URL.createObjectURL(blob),contentType:type,sizeBytes:blob.size}},
+    async delete(){}}, // files stay in assets/: the change log may still point to them
+  downloads:{async save(r){const name=String(r.filename).replace(/\.mplstyle\.txt$/,'.mplstyle');
+    await writeFile(await subdir(dir,'exports',true),name,r.data);return{status:'saved',path:'exports/'+name}}},
+  sample:null}}
+function starterDocs(name){const t=now(),id='b-start';
+  return{'report/meta':{title:name,order:[id],schema:SCHEMA,createdAt:t},
+    ['blocks/'+id]:{id,type:'text',title:'',caption:'',breakBefore:'auto',createdAt:t,
+      text:tr('Put raw data files in the data/ folder and example figures in habits/, then use the Folder tab. Or ask your agent to write the report into report.json (see AGENTS.md).')}}}
+function useDB(next){db=next;
+  Object.assign(S,{meta:null,blocks:new Map(),datasets:new Map(),annos:[],changes:[],rounds:[],style:null,examples:[],agentProposal:null,proposal:null,drafts:new Map(),page:0,stale:new Set(),folderFiles:null});
+  subscribe()}
+async function pickFolder(){let dir;try{dir=await window.showDirectoryPicker({mode:'readwrite',id:'duetsheet'})}catch(e){return}await openFolder(dir,true)}
+async function openFolder(dir,ask){
+  try{
+    if(dir.requestPermission&&await dir.requestPermission({mode:'readwrite'})!=='granted'){toast(tr('Permission to use the folder was not granted.'));return}
+    let seed=null;
+    if(!await dir.getFileHandle(REPORT_FILE).then(()=>true,()=>false))
+      seed=ask&&S.meta&&S.blocks.size&&confirm(tr('This folder has no report.json yet. Save the report that is open now into it? Cancel starts an empty report.'))?docsFromReport(reportFromState()):starterDocs(dir.name);
+    const f=await folderDB(dir,seed);
+    if(S.folder)S.folder.close();
+    S.folder=f;S.lastFolder=dir;S.caps=folderCaps(dir);S.assetURL=new Map();await loadAssetURLs(dir);
+    useDB(f);await loadFolderLangs(dir);
+    try{await idb.set('folder',dir)}catch(e){}
+    S.tab='folder';S.panelInView=true;document.body.classList.remove('nopanel');
+    renderLocalBar();refreshFolderFiles();toast(tr('Opened folder {name}',{name:dir.name}))}
+  catch(e){toast(tr('Could not open the folder ({m}).',{m:(e&&(e.message||e.name||e.code))||tr('unknown')}))}
+}
+async function restoreFolder(){
+  if(!FS_OK)return;let d=null;try{d=await idb.get('folder')}catch(e){}if(!d)return;S.lastFolder=d;
+  try{if(await d.queryPermission({mode:'readwrite'})==='granted'){await openFolder(d,false);return}}catch(e){}
+  renderLocalBar()}
+function setSave(state,e){S.saveState=state;S.saveError=e?String(e.message||e.name||e.code||e):'';renderLocalBar()}
+function renderLocalBar(){
+  if(S.cloud)return;
+  const B=(t,fn,primary)=>h('button',{type:'button',class:'btn small'+(primary?' primary':''),text:t,onclick:fn});const acts=[];let text;
+  if(S.folder){
+    text=tr('Project folder "{name}": changes are saved to report.json automatically.',{name:S.folder.name})+' '+
+      ({pending:tr('Saving…'),saved:tr('All changes saved.'),error:tr('Could not save ({m}).',{m:S.saveError})}[S.saveState]||'');
+    acts.push(B(tr('Open another folder'),pickFolder),B(tr('Save a copy'),exportReport));
+  }else{
+    text=(S.initError?S.initError+' ':'')+(FS_OK?tr('Not saved: changes are lost when you close this tab. Open a project folder to save automatically, or save the report as a file.')
+      :tr('Not saved: changes are lost when you close this tab. This browser cannot open folders (use Chrome or Edge), but you can save the report as a file and open it again later.'));
+    if(FS_OK)acts.push(B(tr('Open project folder'),pickFolder,true));
+    if(FS_OK&&S.lastFolder)acts.push(B(tr('Reopen "{name}"',{name:S.lastFolder.name}),()=>openFolder(S.lastFolder,false)));
+    acts.push(B(tr('Open report file'),()=>{$('#reportfile').value='';$('#reportfile').click()}),B(tr('Save report file'),exportReport));
+  }
+  showNote(text,acts,!!S.folder&&S.saveState!=='error');
+}
+function exportReport(){const name=((S.meta&&S.meta.title)||'report').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'report';
+  saveTextFile(name+'.report.json',JSON.stringify(reportFromState(),null,1)+'\n','application/json')}
+$('#reportfile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;
+  let docs;try{docs=docsFromReport(JSON.parse(await f.text()))}catch(err){toast(tr('This is not a Duetsheet report file.'));return}
+  if(S.blocks.size&&!confirm(tr('Replace the report that is open now with {file}?',{file:f.name})))return;
+  useDB(memDB(docs));renderLocalBar();toast(tr('Opened {file}',{file:f.name}))});
+addEventListener('beforeunload',e=>{if(S.folder&&S.folder.pending()){S.folder.flush();e.preventDefault();e.returnValue=''}});
+addEventListener('focus',()=>{if(S.folder)refreshFolderFiles()});
+async function loadFolderLangs(dir){
+  for(const fh of await listFiles(await subdir(dir,'lang'),/\.json$/i)){try{importLang(JSON.parse(await(await fh.getFile()).text()))}catch(e){}}
+  renderLangMenu()}
+
+/* data/: raw data imported into datasets, with the source file recorded */
+async function refreshFolderFiles(){
+  if(!S.folder)return;const dir=S.folder.dir;
+  const data=await Promise.all((await listFiles(await subdir(dir,'data'),DATA_EXT)).map(async fh=>{const f=await fh.getFile();
+    return{name:fh.name,path:'data/'+fh.name,fh,size:f.size,modified:new Date(f.lastModified).toISOString()}}));
+  const habits=(await listFiles(await subdir(dir,'habits'),HABIT_EXT)).map(fh=>fh.name);
+  // a dataset is stale when its source file changed after the import: size and date first, then the content hash
+  const stale=new Set();
+  for(const ds of S.datasets.values()){const src=ds.source,f=src&&data.find(x=>x.path===src.path);if(!f)continue;
+    if(f.size===src.size&&f.modified===src.modified)continue;
+    if(await sha256(await(await f.fh.getFile()).arrayBuffer())!==src.sha256)stale.add(ds.id)}
+  const changed=!same([...stale].sort(),[...(S.stale||[])].sort());
+  S.folderFiles={data,habits};S.stale=stale;renderPanel();if(changed&&S.mode==='edit')render();
+}
+function parseDelimited(txt){
+  const first=txt.split(/\r?\n/,1)[0];const d=[',','\t',';'].map(c=>[c,first.split(c).length]).sort((a,b)=>b[1]-a[1])[0][0];
+  const rows=[];let row=[],cell='',q=false;
+  for(let i=0;i<txt.length;i++){const ch=txt[i];
+    if(q){if(ch==='"'){if(txt[i+1]==='"'){cell+='"';i++}else q=false}else cell+=ch}
+    else if(ch==='"')q=true;else if(ch===d){row.push(cell);cell=''}
+    else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&txt[i+1]==='\n')i++;row.push(cell);rows.push(row);row=[];cell=''}
+    else cell+=ch}
+  if(cell!==''||row.length){row.push(cell);rows.push(row)}
+  return rows.filter(r=>r.some(c=>c.trim()!==''));
+}
+function tableFromObjects(objs,cols,parser){
+  const MAX=20000;if(objs.length>MAX)throw{msg:tr('Too many rows ({n}). The limit is {max}.',{n:objs.length,max:MAX})};
+  const src=cols?cols.map(c=>({key:String(c.key),label:String(c.label??c.key)})):[...new Set(objs.flatMap(o=>Object.keys(o)))].map(k=>({key:k,label:k}));
+  const used=new Set(['id']);
+  const keyOf=s=>{let k=String(s).trim().toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')||'col';if(/^\d/.test(k))k='c'+k;let x=k,i=2;while(used.has(x))x=k+'_'+i++;used.add(x);return x};
+  const val=v=>{if(v==null)return null;if(typeof v==='number')return isFinite(v)?v:null;if(typeof v==='boolean')return v;
+    const s=String(v).trim();if(s==='')return null;return/^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(s)?+s:s};
+  const idCol=src.find(c=>c.key.trim().toLowerCase()==='id');const ids=idCol?objs.map(o=>val(o[idCol.key])):null;
+  const useIds=!!ids&&ids.every(Number.isInteger)&&new Set(ids).size===ids.length;
+  const columns=[{key:'id',label:useIds?idCol.label:tr('Row')}],map=[];
+  src.forEach(c=>{if(useIds&&c===idCol)return;const k=keyOf(c.key);columns.push({key:k,label:c.label});map.push([c.key,k])});
+  const rows=objs.map((o,i)=>{const r={id:useIds?ids[i]:i+1};map.forEach(([from,to])=>{r[to]=val(o[from])});return r});
+  return{columns,rows,parser};
+}
+function parseDataFile(name,text){
+  if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);
+  if(/\.json$/i.test(name)){let j;try{j=JSON.parse(text)}catch(e){throw{msg:tr('{file} is not valid JSON.',{file:name})}}
+    if(j&&Array.isArray(j.columns)&&Array.isArray(j.rows))return tableFromObjects(j.rows,j.columns,'json');
+    if(Array.isArray(j)&&j.length&&j.every(r=>r&&typeof r==='object'&&!Array.isArray(r)))return tableFromObjects(j,null,'json');
+    throw{msg:tr('{file}: the JSON must be a list of objects, or an object with "columns" and "rows".',{file:name})}}
+  const grid=parseDelimited(text);if(grid.length<2)throw{msg:tr('{file} needs a header row and at least one data row.',{file:name})};
+  const head=grid[0].map((k,i)=>k.trim()||'col'+(i+1));
+  return tableFromObjects(grid.slice(1).map(r=>Object.fromEntries(head.map((k,i)=>[k,r[i]]))),head.map(k=>({key:k,label:k})),'delimited');
+}
+function uniqueDatasetId(fname){let k=fname.replace(/\.[^.]+$/,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'data';let x=k,i=2;while(S.datasets.has(x))x=k+'-'+i++;return x}
+async function importDataFile(f){
+  try{const file=await f.fh.getFile(),buf=await file.arrayBuffer();const table=parseDataFile(f.name,new TextDecoder('utf-8').decode(buf));
+    const old=[...S.datasets.values()].find(d=>d.source&&d.source.path===f.path);const id=old?old.id:uniqueDatasetId(f.name);
+    const ds={id,title:old?old.title:f.name.replace(/\.[^.]+$/,''),columns:table.columns,rows:table.rows,
+      source:{path:f.path,sha256:await sha256(buf),size:file.size,modified:new Date(file.lastModified).toISOString(),importedAt:now(),parser:table.parser}};
+    S.datasets.set(id,ds);render();await put('datasets/'+id,ds);
+    const sum=d=>d?{rows:d.rows.length,columns:d.columns.length,sha256:(d.source&&d.source.sha256)||null}:null;
+    const c={id:uid('c'),by:'user',at:now(),blockId:null,datasetId:id,field:'dataset',before:sum(old),after:sum(ds),name:ds.title,revertible:false};
+    S.changes=[...S.changes,c];renderPanel();await put('changes/'+c.id,c);
+    toast(tr('Imported {file}: {n} rows, {c} columns.',{file:f.name,n:ds.rows.length,c:ds.columns.length}));refreshFolderFiles()}
+  catch(e){toast(e&&e.msg?e.msg:tr('Could not read {file}.',{file:f.name}))}
+}
+
+/* habits/: learn the user's figure style from their own files, then let them confirm */
+function parseMplstyle(txt){
+  const kv={};txt.split(/\r?\n/).forEach(l=>{const m=/^\s*([\w.-]+)\s*:\s*(.*?)\s*(#.*)?$/.exec(l);if(m)kv[m[1]]=m[2].replace(/^['"]|['"]$/g,'')});
+  const out={},num=k=>{const v=parseFloat(kv[k]);return isFinite(v)?v:null},yes=v=>/^true$/i.test(String(v||'').trim());
+  let fam=(kv['font.family']||'').split(',')[0].trim();if(/^(sans-serif|serif|monospace)$/.test(fam))fam=(kv['font.'+fam]||'').split(',')[0].trim();if(fam)out['font.family']=fam;
+  const tick=num('xtick.labelsize')??num('font.size');if(tick)out['font.size']=tick;
+  if(num('axes.labelsize'))out['font.label']=num('axes.labelsize');
+  if(num('lines.linewidth'))out.line=num('lines.linewidth');
+  if(num('lines.markersize'))out.marker=num('lines.markersize');
+  if(/^(in|out)$/.test(kv['xtick.direction']||''))out.ticks=kv['xtick.direction'];
+  if(kv['axes.grid']!=null)out.grid=yes(kv['axes.grid']);
+  if(kv['axes.spines.top']!=null||kv['axes.spines.right']!=null)out.frame=yes(kv['axes.spines.top']??kv['axes.spines.right']);
+  const cyc=/color'?\s*,\s*\[([^\]]*)\]/.exec(kv['axes.prop_cycle']||'');
+  if(cyc){const pal=cyc[1].split(',').map(s=>s.trim().replace(/['"]/g,'')).map(s=>parseColor(/^[0-9a-f]{6}$/i.test(s)?'#'+s:s)).filter(Boolean).slice(0,6);if(pal.length)out.palette=pal}
+  const w=parseFloat((kv['figure.figsize']||'').split(',')[0]);if(w>0){const pt=w*72;out['figure.preset']=Math.abs(pt-234)<25?'acs1':Math.abs(pt-504)<40?'acs2':'free'}
+  return out;
+}
+function validStyleValue(f,v){
+  if(['font.size','font.label','marker','line'].includes(f))return typeof v==='number'&&v>0&&v<100;
+  if(f==='font.family')return typeof v==='string'&&v.length<80;
+  if(f==='ticks')return v==='in'||v==='out';
+  if(f==='frame'||f==='grid')return typeof v==='boolean';
+  if(f==='palette')return Array.isArray(v)&&v.length<=6&&v.every(c=>/^#[0-9a-f]{6}$/i.test(c));
+  if(f==='figure.preset')return typeof v==='string'&&v in PRESET_PT;
+  if(f==='chartDefaults.kind')return v===null||v==='scatter'||v==='line';
+  if(f==='chartDefaults.logY')return v===null||typeof v==='boolean';
+  return false;
+}
+const effective=(st,f)=>f==='palette'?[...Array(6)].map((_,i)=>st.palette[i]||DEFAULT_PALETTE[i]):getPath(st,f);
+async function learnHabits(){
+  if(!S.folder||S.learning)return;S.learning=true;renderPanel();
+  try{const files=await listFiles(await subdir(S.folder.dir,'habits'),HABIT_EXT);
+    const votes=new Map();let n=0,profile=null;
+    const vote=(field,value,file,source)=>{if(value==null||value===''||!validStyleValue(field,value))return;
+      const m=votes.get(field)||votes.set(field,new Map()).get(field),k=JSON.stringify(value);const e=m.get(k)||m.set(k,{value,source,files:[]}).get(k);e.files.push(file);if(e.source!==source)e.source='files'};
+    for(const fh of files){const name=fh.name,text=async()=>(await fh.getFile()).text();
+      if(/\.svg$/i.test(name)){n++;const a=analyzeSVG(await text());vote('font.family',a.family,name,'svg');vote('font.size',a.size,name,'svg');vote('line',a.line,name,'svg');
+        if(a.palette.length)vote('palette',a.palette,name,'svg');
+        if(a.widthPt){const p=Math.abs(a.widthPt-234)<25?'acs1':Math.abs(a.widthPt-504)<40?'acs2':null;if(p)vote('figure.preset',p,name,'svg')}}
+      else if(/\.mplstyle$/i.test(name)){n++;Object.entries(parseMplstyle(await text())).forEach(([f,v])=>vote(f,v,name,'mplstyle'))}
+      else if(name==='profile.json'){try{profile=JSON.parse(await text())}catch(e){}}}
+    const st=styleNow(),rows=[];
+    if(profile&&typeof profile==='object')STYLE_FIELDS.forEach(f=>{const v=getPath(profile,f);if(v!==undefined&&validStyleValue(f,v)&&!same(v,effective(st,f)))rows.push({field:f,value:v,source:'profile',on:true})});
+    votes.forEach((m,field)=>{if(rows.some(r=>r.field===field))return;const best=[...m.values()].sort((a,b)=>b.files.length-a.files.length)[0];
+      if(same(best.value,effective(st,field)))return;
+      rows.push({field,value:best.value,source:best.source,on:best.files.length*2>=n,
+        from:tr('{k} of {n} files: {files}',{k:best.files.length,n,files:best.files.slice(0,3).join(', ')+(best.files.length>3?', …':'')})})});
+    S.proposal=rows;S.tab='style';
+    if(!rows.length)toast(n||profile?tr('Your habits already match the current style. Nothing to change.'):tr('No SVG, .mplstyle or profile.json files in habits/.'))}
+  catch(e){toast(tr('Analysis failed. Please try again.'))}
+  finally{S.learning=false;renderPanel()}
+}
+async function saveHabits(){
+  if(!S.folder)return;
+  try{await writeFile(await subdir(S.folder.dir,'habits',true),'profile.json',JSON.stringify({...styleExport(styleNow()),savedAt:now()},null,1)+'\n');
+    toast(tr('Saved to {p}',{p:'habits/profile.json'}));refreshFolderFiles()}
+  catch(e){toast(tr('Save failed. Please try again.'))}
+}
+function renderFolder(){
+  const box=$('#tab-folder');box.replaceChildren();if(!S.folder)return;
+  const F=S.folderFiles||{data:[],habits:[]},B=(t,fn,cls,dis)=>h('button',{type:'button',class:'btn small'+(cls?' '+cls:''),text:t,disabled:dis?'':null,onclick:fn});
+  box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Project folder')}),
+    h('p',{class:'cap',text:tr('"{name}". The report is saved to report.json automatically. An agent can read and edit the same folder (see AGENTS.md).',{name:S.folder.name})}),
+    h('div',{class:'crow'},[B(tr('Refresh'),refreshFolderFiles)])]));
+  const dl=h('ul',{class:'flist'});
+  if(!F.data.length)dl.append(h('li',{class:'empty',text:tr('No files yet. Put CSV, TSV or JSON files in the data/ folder, then click Refresh.')}));
+  F.data.forEach(f=>{const ds=[...S.datasets.values()].find(d=>d.source&&d.source.path===f.path),stale=!!ds&&S.stale.has(ds.id);
+    dl.append(h('li',{},[h('span',{class:'fname',text:f.name}),
+      h('span',{class:'fstat'+(stale?' stale':''),text:!ds?tr('not imported'):stale?tr('changed since import'):tr('imported as "{t}", {n} rows',{t:ds.title||ds.id,n:ds.rows.length})}),
+      B(ds?tr('Update'):tr('Import'),()=>importDataFile(f),stale?'primary':'')]))});
+  box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Raw data (data/)')}),dl,
+    h('p',{class:'cap',text:tr('Each import records the file path and a fingerprint (SHA-256), so you can see when the file changes. Excel files: save them as CSV, or ask your agent.')})]));
+  const cnt=re=>F.habits.filter(x=>re.test(x)).length,svg=cnt(/\.svg$/i),mpl=cnt(/\.mplstyle$/i),ras=cnt(/\.(png|jpe?g|webp|gif)$/i),prof=F.habits.includes('profile.json');
+  box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Figure habits (habits/)')}),
+    h('p',{class:'cap',text:tr('{svg} SVG, {mpl} matplotlib style and {ras} PNG/JPG files.',{svg,mpl,ras})+(prof?' '+tr('Your saved habits (profile.json) are there too.'):'')}),
+    ras?h('p',{class:'cap',text:tr('PNG and JPG files cannot be measured here. Ask your agent to look at them, or export them as SVG.')}):null,
+    h('div',{class:'crow'},[B(S.learning?tr('Analysing…'):tr('Learn my habits'),learnHabits,'primary',S.learning||!(svg+mpl+(prof?1:0))),B(tr('Save current style as my habits'),saveHabits)]),
+    h('p',{class:'cap',text:tr('Saved habits go to habits/profile.json. Copy that file into the habits/ folder of your next project to start from the same style.')})]));
+}
+
+/* ---------- Welcome and help ---------- */
+const REPO_URL='https://github.com/Ashur5457/duetsheet';
+function openHelp(){
+  const step=(t,d)=>h('li',{},[h('strong',{text:t}),' '+d]);
+  const link=(path,t)=>h('a',{href:REPO_URL+path,target:'_blank',rel:'noopener',text:t});
+  openModal(tr('Welcome to Duetsheet'),[h('div',{class:'langbox'},[
+    h('p',{text:tr('Duetsheet is a report that you and an AI agent revise together. Every change is recorded with who made it.')}),
+    h('ol',{},[
+      step(tr('Read.'),tr('View shows the report as pages. Turn pages with the arrow keys.')),
+      step(tr('Review.'),tr('In Edit, change text and charts directly. Under each block, write a comment or pick a tag. On a chart, click a point or draw a box or a lasso.')),
+      step(tr('Keep track.'),tr('The Changes tab lists every change, by you or by the agent. Click "Finish this round" when you are done.')),
+      step(tr('Hand it to your agent.'),S.cloud?tr('Go back to Claude and ask it to read the annotations and revise the report.')
+        :tr('Open a project folder. Your agent (Claude Code, Codex, Gemini CLI, ...) edits report.json in the same folder, following AGENTS.md.'))]),
+    h('p',{},[link('/blob/main/docs/tutorial.md',tr('Tutorial with screenshots')),' · ',link('/blob/main/AGENTS.md',tr('AGENTS.md (for agents)'))]),
+    h('div',{class:'crow'},[h('span',{class:'sp'}),h('button',{type:'button',class:'btn small primary',text:tr('Got it'),onclick:closeModal})])])]);
+}
+function welcomeOnce(){try{if(localStorage.getItem('duetsheet-welcomed'))return;localStorage.setItem('duetsheet-welcomed','1')}catch(e){return}openHelp()}
+$('#helpBtn').addEventListener('click',openHelp);
+
 /* ---------- Startup and sync ---------- */
 async function seedIfEmpty(){
   const m=await db.doc('report/meta').get();if(m.exists)return;
   const ds=seedData(),blocks=seedBlocks(),t=now();
   await db.doc('datasets/'+ds.id).set(ds);
   for(const b of blocks)await db.doc('blocks/'+b.id).set({...b,createdAt:t});
-  await db.doc('report/meta').set({title:tr('NIMO demo report'),order:blocks.map(b=>b.id),schema:'duetsheet/0.3',createdAt:t});
+  await db.doc('report/meta').set({title:tr('NIMO demo report'),order:blocks.map(b=>b.id),schema:SCHEMA,createdAt:t});
 }
 function subscribe(){
   const fail=e=>showNote(tr('Failed to read cloud data (')+((e&&e.code)||tr('unknown'))+tr('). Please reload.'));
@@ -3118,21 +3833,27 @@ function subscribe(){
   db.collection('rounds').limit(500).onSnapshot(s=>{S.rounds=s.docs.map(d=>d.data()).filter(r=>r&&r.id);renderPanel()},fail);
   db.doc('style/profile').onSnapshot(s=>{S.style=s.exists?s.data():null;render()},fail);
   db.collection('examples').limit(200).onSnapshot(s=>{S.examples=s.docs.map(d=>d.data()).filter(x=>x&&x.id);renderPanel()},fail);
+  db.doc('style/proposal').onSnapshot(s=>{const d=s.exists?s.data():null; // written by an agent, confirmed by the user in the Style tab
+    const rows=d&&Array.isArray(d.rows)?d.rows.filter(r=>r&&STYLE_FIELDS.includes(r.field)&&validStyleValue(r.field,r.value)).map(r=>({field:r.field,value:r.value,conf:r.conf,from:r.from?String(r.from):'',source:'agent',on:(r.conf??1)>=0.6})):[];
+    S.agentProposal=rows.length?{rows,note:d.note?String(d.note):''}:null;renderPanel()},fail);
 }
-function showNote(t){const n=$('#note-db');n.textContent=t;n.hidden=!t}
+function showNote(t,acts,ok){const n=$('#note-db');$('#note-text').textContent=t||'';$('#note-acts').replaceChildren(...(acts||[]));n.hidden=!t;n.classList.toggle('saved',!!ok)}
 async function start(){
   setMode('view');
   let cloud=null;try{cloud=(window.claude&&window.claude.use)?await window.claude.use('db'):null}catch(e){cloud=null}
-  if(cloud){db=cloud;S.cloud=true}else{db=memDB();showNote(tr('Cloud storage is not available. Edits and comments stay in this tab only and are lost on reload. Open the report from its claude.ai link while signed in.'))}
-  try{await seedIfEmpty()}catch(e){if(S.cloud){showNote(tr('Failed to initialise cloud data (')+((e&&e.code)||tr('unknown'))+tr('). Showing local mode.'));db=memDB();S.cloud=false;await seedIfEmpty()}}
+  if(cloud){db=cloud;S.cloud=true}else db=memDB();
+  try{await seedIfEmpty()}catch(e){if(S.cloud){S.initError=tr('Failed to initialise cloud data (')+((e&&e.code)||tr('unknown'))+tr('). Showing local mode.');db=memDB();S.cloud=false;await seedIfEmpty()}}
   subscribe();
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(render);
   if(S.cloud){const tryUse=async n=>{try{return await window.claude.use(n)}catch(e){return null}};
     const[a,sm,dl]=await Promise.all(['assets','sample','downloads'].map(tryUse));S.caps={assets:a,sample:sm,downloads:dl};render()}
+  else{renderLocalBar();restoreFolder()}
+  welcomeOnce();
 }
 $('#lang').addEventListener('change',e=>{const v=e.target.value;if(v==='__add'){e.target.value=LANG;openLangDialog();return}if(v!==LANG)switchLang(v)});
 $('#langfile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;
-  try{if(f.size>1e6)throw{};const r=importLang(JSON.parse(await f.text()));closeModal();switchLang(r.code);
+  try{if(f.size>1e6)throw{};const text=await f.text(),r=importLang(JSON.parse(text));closeModal();switchLang(r.code);
+    if(S.folder)subdir(S.folder.dir,'lang',true).then(d=>d&&writeFile(d,r.code+'.json',text)).catch(()=>{});
     toast(tr('Loaded {name}: {n} sentences',{name:r.name,n:r.n})+(r.bad?tr(' ({b} skipped: placeholders do not match)',{b:r.bad}):''))}
   catch(err){toast(err&&err.msg?err.msg:tr('This is not a valid Duetsheet translation file.'))}});
 collectStatic();applyStatic();

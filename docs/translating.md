@@ -16,7 +16,7 @@ There are two ways to add a language or improve a translation.
    - the translations. Leave a sentence empty to keep it in English.
 4. Click **Load translation file** and choose your file. The page switches to your language right away.
 
-A loaded language is kept in your browser only (other people do not see it). You can remove it again from the same dialog. Loading a file for a built-in code such as `ja` overrides only the sentences in your file; the others keep the built-in translation.
+A loaded language is kept in your browser (other people do not see it). When a project folder is open, it is also saved as `lang/<code>.json` in that folder, and every translation file in `lang/` is loaded when the folder is opened, so a project can carry its own language. You can remove it again from the same dialog. Loading a file for a built-in code such as `ja` overrides only the sentences in your file; the others keep the built-in translation.
 
 ## 2. For everyone: send it to the project
 

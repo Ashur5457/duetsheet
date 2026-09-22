@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use Duetsheet, please cite it as below."
+title: "Duetsheet: an interactive report that humans and AI agents review and revise together"
+type: software
+authors:
+  - family-names: Wu
+    given-names: Shu Chi
+version: 0.4.0
+date-released: 2026-09-23
+license: MIT
+repository-code: "https://github.com/Ashur5457/duetsheet"
+url: "https://github.com/Ashur5457/duetsheet"
+abstract: >-
+  Duetsheet is an open-source, single-file interactive HTML report for
+  human-in-the-loop review of AI-generated, data-heavy reports. People edit
+  text and charts in place and annotate figures with boxes, lassos and data
+  points stored in data coordinates; every change is recorded with its author
+  and grouped into review rounds. The report is plain JSON with a published
+  JSON Schema, so any LLM agent can read the feedback and revise the report.
+  Raw data keeps its provenance (path and SHA-256), and the figure style can
+  be learned from the user's own figures.
+keywords:
+  - human-in-the-loop
+  - AI agents
+  - LLM
+  - interactive report
+  - annotation
+  - change tracking
+  - provenance
+  - reproducibility
+  - scientific workflow
+  - data visualization
