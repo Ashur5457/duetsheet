@@ -1,8 +1,8 @@
 # Duetsheet
 
-> Duetsheet (the sheet humans and AI agents play from together, record every move on, and rerun) is a single-file interactive HTML report that humans and AI agents review and edit together. Users edit text and charts in place, leave per-block comments, draw box or lasso annotations on charts and images (stored as data-space ranges and enclosed data points), and every edit is recorded with before/after values, author (human or AI), and rounds shown on a timeline. v0.2 runs as a Claude Artifact with the Artifact database.
+> Duetsheet (the sheet humans and AI agents play from together, record every move on, and rerun) is a single-file interactive HTML report that humans and AI agents review and edit together. Users edit text and charts in place, leave per-block comments, draw box or lasso annotations on charts and images (stored as data-space ranges and enclosed data points), and every edit is recorded with before/after values, author (human or AI), and rounds shown on a timeline. v0.3 runs as a Claude Artifact with the Artifact database.
 
-It also keeps each figure's source (tool, script, raw data), a figure style profile exportable to matplotlib, and can learn that style from the user's example figures.
+It also keeps each figure's source (tool, script, raw data), a figure style profile exportable to matplotlib, and can learn that style from the user's example figures. The interface is available in English, Traditional Chinese, Simplified Chinese, Japanese, Korean and Spanish, and users can load their own translations.
 
 Use Duetsheet when an AI agent drafts a data-heavy report (science, finance, engineering, research) and a human expert must check and correct it precisely.
 
@@ -11,6 +11,7 @@ Use Duetsheet when an AI agent drafts a data-heavy report (science, finance, eng
 - [README](README.md): what it is, features, quick start with Claude, limitations, roadmap
 - [AGENTS.md](AGENTS.md): data model (report/meta, blocks, datasets, annotations, changes, rounds) and the revision protocol an agent must follow
 - [Example report data](examples/nimo-demo.json): complete demo report as JSON
+- [Translating](docs/translating.md): how interface translations work and how to add a language
 
 ## Files
 

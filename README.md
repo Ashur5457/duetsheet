@@ -8,7 +8,7 @@ Why the name: in a duet, two performers play from **one sheet of music**. In Due
 
 It is a human-in-the-loop review tool for AI-generated reports: a single-file interactive report with visual annotation, per-block comments, change tracking with diffs, version rounds, and a change timeline.
 
-> **Status: v0.2 prototype, Claude-first.** This version runs as a [Claude](https://claude.ai) Artifact and uses the Artifact database for cloud storage. See [Roadmap](#roadmap).
+> **Status: v0.3 prototype, Claude-first.** This version runs as a [Claude](https://claude.ai) Artifact and uses the Artifact database for cloud storage. See [Roadmap](#roadmap).
 
 ![Paginated view mode](docs/view-mode.png)
 
@@ -32,6 +32,7 @@ Describing "the cluster of points in the upper left of the second figure looks o
 - **Style profile**: fonts, tick and axis-title sizes (in points, scaled to the figure width), marker size, line width, tick direction, frame, grid, colour palette, figure width presets (free, ACS single column, ACS double column), and defaults for new charts. Applied to every chart in the report and exportable as a matplotlib `.mplstyle` file or JSON.
 - **Learn a style from your own figures**: upload example figures. SVG examples are parsed exactly (font, sizes, colours, line width, figure width); PNG/JPEG examples are estimated by Claude with a confidence per setting. You review the suggested changes and apply only the ones you tick.
 - **Habit suggestions**: when you make the same chart change on three charts (for example switching to a log axis), Duetsheet offers to make it the default. Nothing changes until you confirm.
+- **Six interface languages, plus your own**: English, Traditional Chinese, Simplified Chinese, Japanese, Korean and Spanish, picked from the browser language. Anyone can add a language or correct a translation from the language menu: download a template, fill it in, load it. No code needed. See [docs/translating.md](docs/translating.md).
 
 ![Annotating a chart with a lasso and a data point](docs/edit-annotate.png)
 
@@ -99,13 +100,14 @@ Opening `duetsheet.html` directly in a browser also works, but in that case data
 - Learning a style from PNG/JPEG examples uses the viewer's own Claude usage and gives approximate values; SVG examples give exact values.
 - The matplotlib export is saved as `duetsheet-style.mplstyle.txt` (the download allowlist has no `.mplstyle`); remove the `.txt` extension before use.
 - Origin theme files (`.oth`) cannot be imported; export an SVG from Origin and use it as an example instead.
+- The interface language does not translate the report itself: titles, text and captions stay in the language they were written in.
+- Right-to-left languages (for example Arabic or Hebrew) can be loaded as translations, but the layout stays left-to-right.
 
 ## Roadmap
 
 Duetsheet is planned in four stages: **record and review** (today), **workflows**, **lab automation**, and **agent evaluation**.
 
 
-- More interface languages (the code already supports a language switch; a Traditional Chinese translation exists)
 - Local file storage and JSON import/export, so the report works without any AI platform
 - A published JSON Schema, so any LLM (GPT, Gemini, local models) can generate and revise Duetsheet reports
 - One-click "copy feedback for your LLM" prompt export
@@ -119,6 +121,10 @@ Duetsheet is planned in four stages: **record and review** (today), **workflows*
 ## Contributing
 
 Issues and pull requests are welcome, especially real-world report types, annotation needs from other fields, and translations.
+
+- `duetsheet.html` is the only source file. There is no build step: edit it and open it in a browser.
+- New interface text goes through `tr('English text')` and needs an entry in the translation tables. [docs/translating.md](docs/translating.md) explains how.
+- Before sending a pull request, run `python tools/check.py`. It checks that code and comments are English, that the translation tables are valid, and that no interface text is missing a translation entry.
 
 ## License
 

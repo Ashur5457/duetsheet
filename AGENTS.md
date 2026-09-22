@@ -2,7 +2,11 @@
 
 This file tells an AI agent how to read human feedback in a Duetsheet report and how to revise the report so that every change stays visible, attributable, and reversible.
 
-Schema version: `duetsheet/0.2`. In v0.2 the data lives in the database of a Claude Artifact (collections and documents, JSON values). A full example is in [`examples/nimo-demo.json`](examples/nimo-demo.json).
+Schema version: `duetsheet/0.3`. The data lives in the database of a Claude Artifact (collections and documents, JSON values). A full example is in [`examples/nimo-demo.json`](examples/nimo-demo.json).
+
+Reports created with `duetsheet/0.2` are read as they are; nothing needs to be migrated. The only difference is how annotation tags are stored (see `annotations` below).
+
+The interface can be shown in several languages, but that never changes the data: field names, tag ids and enum values are always English. Report content (titles, text, captions, replies) is written in whatever language the user works in; reply in the language of the annotation.
 
 ## Collections
 
@@ -58,7 +62,7 @@ Example figures the user uploaded to show their preferred style. Use them as the
 
 ### `annotations/{id}`
 ```json
-{ "id": "a...", "no": 3, "target": { }, "tags": ["add trend line"], "text": "free text, may be empty",
+{ "id": "a...", "no": 3, "target": { }, "tags": ["add-trend-line"], "text": "free text, may be empty",
   "status": "open" | "done", "reply": "", "createdAt": "ISO-8601", "resolvedAt": null }
 ```
 `target` is one of:
@@ -72,7 +76,16 @@ Example figures the user uploaded to show their preferred style. Use them as the
 
 `space: "data"` means coordinates are in the chart's data units for the columns `xKey` and `yKey`, and `enclosed` lists the row ids inside the region. `space: "image"` means coordinates are normalised to the visible (cropped) image, from 0 to 1, with y pointing down.
 
-Tags come from preset buttons in the UI and are stored as the text shown in the UI language at the time (for example `Add trend line`).
+Tags come from preset buttons in the UI and are stored as stable ids, whatever the interface language:
+
+| Block type | Tag ids |
+|---|---|
+| `text` | `more-concise`, `more-formal`, `add-data`, `add-citation`, `claim-too-strong`, `translate` |
+| `chart` | `change-chart-type`, `change-axes`, `use-log-scale`, `add-error-bars`, `add-trend-line`, `highlight-key-points`, `change-colours` |
+| `table` | `add-units`, `change-sort`, `add-remove-columns`, `highlight-key-points` |
+| `image` | `crop`, `add-labels`, `replace-image`, `add-caption` |
+
+Reports from `duetsheet/0.2` stored the button text instead, in the interface language of the time (for example `Add trend line` or its Chinese translation). Read such a tag by its meaning; do not rewrite old annotations just to change the tag format. A tag that is not in the table above is free text from the user.
 
 ### `changes/{id}`
 One document per changed field.

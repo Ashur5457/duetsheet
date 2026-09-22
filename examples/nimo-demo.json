@@ -1,5 +1,5 @@
 {
- "schema": "duetsheet/0.2",
+ "schema": "duetsheet/0.3",
  "meta": {
   "title": "NIMO demo report",
   "order": [
@@ -11,7 +11,7 @@
    "b-img",
    "b-next"
   ],
-  "schema": "duetsheet/0.2",
+  "schema": "duetsheet/0.3",
   "createdAt": "2026-09-22T00:00:00.000Z"
  },
  "datasets": {
