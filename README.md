@@ -185,7 +185,7 @@ Duetsheet is planned in four stages: **record and review** (today), **workflows*
 
 ## Contributing
 
-Issues and pull requests are welcome, especially real-world report types, annotation needs from other fields, and translations.
+Issues and pull requests are welcome, especially real-world report types, annotation needs from other fields, and translations. The Simplified Chinese, Japanese, Korean and Spanish interface texts were drafted with AI help: corrections from native speakers are very welcome.
 
 - `duetsheet.html` is the only source file. There is no build step: edit it and open it in a browser.
 - New interface text goes through `tr('English text')` and needs an entry in the translation tables. [docs/translating.md](docs/translating.md) explains how.
