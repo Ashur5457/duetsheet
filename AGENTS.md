@@ -46,6 +46,7 @@ battery-test-0924/            the raw data folder the user works in
 ```bash
 python duetsheet.py "<folder>"          # start (keep it running, for example as a background process)
 python duetsheet.py check "<folder>"    # check report.json; exit code 1 on errors
+python duetsheet.py shortcut "<folder>" # put a desktop shortcut that starts Duetsheet for the folder
 ```
 
 - It serves the page on `127.0.0.1` with a random token, and lets the page write only Duetsheet's own files (`report.json`, `assets/`, `exports/`, `habits/`, `lang/`, `errors.log`). Raw data is read only.

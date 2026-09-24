@@ -4,6 +4,7 @@
     python duetsheet.py [FOLDER]            start Duetsheet for FOLDER (default: the current folder)
     python duetsheet.py check [FOLDER]      check the report in FOLDER and exit (exit code 1 on errors)
     python duetsheet.py install-skill       install the /duetsheet skill for Claude Code
+    python duetsheet.py shortcut [FOLDER]   put a shortcut on the desktop that starts Duetsheet for FOLDER
 
 Where the report lives:
   - If FOLDER contains report.json, FOLDER is the project folder (raw data in FOLDER/data/).
@@ -17,7 +18,7 @@ so an agent running this command sees them.
 
 Python 3.8 or later, standard library only.
 """
-import argparse, hashlib, hmac, http.server, json, mimetypes, os, pathlib, secrets, sys, threading, time, urllib.parse, webbrowser
+import argparse, base64, hashlib, hmac, http.server, json, mimetypes, os, pathlib, re, secrets, subprocess, sys, threading, time, urllib.parse, webbrowser
 
 VERSION = '0.5.0'
 HERE = pathlib.Path(__file__).resolve().parent
@@ -424,15 +425,68 @@ def install_skill(target):
     return 0
 
 
+# ---------------------------------------------------------------- a desktop shortcut
+
+def desktop_dir():
+    if os.name == 'nt':
+        try:  # the real desktop, also when OneDrive has moved it
+            import ctypes
+            buf = ctypes.create_unicode_buffer(1024)
+            if ctypes.windll.shell32.SHGetFolderPathW(None, 0x10, None, 0, buf) == 0 and buf.value:
+                return pathlib.Path(buf.value)
+        except Exception:
+            pass
+    d = pathlib.Path.home() / 'Desktop'
+    return d if d.is_dir() else pathlib.Path.home()
+
+
+def shortcut_name(root):
+    project, _ = project_of(root)
+    title = ''
+    try:
+        title = json.loads((project / 'report.json').read_text(encoding='utf-8-sig'))['report']['meta']['title']
+    except Exception:
+        pass
+    name = str(title or (root.parent.name if root.name == SUBDIR else root.name)).strip()
+    name = re.sub(r'[\\/:*?"<>|\x00-\x1f]+', ' ', name).strip()[:60] or 'report'
+    return 'Duetsheet - ' + name
+
+
+def make_shortcut(root, target):
+    dest = pathlib.Path(target).expanduser() if target else desktop_dir()
+    dest.mkdir(parents=True, exist_ok=True)
+    name, py, script = shortcut_name(root), sys.executable, HERE / 'duetsheet.py'
+    if os.name == 'nt':
+        link = dest / (name + '.lnk')
+        q = lambda v: "'" + str(v).replace("'", "''") + "'"
+        ps = (f'$s=(New-Object -ComObject WScript.Shell).CreateShortcut({q(link)});$s.TargetPath={q(py)};'
+              f'$s.Arguments={q(chr(34) + str(script) + chr(34) + " " + chr(34) + str(root) + chr(34))};'
+              f'$s.WorkingDirectory={q(root)};$s.Description={q("Start Duetsheet for " + str(root))};$s.Save()')
+        enc = base64.b64encode(ps.encode('utf-16-le')).decode('ascii')
+        r = subprocess.run(['powershell', '-NoProfile', '-NonInteractive', '-EncodedCommand', enc], capture_output=True, text=True)
+        if r.returncode or not link.is_file():
+            say('ERROR', 'could not create the shortcut:', (r.stderr or r.stdout).strip()[:500])
+            return 1
+    else:
+        link = dest / (name + ('.command' if sys.platform == 'darwin' else '.sh'))
+        sh = lambda v: "'" + str(v).replace("'", "'\\''") + "'"
+        link.write_text(f'#!/bin/sh\nexec {sh(py)} {sh(script)} {sh(root)}\n', encoding='utf-8')
+        link.chmod(0o755)
+    say('Created', link)
+    say('Double-click it to open the report; keep the window that opens while you use it.')
+    return 0
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description='Duetsheet launcher', formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__)
-    ap.add_argument('args', nargs='*', help='[check | install-skill] [FOLDER]')
+    ap.add_argument('args', nargs='*', help='[check | install-skill | shortcut] [FOLDER]')
     ap.add_argument('--port', type=int, default=0, help='port (default: first free port from 8765)')
     ap.add_argument('--no-browser', action='store_true', help='do not open a browser window')
     ap.add_argument('--skills-dir', default='~/.claude/skills', help='where install-skill puts the skill')
+    ap.add_argument('--to', default='', help='where shortcut puts the shortcut (default: the desktop)')
     ap.add_argument('--version', action='version', version=VERSION)
     a = ap.parse_args(argv)
-    cmd = a.args[0] if a.args and a.args[0] in ('check', 'install-skill', 'serve') else 'serve'
+    cmd = a.args[0] if a.args and a.args[0] in ('check', 'install-skill', 'shortcut', 'serve') else 'serve'
     rest = a.args[1:] if a.args and a.args[0] == cmd else a.args
     if cmd == 'install-skill':
         return install_skill(a.skills_dir)
@@ -442,6 +496,8 @@ def main(argv=None):
         return 1
     if cmd == 'check':
         return run_check(root)
+    if cmd == 'shortcut':
+        return make_shortcut(root, a.to)
     return serve(root, a.port, not a.no_browser)
 
 

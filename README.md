@@ -22,8 +22,8 @@ Describing "the cluster of points in the upper left of the second figure looks o
 
 **Review**
 - **View mode**: clean, paginated 16:9 pages with automatic page breaks. Mark any block as "force a new page", "keep with the previous block", or "beside the previous block", which puts a figure and its discussion side by side. A contents block lists the sections and figures with their page numbers as links. Figures shrink to fit when a page overflows.
-- **Edit mode**: edit titles, text and captions in place; change chart type, dataset, axes, ranges and log scale; crop and resize images; drag blocks to reorder; add or delete blocks.
-- **Visual annotation on figures**: box-select or free-hand lasso on charts and images, or click a single data point. On charts the annotation stores the **data-space range and the enclosed data points**, not pixels, so the agent knows exactly which measurements you mean.
+- **Edit mode**: edit titles, text and captions in place; change chart type, dataset, axes, ranges and log scale; crop and resize images; drag blocks to reorder, or switch to **Reorder (titles only)** to see every block as one line, page by page, and drag a figure together with its discussion; add or delete blocks.
+- **Visual annotation on figures**: box-select or free-hand lasso on charts and images, or click a single data point (also in View mode). A small dialog opens right there to say what should change. On charts the annotation stores the **data-space range and the enclosed data points**, not pixels, so the agent knows exactly which measurements you mean.
 - **Per-block comments** with preset tags ("more concise", "add data", "use log scale", "add trend line", ...) and quotes of selected text.
 
 **History**
@@ -44,6 +44,7 @@ Describing "the cluster of points in the upper left of the second figure looks o
 **For everyone**
 - **Problems you can see**: errors and warnings stay listed under **⚠** at the top (for a broken `report.json`, with the line and column). With the launcher they also reach your agent and are saved in `errors.log`. `NaN` and `Infinity` written by Python are read as empty values instead of breaking the page, and failed saves (for example while OneDrive holds the file) are retried.
 - **Six interface languages, plus your own**: English, Traditional Chinese, Simplified Chinese, Japanese, Korean and Spanish, picked from the browser language. Anyone can add a language or correct a translation from the language menu, with no code. See [docs/translating.md](docs/translating.md).
+- **Read-only copies and shortcuts**: **Export read-only copy** writes one HTML file with the report and its images inside; it opens in any browser, straight into View mode, and can be sent to anyone. `python duetsheet.py shortcut <folder>` puts a desktop shortcut that opens the report with one double-click.
 - **Open format**: the report is plain JSON with a published [JSON Schema](schema/report.schema.json), so any program or LLM can read, generate and validate it.
 
 ![Annotating a chart with a lasso and a data point](docs/edit-annotate.png)

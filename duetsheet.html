@@ -98,7 +98,7 @@ main{min-width:0}
 .page{width:var(--pw);height:var(--ph);margin:0 auto;background:var(--paper);border-radius:6px;
   box-shadow:0 1px 2px rgba(0,0,0,.08),0 6px 24px rgba(0,0,0,.08);position:relative;overflow:hidden}
 .page .inner{position:absolute;inset:0;padding:var(--py) var(--px);overflow:hidden;display:flex;flex-direction:column;gap:var(--gap)}
-.page.over .inner{overflow:auto}
+.page.scrolls .inner{overflow:auto}
 .page .pno{position:absolute;right:14px;bottom:8px;font-size:12px;color:var(--muted)}
 .pager{display:flex;align-items:center;justify-content:center;gap:12px;margin:16px 0 10px}
 .pager .cnt{min-width:96px;text-align:center;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -142,7 +142,7 @@ th{font-weight:500;color:var(--muted);font-size:13px}
 .imgw svg.ov{position:absolute;inset:0;width:100%;height:100%;touch-action:none;user-select:none}
 
 /* annotation marks */
-.over,.pend,.live{pointer-events:none}
+g.over,g.pend,g.live{pointer-events:none}
 .shape{fill:var(--mark-fill);stroke:var(--mark);stroke-width:1.8;stroke-dasharray:6 4;vector-effect:non-scaling-stroke}
 .ov .done .shape,.done>.shape{fill:var(--ok-fill);stroke:var(--ok)}
 .ring{fill:none;stroke:var(--mark);stroke-width:2;vector-effect:non-scaling-stroke}
@@ -291,7 +291,24 @@ details.round summary{cursor:pointer;font-size:13.5px}
 .expout{width:100%;box-sizing:border-box;min-height:120px;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--line);border-radius:5px;background:var(--paper);margin-top:6px}
 #measure{position:absolute;left:-10000px;top:0;visibility:hidden;width:var(--iw)}
 #measure .blk{margin:0}
-#tip{position:fixed;z-index:60;pointer-events:none;background:var(--ink);color:var(--paper);padding:4px 9px;border-radius:6px;font-size:12.5px;white-space:nowrap}
+#tip{position:fixed;z-index:60;pointer-events:none;background:var(--ink);color:var(--paper);padding:5px 10px;border-radius:6px;font-size:12.5px;line-height:1.45;white-space:pre-line;max-width:320px;overflow-wrap:anywhere}
+#qc{position:fixed;z-index:55;width:340px;max-width:calc(100vw - 16px);background:var(--paper);border:1px solid var(--line);border-radius:8px;
+  box-shadow:0 4px 24px rgba(0,0,0,.18);padding:10px 12px}
+#qc .qwhere{margin:0 0 6px;font-size:12.5px;font-weight:500}
+#qc .qrow{margin:0 0 8px;font-size:12.5px;color:var(--muted);white-space:pre-line;line-height:1.45;overflow-wrap:anywhere}
+#qc textarea{width:100%;box-sizing:border-box;font:inherit;font-size:13px;margin:0 0 8px}
+#qc .crow{display:flex;gap:8px;align-items:center}#qc .sp{flex:1}
+.flowbar{max-width:var(--pw);margin:0 auto 8px;display:flex;justify-content:flex-end}
+#flow.compact .pgsep{font-size:12px;color:var(--muted);margin:14px 0 4px;border-bottom:1px dotted var(--line);padding-bottom:2px}
+#flow.compact .cg{display:flex;gap:10px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:6px 10px;margin:4px 0;cursor:grab}
+#flow.compact .cg .hdl{color:var(--muted)}
+#flow.compact .cgl{flex:1;min-width:0}
+#flow.compact .cgi{display:flex;gap:10px;font-size:13.5px;line-height:1.5}
+#flow.compact .cgi.side{padding-left:1.4em}
+#flow.compact .cgi.side::before{content:"\21B3";color:var(--muted);margin-left:-1.2em}
+#flow.compact .cgi .ty{color:var(--muted);flex:0 0 4.5em;font-size:12px}
+#flow.compact .cgi .tt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:none!important}
 #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);transform:translateX(-50%);z-index:70;background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:8px;font-size:14px;max-width:80vw}
 @media (max-width:1100px){.wrap{grid-template-columns:1fr}#panel{position:static;max-height:none}}
 </style>
@@ -323,6 +340,7 @@ details.round summary{cursor:pointer;font-size:13.5px}
     <nav class="thumbs" id="thumbs" aria-label="Pages"></nav>
   </section>
   <section id="edit" aria-label="Edit" hidden>
+    <div class="flowbar"><button type="button" class="btn small" id="compactBtn" aria-pressed="false">Reorder (titles only)</button></div>
     <div id="flow"></div>
     <div class="addrow" id="addrow">
       <button type="button" class="btn" data-add="text">Add text</button>
@@ -373,6 +391,7 @@ details.round summary{cursor:pointer;font-size:13.5px}
 <input type="file" id="langfile" accept=".json,application/json" hidden>
 <input type="file" id="reportfile" accept=".json,application/json" hidden>
 <div id="tip" hidden></div>
+<div id="qc" hidden role="dialog" aria-label="Comment"></div>
 <div id="toast" hidden></div>
 
 <!-- Interface translations. Keys are the English text; "context|English" keys disambiguate the same English in different places.
@@ -670,7 +689,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Cancel": "取消",
  "Apply selected": "套用勾選項目",
  "Style applied": "已套用樣式",
- "data|, ": "，",
  "field|Text": "內文",
  "field|Page break": "分頁方式",
  "timeline|Current": "本輪",
@@ -797,7 +815,17 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Made from the titles of the blocks after this one. Page numbers follow view mode; click a title to go there.": "依照這個區塊之後各區塊的標題自動產生。頁碼與檢視模式一致；點標題即可跳過去。",
  "Beside previous (right column)": "放在前一塊旁邊（右欄）",
  "Beside previous": "放在前一塊旁邊",
- "Click to switch: automatic, new page, keep with previous, beside previous": "點一下切換：自動、強制換頁、與上一塊同頁、放在上一塊旁邊"
+ "Click to switch: automatic, new page, keep with previous, beside previous": "點一下切換：自動、強制換頁、與上一塊同頁、放在上一塊旁邊",
+ "An image could not be included in the read-only copy: {name}": "有一張圖無法放進唯讀副本：{name}",
+ "Comment": "註記",
+ "Export read-only copy": "匯出唯讀報告",
+ "Page {n}": "第 {n} 頁",
+ "Read-only copy. Use the arrow keys or the buttons below to turn pages.": "唯讀副本。用方向鍵或下方按鈕翻頁。",
+ "Reorder (titles only)": "整理順序（只看標題）",
+ "This file": "這個檔案",
+ "What should change here? Ctrl + Enter to send.": "這裡想怎麼改？Ctrl + Enter 送出。",
+ "{title} (read-only)": "{title}（唯讀）",
+ "… {n} more": "…還有 {n} 項"
 },
 "zh-Hans": {
  "_name": "简体中文",
@@ -1090,7 +1118,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Cancel": "取消",
  "Apply selected": "应用勾选项",
  "Style applied": "已应用样式",
- "data|, ": "，",
  "field|Text": "正文",
  "field|Page break": "分页方式",
  "timeline|Current": "本轮",
@@ -1217,7 +1244,17 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Made from the titles of the blocks after this one. Page numbers follow view mode; click a title to go there.": "根据此区块之后各区块的标题自动生成。页码与查看模式一致；点击标题即可跳转。",
  "Beside previous (right column)": "放在前一块旁边（右栏）",
  "Beside previous": "放在前一块旁边",
- "Click to switch: automatic, new page, keep with previous, beside previous": "点击切换：自动、强制分页、与上一块同页、放在上一块旁边"
+ "Click to switch: automatic, new page, keep with previous, beside previous": "点击切换：自动、强制分页、与上一块同页、放在上一块旁边",
+ "An image could not be included in the read-only copy: {name}": "有一张图无法放入只读副本：{name}",
+ "Comment": "批注",
+ "Export read-only copy": "导出只读报告",
+ "Page {n}": "第 {n} 页",
+ "Read-only copy. Use the arrow keys or the buttons below to turn pages.": "只读副本。用方向键或下方按钮翻页。",
+ "Reorder (titles only)": "调整顺序（只看标题）",
+ "This file": "此文件",
+ "What should change here? Ctrl + Enter to send.": "这里想怎么改？Ctrl + Enter 发送。",
+ "{title} (read-only)": "{title}（只读）",
+ "… {n} more": "…还有 {n} 项"
 },
 "ja": {
  "_name": "日本語",
@@ -1510,7 +1547,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Cancel": "キャンセル",
  "Apply selected": "選択した項目を適用",
  "Style applied": "スタイルを適用しました",
- "data|, ": "、",
  "field|Text": "本文",
  "field|Page break": "改ページ設定",
  "timeline|Current": "現在",
@@ -1637,7 +1673,17 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Made from the titles of the blocks after this one. Page numbers follow view mode; click a title to go there.": "このブロックより後のブロックのタイトルから自動で作られます。ページ番号は閲覧モードと同じです。タイトルをクリックするとそのページへ移動します。",
  "Beside previous (right column)": "前のブロックの横（右列）",
  "Beside previous": "前のブロックの横",
- "Click to switch: automatic, new page, keep with previous, beside previous": "クリックで切り替え：自動、改ページ、前のブロックと同じページ、前のブロックの横"
+ "Click to switch: automatic, new page, keep with previous, beside previous": "クリックで切り替え：自動、改ページ、前のブロックと同じページ、前のブロックの横",
+ "An image could not be included in the read-only copy: {name}": "閲覧専用コピーに含められなかった画像があります：{name}",
+ "Comment": "コメント",
+ "Export read-only copy": "閲覧専用コピーを書き出す",
+ "Page {n}": "{n} ページ",
+ "Read-only copy. Use the arrow keys or the buttons below to turn pages.": "閲覧専用コピーです。矢印キーか下のボタンでページをめくります。",
+ "Reorder (titles only)": "順序を整理（タイトルのみ）",
+ "This file": "このファイル",
+ "What should change here? Ctrl + Enter to send.": "ここをどう直しますか？Ctrl + Enter で送信。",
+ "{title} (read-only)": "{title}（閲覧専用）",
+ "… {n} more": "…ほか {n} 項目"
 },
 "ko": {
  "_name": "한국어",
@@ -1930,7 +1976,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Cancel": "취소",
  "Apply selected": "선택한 항목 적용",
  "Style applied": "스타일을 적용했습니다",
- "data|, ": ", ",
  "field|Text": "본문",
  "field|Page break": "페이지 나눔 방식",
  "timeline|Current": "현재",
@@ -2057,7 +2102,17 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Made from the titles of the blocks after this one. Page numbers follow view mode; click a title to go there.": "이 블록 뒤에 있는 블록의 제목으로 자동 생성됩니다. 페이지 번호는 보기 모드와 같으며, 제목을 클릭하면 해당 위치로 이동합니다.",
  "Beside previous (right column)": "앞 블록 옆 (오른쪽 열)",
  "Beside previous": "앞 블록 옆",
- "Click to switch: automatic, new page, keep with previous, beside previous": "클릭하여 전환: 자동, 새 페이지, 앞 블록과 같은 페이지, 앞 블록 옆"
+ "Click to switch: automatic, new page, keep with previous, beside previous": "클릭하여 전환: 자동, 새 페이지, 앞 블록과 같은 페이지, 앞 블록 옆",
+ "An image could not be included in the read-only copy: {name}": "읽기 전용 사본에 넣지 못한 이미지가 있습니다: {name}",
+ "Comment": "코멘트",
+ "Export read-only copy": "읽기 전용 사본 내보내기",
+ "Page {n}": "{n}페이지",
+ "Read-only copy. Use the arrow keys or the buttons below to turn pages.": "읽기 전용 사본입니다. 방향키나 아래 버튼으로 페이지를 넘기세요.",
+ "Reorder (titles only)": "순서 정리 (제목만)",
+ "This file": "이 파일",
+ "What should change here? Ctrl + Enter to send.": "여기를 어떻게 바꿀까요? Ctrl + Enter로 보내기.",
+ "{title} (read-only)": "{title} (읽기 전용)",
+ "… {n} more": "… 외 {n}개"
 },
 "es": {
  "_name": "Español",
@@ -2350,7 +2405,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Cancel": "Cancelar",
  "Apply selected": "Aplicar lo seleccionado",
  "Style applied": "Estilo aplicado",
- "data|, ": ", ",
  "field|Text": "Texto",
  "field|Page break": "Salto de página",
  "timeline|Current": "Actual",
@@ -2477,13 +2531,25 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Made from the titles of the blocks after this one. Page numbers follow view mode; click a title to go there.": "Se genera a partir de los títulos de los bloques que vienen después de este. Los números de página son los del modo de lectura; haz clic en un título para ir allí.",
  "Beside previous (right column)": "Junto al bloque anterior (columna derecha)",
  "Beside previous": "Junto al bloque anterior",
- "Click to switch: automatic, new page, keep with previous, beside previous": "Haz clic para cambiar: automático, página nueva, con el bloque anterior, junto al bloque anterior"
+ "Click to switch: automatic, new page, keep with previous, beside previous": "Haz clic para cambiar: automático, página nueva, con el bloque anterior, junto al bloque anterior",
+ "An image could not be included in the read-only copy: {name}": "Una imagen no se pudo incluir en la copia de solo lectura: {name}",
+ "Comment": "Comentario",
+ "Export read-only copy": "Exportar copia de solo lectura",
+ "Page {n}": "Página {n}",
+ "Read-only copy. Use the arrow keys or the buttons below to turn pages.": "Copia de solo lectura. Usa las flechas o los botones de abajo para pasar de página.",
+ "Reorder (titles only)": "Reordenar (solo títulos)",
+ "This file": "Este archivo",
+ "What should change here? Ctrl + Enter to send.": "¿Qué debería cambiar aquí? Ctrl + Enter para enviar.",
+ "{title} (read-only)": "{title} (solo lectura)",
+ "… {n} more": "… {n} más"
 }
 }
 </script>
 <script>
 (()=>{
 'use strict';
+// The page's own source, kept before anything changes the document: a read-only copy is this source plus the report.
+const SOURCE='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const NS='http://www.w3.org/2000/svg';
@@ -2885,7 +2951,7 @@ function fitPage(inner,blocks){
   let cur=parseFloat(cssv('--chartmax'))||300;
   for(let i=0;i<4&&visuals;i++){const over=inner.scrollHeight-inner.clientHeight;if(over<=1)break;
     cur=Math.max(160,cur-over/visuals-4);inner.style.setProperty('--chartmax',cur+'px');if(cur===160)break}
-  if(inner.scrollHeight-inner.clientHeight>1)inner.parentElement.classList.add('over');
+  if(inner.scrollHeight-inner.clientHeight>1)inner.parentElement.classList.add('scrolls');
 }
 
 /* ---------- Edit mode ---------- */
@@ -3226,7 +3292,9 @@ async function submitDraft(id){
   await put('annotations/'+a.id,a);toast(tr('Comment sent #')+no);
 }
 function renderEdit(){
-  const flow=$('#flow');flow.replaceChildren();S.geo={};
+  $('#compactBtn').setAttribute('aria-pressed',String(!!S.compact));$('#addrow').hidden=!!S.compact;
+  if(S.compact)return renderCompact();
+  const flow=$('#flow');flow.replaceChildren();flow.classList.remove('compact');S.geo={};
   const blocks=orderedBlocks();
   blocks.forEach((b,i)=>{
     const cw=h('div',{class:'cw','data-id':b.id});
@@ -3250,6 +3318,22 @@ function renderEdit(){
     S.sortable=Sortable.create(flow,{handle:'.hdl',draggable:'.cw',animation:150,ghostClass:'ghost',
       onEnd:()=>{const o=$$('.cw',flow).map(n=>n.dataset.id);if(!same(o,orderedBlocks().map(b=>b.id)))saveOrder(o)}})}
   paintAllOverlays();
+}
+
+/* Reorder view: one line per block, one card per group of blocks kept together, page by page */
+function blockLabel(b){if(b.title)return b.title;
+  if(b.type==='text'){const t=(b.text||'').replace(/[*_#>`]/g,'').replace(/^\s*- /gm,'').replace(/\s+/g,' ').trim();return t.length>70?t.slice(0,70)+'…':t}
+  return b.caption||typeName(b.type)}
+function renderCompact(){
+  const flow=$('#flow');flow.replaceChildren();flow.classList.add('compact');S.geo={};
+  S.pages.forEach((p,i)=>{flow.append(h('div',{class:'pgsep',text:tr('Page {n}',{n:i+1})}));
+    blockGroups(p).forEach(g=>flow.append(h('div',{class:'cg','data-ids':g.blocks.map(b=>b.id).join(' '),title:tr('Drag to reorder')},[
+      h('span',{class:'hdl',text:'⠿'}),
+      h('div',{class:'cgl'},g.blocks.map(b=>h('div',{class:'cgi'+(b.breakBefore==='beside'&&g.side.includes(b)?' side':'')},[
+        h('span',{class:'ty',text:typeName(b.type)}),h('span',{class:'tt',text:blockLabel(b)})])))])))});
+  if(window.Sortable){if(S.sortable)S.sortable.destroy();
+    S.sortable=Sortable.create(flow,{draggable:'.cg',animation:150,ghostClass:'ghost',
+      onEnd:()=>{const o=$$('.cg',flow).flatMap(n=>n.dataset.ids.split(' '));if(!same(o,orderedBlocks().map(b=>b.id)))saveOrder(o)}})}
 }
 
 /* ---------- Comment text ---------- */
@@ -3617,11 +3701,11 @@ function bindDraw(G,svg){
       if(x<G.plot.x0||x>G.plot.x1||y<G.plot.y0||y>G.plot.y1)return}
     e.preventDefault();svg.setPointerCapture(e.pointerId);d={tool:S.draw.tool,start:p0,cur:p0,pts:[p0]};live()});
   svg.addEventListener('pointermove',e=>{if(!d)return;const p=loc(e);d.cur=p;if(d.tool==='lasso'){const l=d.pts[d.pts.length-1];if(Math.hypot(p[0]-l[0],p[1]-l[1])>=(G.space==='image'?G.W/200:3))d.pts.push(p)}live()});
-  const end=e=>{if(!d)return;const dd=d;d=null;G.live.replaceChildren();if(e.type==='pointerup')finish(dd)};
+  const end=e=>{if(!d)return;const dd=d;d=null;G.live.replaceChildren();if(e.type==='pointerup')finish(dd,e)};
   svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
   function live(){G.live.replaceChildren();if(d.tool==='box'){el('rect',{class:'shape pendshape',x:Math.min(d.start[0],d.cur[0]),y:Math.min(d.start[1],d.cur[1]),width:Math.abs(d.cur[0]-d.start[0]),height:Math.abs(d.cur[1]-d.start[1])},G.live)}
     else if(d.pts.length>1)el('path',{class:'shape pendshape',d:'M'+d.pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L')+' Z'},G.live)}
-  function finish(dd){
+  function finish(dd,ev){
     const scale=G.space==='image'?G.W/680:1;
     const base={blockId:G.b.id,space:G.space};if(G.space==='data'){base.xKey=G.xKey;base.yKey=G.yKey}
     const inside=G.space==='data'?(pred=>G.rows.filter(r=>pred(+r[G.xKey],+r[G.yKey])).map(r=>r.id)):null;
@@ -3637,23 +3721,62 @@ function bindDraw(G,svg){
       t={...base,kind:'lasso',polygon:poly};if(inside)t.enclosed=inside((x,y)=>inPoly(x,y,poly));
     }
     draftOf(G.b.id).target=t;S.draw=null;document.body.dataset.draw='';render();
-    const c=$(`[data-fid="${CSS.escape(fid(G.b,'comment'))}"]`);if(c)c.focus({preventScroll:true});
+    openQuick(G.b.id,ev.clientX,ev.clientY);
   }
 }
-// Clicking a data point: only in edit mode, and only when not drawing a box or lasso
+// One line per column: the chart's x, y and colour columns first
+function pointLines(b,ds,r,max){
+  const c=b.chart||{},first=[c.x,c.y,c.color].filter((k,i,a)=>k&&a.indexOf(k)===i);
+  const cols=[...first.map(k=>ds.columns.find(x=>x.key===k)).filter(Boolean),...ds.columns.filter(x=>!first.includes(x.key))];
+  const lines=cols.map(x=>x.label+': '+(x.key==='id'?'#'+r[x.key]:fmt(r[x.key])));
+  return lines.length>max?[...lines.slice(0,max),tr('… {n} more',{n:lines.length-max})]:lines}
+// Clicking a data point (view or edit mode, not while drawing) opens the comment dialog next to it
 document.addEventListener('click',e=>{
-  if(S.mode!=='edit'||S.draw)return;const pt=e.target.closest&&e.target.closest('#flow .pt');if(!pt||!pt.dataset.row)return;
-  const cw=pt.closest('.cw');if(!cw)return;draftOf(cw.dataset.id).target={kind:'point',blockId:cw.dataset.id,rowId:+pt.dataset.row};render();
-  const b=S.blocks.get(cw.dataset.id);const c=b&&$(`[data-fid="${CSS.escape(fid(b,'comment'))}"]`);if(c)c.focus({preventScroll:true});
+  if(S.readonly||S.draw)return;const pt=e.target.closest&&e.target.closest('#flow .pt, #pagehost .pt');if(!pt||!pt.dataset.row)return;
+  const host=pt.closest('.cw,.blk'),id=host&&host.dataset.id;if(!id||!S.blocks.has(id))return;
+  draftOf(id).target={kind:'point',blockId:id,rowId:+pt.dataset.row};
+  if(S.mode==='edit')render();else paintAllOverlays();
+  openQuick(id,e.clientX,e.clientY);
 });
 document.addEventListener('pointermove',e=>{
   const tip=$('#tip');const n=e.target instanceof Element?e.target.closest('.pt'):null;
-  if(!n||!n.dataset.row||S.draw){tip.hidden=true;return}
+  if(!n||!n.dataset.row||S.draw||S.quick){tip.hidden=true;return}
   const blk=n.closest('[data-id]');const b=blk&&S.blocks.get(blk.dataset.id);const ds=b&&b.chart&&S.datasets.get(b.chart.dataset);
   const r=ds&&ds.rows.find(r=>r.id===+n.dataset.row);if(!r){tip.hidden=true;return}
-  tip.textContent=ds.columns.map(c=>`${c.label} ${c.key==='id'?'#'+r[c.key]:fmt(r[c.key])}`).join(trc('data',', '));
-  tip.hidden=false;tip.style.left=Math.min(e.clientX+14,innerWidth-tip.offsetWidth-8)+'px';tip.style.top=(e.clientY+14)+'px';
+  tip.textContent=pointLines(b,ds,r,8).join('\n');
+  tip.hidden=false;tip.style.left=Math.max(8,Math.min(e.clientX+14,innerWidth-tip.offsetWidth-8))+'px';
+  tip.style.top=(e.clientY+14+tip.offsetHeight>innerHeight-8?Math.max(8,e.clientY-tip.offsetHeight-10):e.clientY+14)+'px';
 });
+
+/* ---------- Comment dialog next to a point, box or lasso ---------- */
+// It edits the same draft as the comment box under the block, so nothing typed is lost when it closes.
+function openQuick(blockId,x,y){S.quick={blockId,x,y};$('#tip').hidden=true;renderQuick();const t=$('#qc textarea');if(t)t.focus({preventScroll:true})}
+function closeQuick(clear){const q=S.quick;S.quick=null;$('#qc').hidden=true;
+  if(clear&&q){draftOf(q.blockId).target=null;if(S.mode==='edit')render();else paintAllOverlays()}}
+function renderQuick(){
+  const box=$('#qc'),q=S.quick;if(!q){box.hidden=true;return}
+  const b=S.blocks.get(q.blockId),d=draftOf(q.blockId),t=d.target;if(!b||!t){closeQuick(false);return}
+  const kids=[h('p',{class:'qwhere',text:describe(t)})];
+  if(t.kind==='point'&&b.chart){const ds=S.datasets.get(b.chart.dataset),r=ds&&ds.rows.find(r=>r.id===t.rowId);if(r)kids.push(h('p',{class:'qrow',text:pointLines(b,ds,r,8).join('\n')}))}
+  kids.push(h('div',{class:'chips'},(PRESETS[b.type]||[]).map(label=>{const id=tagId(label);
+    const c=h('button',{type:'button',class:'chip','aria-pressed':String(d.tags.includes(id)),text:tr(label)});
+    c.onclick=()=>{d.tags=d.tags.includes(id)?d.tags.filter(x=>x!==id):[...d.tags,id];c.setAttribute('aria-pressed',String(d.tags.includes(id)))};return c})));
+  const ta=h('textarea',{rows:'3',placeholder:tr('What should change here? Ctrl + Enter to send.')});ta.value=d.text;
+  ta.addEventListener('input',()=>{d.text=ta.value});
+  ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();sendQuick()}});
+  kids.push(ta,h('div',{class:'crow'},[h('button',{type:'button',class:'btn small',text:tr('Cancel'),onclick:()=>closeQuick(true)}),h('span',{class:'sp'}),
+    h('button',{type:'button',class:'btn small primary',text:tr('Send comment'),onclick:sendQuick})]));
+  box.replaceChildren(...kids);box.hidden=false;
+  const w=box.offsetWidth,hh=box.offsetHeight;
+  box.style.left=Math.max(8,Math.min(q.x+14,innerWidth-w-8))+'px';
+  box.style.top=(q.y+14+hh>innerHeight-8?Math.max(8,q.y-hh-14):q.y+14)+'px';
+}
+async function sendQuick(){const q=S.quick;if(!q)return;const d=draftOf(q.blockId);
+  if(!d.text.trim()&&!d.tags.length){toast(tr('Write a comment or pick a tag first'));return}
+  S.quick=null;$('#qc').hidden=true;await submitDraft(q.blockId)}
+// A click elsewhere closes the dialog; the draft is kept unless it is still empty
+document.addEventListener('pointerdown',e=>{if(!S.quick||!(e.target instanceof Element)||e.target.closest('#qc,.pt'))return;
+  const d=draftOf(S.quick.blockId);closeQuick(!d.text.trim()&&!d.tags.length)},true);
 
 /* ---------- Main render ---------- */
 // Leave the text field being edited (this also saves it), so an explicit action can redraw the page right away
@@ -3678,7 +3801,7 @@ const HINT={view:'Use the arrow keys or the buttons below to turn pages.',edit:'
 function setMode(m){leaveField();S.mode=m;document.body.dataset.mode=m;if(S.draw){S.draw=null;document.body.dataset.draw=''}
   $$('#modes button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===m)));
   document.body.classList.toggle('nopanel',m==='view'&&!S.panelInView);
-  $('#hint').textContent=tr(HINT[m]);render()}
+  $('#hint').textContent=S.readonly?tr('Read-only copy. Use the arrow keys or the buttons below to turn pages.'):tr(HINT[m]);render()}
 $('#modes').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setMode(b.dataset.mode)});
 $('#togglePanel').addEventListener('click',()=>{const hid=document.body.classList.toggle('nopanel');if(S.mode==='view')S.panelInView=!hid;render()});
 $('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b){S.tab=b.dataset.tab;if(S.mode==='view'&&document.body.classList.contains('nopanel')){document.body.classList.remove('nopanel');S.panelInView=true}renderPanel()}});
@@ -3690,9 +3813,10 @@ $('#mclose').addEventListener('click',closeModal);
 $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
 $('#prev').addEventListener('click',()=>{S.page--;render()});
 $('#next').addEventListener('click',()=>{S.page++;render()});
+$('#compactBtn').addEventListener('click',()=>{leaveField();S.compact=!S.compact;render()});
 $('#addrow').addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(!b)return;if(b.dataset.add==='image')pickImage(null);else addBlock(b.dataset.add)});
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if(!$('#modal').hidden){closeModal();return}if(S.draw){stopDraw();return}}
+  if(e.key==='Escape'){if(S.quick){const d=draftOf(S.quick.blockId);closeQuick(!d.text.trim()&&!d.tags.length);return}if(!$('#modal').hidden){closeModal();return}if(S.draw){stopDraw();return}}
   if(S.mode!=='view'||/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||''))return;
   if(e.key==='ArrowRight'||e.key==='PageDown'){if(S.page<S.pages.length-1){S.page++;render()}}
   if(e.key==='ArrowLeft'||e.key==='PageUp'){if(S.page>0){S.page--;render()}}
@@ -3931,7 +4055,7 @@ function renderLocalBar(){
     text=tr('Project folder "{name}": changes are saved to {file} automatically.',{name:S.folder.name,file:S.folder.file})+' '+
       ({pending:tr('Saving…'),saved:tr('All changes saved.'),error:tr('Could not save ({m}).',{m:S.saveError})}[S.saveState]||'');
     if(!S.server)acts.push(B(tr('Open another folder'),pickFolder));
-    acts.push(B(tr('Save a copy'),exportReport));
+    acts.push(B(tr('Save a copy'),exportReport),B(tr('Export read-only copy'),exportReadonly));
   }else if(S.server){
     text=tr('The report could not be opened. See Problems (⚠) for the reason, fix report.json, then reload this page.');
     acts.push(B(tr('Reload'),()=>location.reload(),true));
@@ -3940,9 +4064,22 @@ function renderLocalBar(){
       :tr('Not saved: changes are lost when you close this tab. This browser cannot open folders (use Chrome or Edge), but you can save the report as a file and open it again later.'));
     if(FS_OK)acts.push(B(tr('Open project folder'),pickFolder,true));
     if(FS_OK&&S.lastFolder)acts.push(B(tr('Reopen "{name}"',{name:S.lastFolder.name}),()=>openFolder(S.lastFolder,false)));
-    acts.push(B(tr('Open report file'),()=>{$('#reportfile').value='';$('#reportfile').click()}),B(tr('Save report file'),exportReport));
+    acts.push(B(tr('Open report file'),()=>{$('#reportfile').value='';$('#reportfile').click()}),B(tr('Save report file'),exportReport),B(tr('Export read-only copy'),exportReadonly));
   }
   showNote(text,acts,!!S.folder&&S.saveState!=='error');
+}
+// A read-only copy: this page with the report embedded, images included. It opens in any browser, straight into View mode.
+async function exportReadonly(){
+  const rep=clone(reportFromState());
+  const toData=blob=>new Promise((ok,no)=>{const fr=new FileReader();fr.onload=()=>ok(fr.result);fr.onerror=no;fr.readAsDataURL(blob)});
+  for(const b of Object.values(rep.blocks||{})){const im=b.image;if(b.type!=='image'||!im||!ASSET_ID.test(im.asset||''))continue;
+    try{const src=await toData(await(await fetch(assetURL(im.asset))).blob());const{asset,...rest}=im;b.image={...rest,src}}
+    catch(e){logIssue('warning',tr('An image could not be included in the read-only copy: {name}',{name:im.name||im.asset}),errText(e))}}
+  delete rep.examples;
+  const json=JSON.stringify(rep).replace(/</g,'\\u003c'),at=SOURCE.lastIndexOf('<script>\n(()=>{');
+  const html=SOURCE.slice(0,at)+'<scr'+'ipt type="application/json" id="duetsheet-embedded">'+json+'<\/script>\n'+SOURCE.slice(at);
+  const title=((S.meta&&S.meta.title)||'report').replace(/[\/:*?"<>|\u0000-\u001f]+/g,' ').trim().slice(0,80)||'report';
+  await saveTextFile(tr('{title} (read-only)',{title})+'.html',html,'text/html');
 }
 function exportReport(){const name=((S.meta&&S.meta.title)||'report').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'report';
   saveTextFile(name+'.report.json',JSON.stringify(reportFromState(),null,1)+'\n','application/json')}
@@ -4151,6 +4288,10 @@ function subscribe(){
 }
 function showNote(t,acts,ok){const n=$('#note-db');$('#note-text').textContent=t||'';$('#note-acts').replaceChildren(...(acts||[]));n.hidden=!t;n.classList.toggle('saved',!!ok)}
 async function start(){
+  const emb=document.getElementById('duetsheet-embedded');
+  if(emb){S.readonly=true;document.body.classList.add('readonly');setMode('view'); // a read-only copy: the report is inside this file
+    try{db=memDB(readReport(emb.textContent,tr('This file')))}catch(e){fail(e&&e.msg||tr('This is not a Duetsheet report file.'),e&&e.detail);return}
+    subscribe();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(render);return}
   setMode('view');
   let cloud=null;try{cloud=(window.claude&&window.claude.use)?await window.claude.use('db'):null}catch(e){cloud=null}
   if(cloud){db=cloud;S.cloud=true}else db=memDB();
