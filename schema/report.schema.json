@@ -51,6 +51,7 @@
         "params": { "type": "object", "description": "Parameters of the run. The same script with other parameters is another step." },
         "inputs": { "type": "array", "items": { "$ref": "#/$defs/fileRef" } },
         "outputs": { "type": "array", "items": { "$ref": "#/$defs/fileRef" }, "minItems": 1 },
+        "inputPatterns": { "type": "array", "items": { "type": "string" }, "description": "Glob patterns (*, ?, [abc], **) relative to the folder of report.json that the inputs were found with. New files that match them make the step need recomputing." },
         "at": { "$ref": "#/$defs/isoTime" },
         "by": { "enum": ["user", "claude"], "description": "claude stands for any AI agent." },
         "note": { "type": "string" }

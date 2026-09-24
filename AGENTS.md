@@ -246,13 +246,16 @@ One document per computation: a script turned some files into other files. Toget
   "command": "python scripts/make_cells.py", "params": { "rounds": ["R1", "R2"] },
   "inputs":  [ { "path": "../Data/R1/ch001.csv", "sha256": "…", "size": 51234, "modified": "ISO-8601" } ],
   "outputs": [ { "path": "derived_data/cells.csv", "sha256": "…", "size": 175596, "modified": "ISO-8601" } ],
+  "inputPatterns": [ "../Data/*/ch*.csv" ],
   "at": "ISO-8601", "by": "claude", "note": "One row per round and channel." }
 ```
+
+- `inputPatterns` are the patterns the inputs were found with (`step` stores its `--in` values). When a new file matching them appears, for example a new round folder, the step needs recomputing and the page lists the file as new. The user adds data by putting files into the folder; nobody types paths.
 
 - Paths are relative to the folder of `report.json` and must stay inside the opened folder.
 - `sha256` is the hash of the file's bytes when the step ran; `size` and `modified` let checkers skip reading files that did not change. `script` is `null` for a step done by hand (say what was done in `note`).
 - A step that produced a file is found by the file's path; when several steps list the same output, the latest (`at`) counts. A dataset is linked to the step whose output is its `source.path`.
-- A step **needs recomputing** when its script or an input changed or is missing, or when an input comes from a step that needs recomputing. Everything computed from it is then out of date. The page shows this under every chart and table (green, red, grey) and in the Folder tab; `check` lists it as warnings.
+- A step **needs recomputing** when its script or an input changed or is missing, when new files match its `inputPatterns`, or when an input comes from a step that needs recomputing. Everything computed from it is then out of date. The page shows this under every chart and table (green, red, grey) and in the Folder tab; `check` lists it as warnings.
 - The same script with other parameters is another step (use another `id`). Re-running a step with the same `id` replaces its record.
 
 **Record steps with the launcher** rather than writing them by hand; it computes every fingerprint:

@@ -178,6 +178,19 @@ class Fingerprints:
 # A step needs rerunning when its script or an input changed, or when an input comes from a step that
 # needs rerunning; everything computed from it (outputs, datasets, charts and tables) is then out of date.
 
+def match_patterns(root, project, patterns):
+    """Files that match a step's inputPatterns now (paths relative to the folder of report.json), inside root only."""
+    found = set()
+    for pat in patterns if isinstance(patterns, list) else []:
+        if not isinstance(pat, str) or not pat or re.match(r'^([A-Za-z]:|[\\/])', pat):
+            continue
+        for h in glob.glob(os.path.join(str(project), pat), recursive=True):
+            rel = norm(os.path.relpath(h, project))
+            if os.path.isfile(h) and inside(root, project, rel):
+                found.add(rel)
+    return found
+
+
 def step_files(step):
     """(role, ref) for every file a step names."""
     if isinstance(step.get('script'), dict):
@@ -230,6 +243,16 @@ def check_chain(project, root, rep, deep):
                 ok = False
             elif not re.fullmatch(r'[0-9a-f]{64}', str(r.get('sha256', ''))):
                 warnings.append(f'{where}: {role} "{r["path"]}" has no sha256, so changes to it cannot be seen')
+        pats = s.get('inputPatterns', [])
+        if not isinstance(pats, list) or not all(isinstance(p, str) and p for p in pats):
+            errors.append(f'{where}.inputPatterns must be a list of file patterns')
+            ok = False
+        else:
+            for p in pats:   # the fixed part of a pattern must stay inside the folder
+                fixed = re.split(r'[*?\[]', p)[0].rsplit('/', 1)[0] or '.'
+                if re.match(r'^([A-Za-z]:|[\\/])', p) or not inside(root, project, fixed):
+                    errors.append(f'{where}: input pattern "{p}" is outside the folder "{root.name}"')
+                    ok = False
         if ok and isinstance(s.get('outputs'), list):
             good[key] = s
 
@@ -239,6 +262,9 @@ def check_chain(project, root, rep, deep):
         for r in s.get('outputs') or []:
             made_by[norm(r['path'])] = key
 
+    # files that match a step's input patterns but are not among its recorded inputs: new data to compute with
+    new_inputs = {key: sorted(match_patterns(root, project, s.get('inputPatterns')) - {norm(r['path']) for r in s.get('inputs') or []})
+                  for key, s in good.items() if s.get('inputPatterns')}
     reasons, stale = {}, {}
 
     def is_stale(key, trail=()):
@@ -247,6 +273,9 @@ def check_chain(project, root, rep, deep):
         if key in trail:   # a loop; reported once below
             return False
         s, why = good[key], []
+        new = new_inputs.get(key) or []
+        if new:
+            why.append(f'{len(new)} new file(s) match its input patterns ({", ".join(new[:3])}{" ..." if len(new) > 3 else ""})')
         for role, r in step_files(s):
             st = state(r)
             if st == 'missing':
@@ -308,8 +337,10 @@ def check_chain(project, root, rep, deep):
         raw = {norm(r['path']) for s in good.values() for r in s.get('inputs') or []} - made
         scripts = {norm(s['script']['path']) for s in good.values() if isinstance(s.get('script'), dict)}
         n_stale = sum(stale.values())
+        n_new = len({p for v in new_inputs.values() for p in v})
         notes.append(f'Data chain: {len(good)} step(s), {len(made)} derived file(s), {len(raw)} raw file(s), {len(scripts)} script(s); '
-                     + (f'{n_stale} step(s) need rerunning' if n_stale else 'all up to date'))
+                     + (f'{n_stale} step(s) need rerunning' if n_stale else 'all up to date')
+                     + (f'; {n_new} new raw file(s) not used yet' if n_new else ''))
     if fp.hashed:
         notes.append(f'Read {fp.hashed} file(s) to compute fingerprints (kept in {"/".join(CACHE_FILE)} for next time)')
     fp.save()
@@ -922,6 +953,7 @@ def record_step(root, a):
     stem = pathlib.PurePosixPath((script or outputs[0])['path']).stem
     sid = a.id or 's-' + (re.sub(r'[^a-z0-9]+', '-', stem.lower()).strip('-') or 'step')
     step = {'id': sid, 'script': script, 'command': a.command, 'params': params, 'inputs': inputs, 'outputs': outputs,
+            'inputPatterns': [norm(p) if not re.search(r'[*?\[]', p) else p.replace('\\', '/') for p in a.inputs],
             'at': iso_ms(time.time() * 1000), 'by': a.by, 'note': a.note}
     try:
         rep = json.loads(path.read_text(encoding='utf-8-sig'))   # read fresh: the page may have saved since

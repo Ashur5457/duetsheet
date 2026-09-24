@@ -138,6 +138,8 @@ Click the line to see the whole chain: the dataset, the derived file, the step t
 
 The **Folder** tab has the **Data chain** overview: every derived file with the script and inputs it comes from and how many charts use it, then the raw data grouped by folder, then the scripts. It works backwards too: open a raw data folder and click **What depends on these files?**, or click a single file, to see which derived files, datasets and charts would change if it did.
 
+**New data.** A step remembers the patterns its inputs were found with, for example `Data_TOSCAT/*/raw data_ch*.xlsx`. To add a new round or replace files, just put them into the folder with File Explorer or Finder; there is no path to type. The Folder tab then lists them as *new, not used yet*, and the steps that should use them turn red. Ask your agent to recompute (or click **Ask the agent to revise**).
+
 Raw data can be large. Duetsheet compares size and modification date first and only reads a file again when they differ; the launcher keeps the fingerprints it computed in `duetsheet/cache/`. `python duetsheet.py check <folder>` reports the same states as warnings, and `check --deep` reads every file.
 
 ## 4. Review: edit and comment
