@@ -3301,7 +3301,9 @@ const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const NS='http://www.w3.org/2000/svg';
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const r3=v=>+Number(v).toFixed(3);
-const fmt=v=>{const n=Number(v);if(!isFinite(n))return String(v);const a=Math.abs(n);return String(+n.toFixed(a>=100?1:a>=1?2:3))};
+// A cell as a number, or null when it is empty or not a number: +null and +'' are 0 in JavaScript, which would draw empty cells at 0
+const numv=v=>typeof v==='number'?(isFinite(v)?v:null):typeof v==='string'&&v.trim()!==''&&isFinite(+v)?+v:null;
+const fmt=v=>{if(v==null||v==='')return'';const n=Number(v);if(!isFinite(n))return String(v);const a=Math.abs(n);return String(+n.toFixed(a>=100?1:a>=1?2:3))};
 function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
 function h(tag,props,kids){const e=document.createElement(tag);for(const k in(props||{})){const v=props[k];if(v==null)continue;
   if(k==='text')e.textContent=v;else if(k==='class')e.className=v;else if(k==='html')e.innerHTML=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v)}
@@ -3527,7 +3529,7 @@ function drawChart(svg,b){
   svg.style.fontFamily=st.font.family||'';
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('class','chart');
   if(!ds){const t=el('text',{x:W/2,y:H/2,'text-anchor':'middle',class:'axl','font-size':14},svg);t.textContent=tr('Dataset not found: ')+b.chart.dataset;return null}
-  const c=b.chart,rows=ds.rows.filter(r=>isFinite(+r[c.x])&&isFinite(+r[c.y])&&(!c.logY||+r[c.y]>0));
+  const c=b.chart,rows=ds.rows.filter(r=>numv(r[c.x])!=null&&numv(r[c.y])!=null&&(!c.logY||numv(r[c.y])>0)); // rows with an empty x or y are not drawn
   const X=linAxis(rows.map(r=>+r[c.x]),null,null);
   const Y=c.logY?logAxis(rows.map(r=>+r[c.y]),c.yMin,c.yMax):linAxis(rows.map(r=>+r[c.y]),c.yMin,c.yMax);
   const iw=W-m.l-m.r,ih=H-m.t-m.b;
@@ -3555,7 +3557,8 @@ function drawChart(svg,b){
     if(vals.length<=6){const idx=new Map(vals.sort((p,q)=>p>q?1:-1).map((v,i)=>[v,i]));colorOf=r=>palColor(st,idx.get(r[c.color]));shapeOf=r=>idx.get(r[c.color])%4;
       const k=fs/11,ly=m.t-8;const lg=el('g',{},grid);let x=m.l;const lab=el('text',{x,y:ly,...tkA},lg);lab.textContent=colLabel(ds,c.color)+tr(': ');x+=textW(lab.textContent)*k+4;
       vals.forEach(v=>{const mk=marker(idx.get(v)%4,x+5*k,ly-fs*0.35,4.5*k);mk.setAttribute('fill',palColor(st,idx.get(v)));mk.setAttribute('class','pt');lg.appendChild(mk);const tt=el('text',{x:x+14*k,y:ly,...tkA},lg);tt.textContent=String(v);x+=(22+String(v).length*8)*k})}
-    else{const nums=ds.rows.map(r=>+r[c.color]),lo=Math.min(...nums),hi=Math.max(...nums);colorOf=r=>ramp((+r[c.color]-lo)/((hi-lo)||1));
+    else{const nums=ds.rows.map(r=>numv(r[c.color])).filter(v=>v!=null),lo=Math.min(...nums),hi=Math.max(...nums);
+      colorOf=r=>{const v=numv(r[c.color]);return v==null?String(cssv('--c0')).trim():ramp((v-lo)/((hi-lo)||1))}; // no colour value: grey
       const k=fs/11,ly=m.t-8;const lg=el('g',{},grid);const lab=el('text',{x:m.l,y:ly,...tkA},lg);lab.textContent=colLabel(ds,c.color)+tr(' low');
       const x0=m.l+textW(lab.textContent)*k+4;for(let i=0;i<5;i++)el('rect',{x:x0+i*16*k,y:ly-fs*0.8,width:16*k,height:fs*0.85,fill:ramp(i/4)},lg);const hiT=el('text',{x:x0+86*k,y:ly,...tkA},lg);hiT.textContent=tr('high')}}
   if(c.kind==='line'&&rows.length>1){const srt=[...rows].sort((p,q)=>+p[c.x]-+q[c.x]);el('path',{class:'ln','stroke-width':+(st.line*u).toFixed(2),d:srt.map((r,i)=>(i?'L':'M')+G.sx(+r[c.x]).toFixed(1)+','+G.sy(+r[c.y]).toFixed(1)).join(' ')},svg)}
@@ -3604,7 +3607,8 @@ function buildImage(b,host,interactive){
 function buildTable(b,host){
   const t=b.table||{},ds=S.datasets.get(t.dataset);
   if(!ds){host.append(h('p',{class:'cap',text:tr('Dataset not found: ')+t.dataset}));return}
-  const rows=[...ds.rows].sort((p,q)=>(t.desc?-1:1)*((+p[t.sortBy])-(+q[t.sortBy]))).slice(0,clamp(t.limit||5,1,50));
+  const key=r=>numv(r[t.sortBy]);
+  const rows=[...ds.rows].sort((p,q)=>{const a=key(p),b=key(q);return a==null?(b==null?0:1):b==null?-1:(t.desc?-1:1)*(a-b)}).slice(0,clamp(t.limit||5,1,50)); // empty cells last
   const cols=t.columns&&t.columns.length?ds.columns.filter(c=>t.columns.includes(c.key)):ds.columns;
   const tb=h('table',{},[h('thead',{},[h('tr',{},cols.map(c=>h('th',{text:c.label})))]),
     h('tbody',{},rows.map(r=>h('tr',{'data-row':r.id},cols.map(c=>h('td',{text:c.key==='id'?'#'+r[c.key]:fmt(r[c.key])})))))]);
