@@ -65,6 +65,13 @@ button,input,select,textarea{font:inherit;color:inherit}
 .srow .sno{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--soft);font-size:11px}
 .srow select,.srow input{font:inherit;font-size:13px;max-width:210px}
 .fsel{margin:0;flex:0 0 auto;align-self:center}
+details.ex{margin:4px 0;font-size:12.5px}details.ex summary{cursor:pointer;color:var(--accent)}
+.exrow{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:baseline;margin:4px 0}
+.excat{color:var(--muted);min-width:5em;font-size:12px}
+.exs{border:1px dashed var(--line);background:var(--soft);color:var(--ink);border-radius:12px;padding:2px 9px;font:inherit;font-size:12.5px;cursor:pointer;text-align:left}
+.exs:hover{border-color:var(--accent)}
+.attach{display:flex;gap:6px;align-items:baseline;font-size:12.5px;margin:4px 0}
+#qc details.ex{max-height:180px;overflow:auto}
 .fselbar{position:sticky;bottom:0;z-index:2;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin:8px 0 0;padding:8px 10px;
   border:1px solid var(--accent);border-radius:8px;background:var(--paper);font-size:13px;box-shadow:0 -2px 8px rgba(0,0,0,.08)}
 .fselbar .sp{flex:1}
@@ -1021,13 +1028,11 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "added by you": "你自己加的",
  "{t} Markdown or text, {d} Word and {p} PDF files.": "{t} 個 Markdown 或文字檔、{d} 個 Word、{p} 個 PDF。",
  ", and {n} more folders": "，還有另外 {n} 個資料夾",
- "Add a data series": "加入一組數據",
  "Add to a chart…": "加入圖表…",
  "Add these files to the chart": "把這些檔案加入圖表",
  "Replace the data with these files": "用這些檔案取代圖表的數據",
  "Anything the agent should know, for example: only the CE10 column, one series per round.": "有什麼要 agent 注意的，例如：只要 CE10 那一欄、每一輪畫成一組。",
  "Create the request": "建立請求",
- "Data series": "數據組",
  "field|Data series": "數據組",
  "Datasets in the report ({n})": "報告裡的資料集（{n}）",
  "Delete selected datasets": "刪除選取的資料集",
@@ -1035,7 +1040,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Deleted {n} datasets.": "已刪除 {n} 個資料集。",
  "Filter datasets…": "篩選資料集…",
  "Import {n}": "匯入 {n} 個",
- "Name in the legend": "圖例名稱",
  "None yet. Import files above, or ask your agent.": "還沒有。從上方匯入檔案，或請 agent 處理。",
  "Not from a file": "不是來自檔案",
  "Replace the data of a chart…": "取代圖表的數據…",
@@ -1046,16 +1050,59 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Still used by: {list}. They will show \"Dataset not found\".": "還有這些在用：{list}。刪除後它們會顯示「找不到資料集」。",
  "There is no chart or table yet. Add one in Edit mode first.": "還沒有圖表或表格。請先在編輯模式新增一個。",
  "Which chart or table?": "哪一張圖表或表格？",
- "With several series, each series has its own colour and marker; \"Colour by\" is not used.": "有多組數據時，每組各有自己的顏色和標記，「顏色依據」不會使用。",
  "not used": "沒有用到",
  "the selection": "選取的檔案",
- "the settings above": "上方的設定",
  "used by {list}": "用在 {list}",
  "{n} files selected: {sum}": "已選 {n} 個檔案：{sum}",
  "{n} files: {sum}": "{n} 個檔案：{sum}",
  "{n} in {dir}": "{dir} 裡 {n} 個",
  "{n} rows": "{n} 列",
- "{n} selected": "已選 {n} 個"
+ "{n} selected": "已選 {n} 個",
+ "Appearance": "外觀",
+ "Range": "範圍",
+ "Compare": "比較",
+ "Statistics": "統計",
+ "Use a log scale for the Y axis.": "Y 軸改用對數刻度。",
+ "Set the Y axis range from […] to […].": "Y 軸範圍改成 […] 到 […]。",
+ "Make it a line chart, sorted by […].": "改成折線圖，依 […] 排序。",
+ "Only show the data where […].": "只畫 […] 的數據。",
+ "Leave out empty values and outliers (say how you define them); keep the original data.": "去掉空白值和離群值（說明判斷標準），原始數據要保留。",
+ "Add the attached files to this chart, one series per […].": "把附上的檔案加進這張圖，每個 […] 一組。",
+ "Replace the data of this chart with the attached files; keep the axes and titles.": "用附上的檔案取代這張圖的數據，軸和標題不變。",
+ "Use […] for the X axis and […] for the Y axis.": "X 軸改用 […]，Y 軸改用 […]。",
+ "Plot […] and […] in this chart, in different colours.": "把 […] 和 […] 畫在同一張圖，用不同顏色。",
+ "Split it into two panels: […] and […].": "拆成兩張子圖：[…] 和 […]。",
+ "Add a y = x line to compare the two measurements.": "加上 y = x 對角線，方便比較兩種量測。",
+ "Add a linear trend line with R².": "加上線性趨勢線和 R²。",
+ "Add error bars from the standard deviation of […].": "用 […] 的標準差加上誤差棒。",
+ "Compute the correlation between […] and […] and explain it in plain words in the caption.": "計算 […] 和 […] 的相關係數，並在圖說用白話解釋。",
+ "Export the data of this chart as CSV, one file per […].": "把這張圖的數據匯出成 CSV，每個 […] 一個檔。",
+ "Export this figure for publication ([…] column width).": "把這張圖匯出成出版用（[…] 欄寬）。",
+ "Why are these points different? Compare them with the rest.": "這些點為什麼不一樣？和其他點比較看看。",
+ "Mark these points and explain what they have in common.": "標出這些點，說明它們有什麼共同點。",
+ "Leave these points out and say why in the caption; keep the original data.": "把這些點排除，在圖說寫明原因，原始數據要保留。",
+ "Fit these points separately from the rest.": "這些點和其他點分開擬合。",
+ "Sort by […] and show the first […] rows.": "依 […] 排序，只列前 […] 列。",
+ "Add units to the column headers.": "欄位名稱加上單位。",
+ "Add a column with […].": "加一欄 […]。",
+ "Show the mean and standard deviation per […].": "改成每個 […] 的平均和標準差。",
+ "Make it shorter and keep the numbers.": "寫短一點，數字保留。",
+ "Give the source dataset for every number.": "每個數字都註明來自哪個資料集。",
+ "Make the conclusion more cautious: separate what the data shows from interpretation.": "結論寫得保守一點：分清楚數據顯示的事實和推論。",
+ "Add a short method paragraph: how the numbers were computed.": "加一段簡短的方法說明：數字是怎麼算出來的。",
+ "Replace it with […].": "換成 […]。",
+ "Crop the white space and enlarge […].": "裁掉空白，放大 […]。",
+ "Write a caption that explains the axes and units.": "補上圖說，說明座標軸和單位。",
+ "Attach the {n} files ticked in the Folder tab ({sum})": "附上資料夾分頁勾選的 {n} 個檔案（{sum}）",
+ "Could not make the image.": "無法產生圖片。",
+ "Download": "下載",
+ "Download this dataset as CSV": "下載這個資料集（CSV）",
+ "Example requests": "範例句",
+ "Quick adjustments and download": "快速調整與下載",
+ "Send and ask the agent": "送出並請 agent 修改",
+ "Series": "數據組",
+ "The data drawn in this chart": "這張圖畫出來的數據",
+ "To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).": "要換數據、欄位、數據組或其他任何修改，請寫在下方的留言框（可參考「範例句」）。"
 },
 "zh-Hans": {
  "_name": "简体中文",
@@ -1627,13 +1674,11 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "added by you": "你自己加的",
  "{t} Markdown or text, {d} Word and {p} PDF files.": "{t} 个 Markdown 或文本文件、{d} 个 Word、{p} 个 PDF。",
  ", and {n} more folders": "，还有另外 {n} 个文件夹",
- "Add a data series": "添加一组数据",
  "Add to a chart…": "加入图表…",
  "Add these files to the chart": "把这些文件加入图表",
  "Replace the data with these files": "用这些文件替换图表的数据",
  "Anything the agent should know, for example: only the CE10 column, one series per round.": "有什么要 agent 注意的，例如：只要 CE10 那一栏、每一轮画成一组。",
  "Create the request": "创建请求",
- "Data series": "数据组",
  "field|Data series": "数据组",
  "Datasets in the report ({n})": "报告里的数据集（{n}）",
  "Delete selected datasets": "删除选中的数据集",
@@ -1641,7 +1686,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Deleted {n} datasets.": "已删除 {n} 个数据集。",
  "Filter datasets…": "筛选数据集…",
  "Import {n}": "导入 {n} 个",
- "Name in the legend": "图例名称",
  "None yet. Import files above, or ask your agent.": "还没有。从上方导入文件，或请 agent 处理。",
  "Not from a file": "不是来自文件",
  "Replace the data of a chart…": "替换图表的数据…",
@@ -1652,16 +1696,59 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Still used by: {list}. They will show \"Dataset not found\".": "还有这些在用：{list}。删除后它们会显示“找不到数据集”。",
  "There is no chart or table yet. Add one in Edit mode first.": "还没有图表或表格。请先在编辑模式新增一个。",
  "Which chart or table?": "哪一张图表或表格？",
- "With several series, each series has its own colour and marker; \"Colour by\" is not used.": "有多组数据时，每组各有自己的颜色和标记，“颜色依据”不会使用。",
  "not used": "没有用到",
  "the selection": "选中的文件",
- "the settings above": "上方的设置",
  "used by {list}": "用在 {list}",
  "{n} files selected: {sum}": "已选 {n} 个文件：{sum}",
  "{n} files: {sum}": "{n} 个文件：{sum}",
  "{n} in {dir}": "{dir} 里 {n} 个",
  "{n} rows": "{n} 行",
- "{n} selected": "已选 {n} 个"
+ "{n} selected": "已选 {n} 个",
+ "Appearance": "外观",
+ "Range": "范围",
+ "Compare": "比较",
+ "Statistics": "统计",
+ "Use a log scale for the Y axis.": "Y 轴改用对数刻度。",
+ "Set the Y axis range from […] to […].": "Y 轴范围改成 […] 到 […]。",
+ "Make it a line chart, sorted by […].": "改成折线图，按 […] 排序。",
+ "Only show the data where […].": "只画 […] 的数据。",
+ "Leave out empty values and outliers (say how you define them); keep the original data.": "去掉空白值和离群值（说明判断标准），原始数据要保留。",
+ "Add the attached files to this chart, one series per […].": "把附上的文件加进这张图，每个 […] 一组。",
+ "Replace the data of this chart with the attached files; keep the axes and titles.": "用附上的文件替换这张图的数据，轴和标题不变。",
+ "Use […] for the X axis and […] for the Y axis.": "X 轴改用 […]，Y 轴改用 […]。",
+ "Plot […] and […] in this chart, in different colours.": "把 […] 和 […] 画在同一张图，用不同颜色。",
+ "Split it into two panels: […] and […].": "拆成两张子图：[…] 和 […]。",
+ "Add a y = x line to compare the two measurements.": "加上 y = x 对角线，方便比较两种测量。",
+ "Add a linear trend line with R².": "加上线性趋势线和 R²。",
+ "Add error bars from the standard deviation of […].": "用 […] 的标准差加上误差棒。",
+ "Compute the correlation between […] and […] and explain it in plain words in the caption.": "计算 […] 和 […] 的相关系数，并在图说用白话解释。",
+ "Export the data of this chart as CSV, one file per […].": "把这张图的数据导出成 CSV，每个 […] 一个文件。",
+ "Export this figure for publication ([…] column width).": "把这张图导出成出版用（[…] 栏宽）。",
+ "Why are these points different? Compare them with the rest.": "这些点为什么不一样？和其他点比较看看。",
+ "Mark these points and explain what they have in common.": "标出这些点，说明它们有什么共同点。",
+ "Leave these points out and say why in the caption; keep the original data.": "把这些点排除，在图说写明原因，原始数据要保留。",
+ "Fit these points separately from the rest.": "这些点和其他点分开拟合。",
+ "Sort by […] and show the first […] rows.": "按 […] 排序，只列前 […] 行。",
+ "Add units to the column headers.": "栏位名称加上单位。",
+ "Add a column with […].": "加一栏 […]。",
+ "Show the mean and standard deviation per […].": "改成每个 […] 的平均和标准差。",
+ "Make it shorter and keep the numbers.": "写短一点，数字保留。",
+ "Give the source dataset for every number.": "每个数字都注明来自哪个数据集。",
+ "Make the conclusion more cautious: separate what the data shows from interpretation.": "结论写得保守一点：分清楚数据显示的事实和推论。",
+ "Add a short method paragraph: how the numbers were computed.": "加一段简短的方法说明：数字是怎么算出来的。",
+ "Replace it with […].": "换成 […]。",
+ "Crop the white space and enlarge […].": "裁掉空白，放大 […]。",
+ "Write a caption that explains the axes and units.": "补上图说，说明坐标轴和单位。",
+ "Attach the {n} files ticked in the Folder tab ({sum})": "附上文件夹分页勾选的 {n} 个文件（{sum}）",
+ "Could not make the image.": "无法生成图片。",
+ "Download": "下载",
+ "Download this dataset as CSV": "下载这个数据集（CSV）",
+ "Example requests": "范例句",
+ "Quick adjustments and download": "快速调整与下载",
+ "Send and ask the agent": "发送并请 agent 修改",
+ "Series": "数据组",
+ "The data drawn in this chart": "这张图画出来的数据",
+ "To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).": "要换数据、栏位、数据组或其他任何修改，请写在下方的留言框（可参考“范例句”）。"
 },
 "ja": {
  "_name": "日本語",
@@ -2233,13 +2320,11 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "added by you": "あなたが追加",
  "{t} Markdown or text, {d} Word and {p} PDF files.": "Markdown・テキスト {t}、Word {d}、PDF {p} ファイル。",
  ", and {n} more folders": "、ほか {n} フォルダ",
- "Add a data series": "データ系列を追加",
  "Add to a chart…": "グラフに追加…",
  "Add these files to the chart": "これらのファイルをグラフに追加",
  "Replace the data with these files": "これらのファイルでデータを置き換え",
  "Anything the agent should know, for example: only the CE10 column, one series per round.": "エージェントに伝えたいこと（例：CE10 の列だけ、ラウンドごとに 1 系列）。",
  "Create the request": "依頼を作成",
- "Data series": "データ系列",
  "field|Data series": "データ系列",
  "Datasets in the report ({n})": "レポートのデータセット（{n}）",
  "Delete selected datasets": "選択したデータセットを削除",
@@ -2247,7 +2332,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Deleted {n} datasets.": "{n} 個のデータセットを削除しました。",
  "Filter datasets…": "データセットを絞り込む…",
  "Import {n}": "{n} 個を取り込む",
- "Name in the legend": "凡例の名前",
  "None yet. Import files above, or ask your agent.": "まだありません。上でファイルを取り込むか、エージェントに頼んでください。",
  "Not from a file": "ファイル以外",
  "Replace the data of a chart…": "グラフのデータを置き換え…",
@@ -2258,16 +2342,59 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Still used by: {list}. They will show \"Dataset not found\".": "まだ使われています：{list}。削除すると「データセットが見つかりません」と表示されます。",
  "There is no chart or table yet. Add one in Edit mode first.": "グラフや表がまだありません。先に編集モードで追加してください。",
  "Which chart or table?": "どのグラフまたは表？",
- "With several series, each series has its own colour and marker; \"Colour by\" is not used.": "複数の系列があるときは系列ごとに色と記号が変わり、「色分け」は使われません。",
  "not used": "未使用",
  "the selection": "選択したファイル",
- "the settings above": "上の設定",
  "used by {list}": "{list} で使用",
  "{n} files selected: {sum}": "{n} 個のファイルを選択：{sum}",
  "{n} files: {sum}": "{n} 個のファイル：{sum}",
  "{n} in {dir}": "{dir} に {n} 個",
  "{n} rows": "{n} 行",
- "{n} selected": "{n} 個を選択"
+ "{n} selected": "{n} 個を選択",
+ "Appearance": "見た目",
+ "Range": "範囲",
+ "Compare": "比較",
+ "Statistics": "統計",
+ "Use a log scale for the Y axis.": "Y 軸を対数目盛にしてください。",
+ "Set the Y axis range from […] to […].": "Y 軸の範囲を […] から […] にしてください。",
+ "Make it a line chart, sorted by […].": "[…] の順に並べた折れ線グラフにしてください。",
+ "Only show the data where […].": "[…] のデータだけを表示してください。",
+ "Leave out empty values and outliers (say how you define them); keep the original data.": "空の値と外れ値を除いてください（基準を説明）。元のデータは残してください。",
+ "Add the attached files to this chart, one series per […].": "添付したファイルをこのグラフに追加してください。[…] ごとに 1 系列。",
+ "Replace the data of this chart with the attached files; keep the axes and titles.": "このグラフのデータを添付ファイルで置き換えてください。軸とタイトルはそのまま。",
+ "Use […] for the X axis and […] for the Y axis.": "X 軸を […]、Y 軸を […] にしてください。",
+ "Plot […] and […] in this chart, in different colours.": "[…] と […] を色分けしてこのグラフに描いてください。",
+ "Split it into two panels: […] and […].": "2 つのパネルに分けてください：[…] と […]。",
+ "Add a y = x line to compare the two measurements.": "2 つの測定を比べられるよう y = x の線を加えてください。",
+ "Add a linear trend line with R².": "線形の近似直線と R² を加えてください。",
+ "Add error bars from the standard deviation of […].": "[…] の標準偏差で誤差棒を加えてください。",
+ "Compute the correlation between […] and […] and explain it in plain words in the caption.": "[…] と […] の相関係数を計算し、図の説明でわかりやすく解説してください。",
+ "Export the data of this chart as CSV, one file per […].": "このグラフのデータを CSV に書き出してください。[…] ごとに 1 ファイル。",
+ "Export this figure for publication ([…] column width).": "この図を出版用に書き出してください（[…] 段幅）。",
+ "Why are these points different? Compare them with the rest.": "これらの点はなぜ違うのですか？他の点と比べてください。",
+ "Mark these points and explain what they have in common.": "これらの点に印を付け、共通点を説明してください。",
+ "Leave these points out and say why in the caption; keep the original data.": "これらの点を除き、理由を図の説明に書いてください。元のデータは残してください。",
+ "Fit these points separately from the rest.": "これらの点は他と分けてフィットしてください。",
+ "Sort by […] and show the first […] rows.": "[…] で並べ替え、上位 […] 行を表示してください。",
+ "Add units to the column headers.": "列見出しに単位を付けてください。",
+ "Add a column with […].": "[…] の列を追加してください。",
+ "Show the mean and standard deviation per […].": "[…] ごとの平均と標準偏差にしてください。",
+ "Make it shorter and keep the numbers.": "数値は残して短くしてください。",
+ "Give the source dataset for every number.": "すべての数値に出典のデータセットを示してください。",
+ "Make the conclusion more cautious: separate what the data shows from interpretation.": "結論を慎重に：データが示すことと解釈を分けてください。",
+ "Add a short method paragraph: how the numbers were computed.": "短い方法の段落を加えてください：数値の計算方法。",
+ "Replace it with […].": "[…] に差し替えてください。",
+ "Crop the white space and enlarge […].": "余白を切り取り、[…] を拡大してください。",
+ "Write a caption that explains the axes and units.": "軸と単位を説明する図の説明を書いてください。",
+ "Attach the {n} files ticked in the Folder tab ({sum})": "フォルダタブで選んだ {n} 個のファイルを添付（{sum}）",
+ "Could not make the image.": "画像を作成できませんでした。",
+ "Download": "ダウンロード",
+ "Download this dataset as CSV": "このデータセットを CSV でダウンロード",
+ "Example requests": "依頼の例",
+ "Quick adjustments and download": "クイック調整とダウンロード",
+ "Send and ask the agent": "送信してエージェントに依頼",
+ "Series": "系列",
+ "The data drawn in this chart": "このグラフに描かれたデータ",
+ "To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).": "データ、列、系列などを変えたいときは、下のコメント欄に書いてください（「依頼の例」を参照）。"
 },
 "ko": {
  "_name": "한국어",
@@ -2839,13 +2966,11 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "added by you": "직접 추가함",
  "{t} Markdown or text, {d} Word and {p} PDF files.": "Markdown·텍스트 {t}개, Word {d}개, PDF {p}개 파일.",
  ", and {n} more folders": ", 외 폴더 {n}개",
- "Add a data series": "데이터 계열 추가",
  "Add to a chart…": "차트에 추가…",
  "Add these files to the chart": "이 파일들을 차트에 추가",
  "Replace the data with these files": "이 파일들로 데이터 교체",
  "Anything the agent should know, for example: only the CE10 column, one series per round.": "에이전트가 알아야 할 것 (예: CE10 열만, 라운드마다 한 계열).",
  "Create the request": "요청 만들기",
- "Data series": "데이터 계열",
  "field|Data series": "데이터 계열",
  "Datasets in the report ({n})": "보고서의 데이터셋 ({n})",
  "Delete selected datasets": "선택한 데이터셋 삭제",
@@ -2853,7 +2978,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Deleted {n} datasets.": "데이터셋 {n}개를 삭제했습니다.",
  "Filter datasets…": "데이터셋 필터…",
  "Import {n}": "{n}개 가져오기",
- "Name in the legend": "범례 이름",
  "None yet. Import files above, or ask your agent.": "아직 없습니다. 위에서 파일을 가져오거나 에이전트에게 요청하세요.",
  "Not from a file": "파일이 아님",
  "Replace the data of a chart…": "차트 데이터 교체…",
@@ -2864,16 +2988,59 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Still used by: {list}. They will show \"Dataset not found\".": "아직 사용 중: {list}. 삭제하면 \"데이터셋을 찾을 수 없음\"으로 표시됩니다.",
  "There is no chart or table yet. Add one in Edit mode first.": "아직 차트나 표가 없습니다. 먼저 편집 모드에서 추가하세요.",
  "Which chart or table?": "어느 차트 또는 표?",
- "With several series, each series has its own colour and marker; \"Colour by\" is not used.": "계열이 여러 개면 계열마다 색과 표시가 달라지며 \"색상 기준\"은 쓰지 않습니다.",
  "not used": "사용 안 함",
  "the selection": "선택한 파일",
- "the settings above": "위의 설정",
  "used by {list}": "{list}에서 사용",
  "{n} files selected: {sum}": "파일 {n}개 선택됨: {sum}",
  "{n} files: {sum}": "파일 {n}개: {sum}",
  "{n} in {dir}": "{dir}에 {n}개",
  "{n} rows": "{n}행",
- "{n} selected": "{n}개 선택됨"
+ "{n} selected": "{n}개 선택됨",
+ "Appearance": "모양",
+ "Range": "범위",
+ "Compare": "비교",
+ "Statistics": "통계",
+ "Use a log scale for the Y axis.": "Y축을 로그 눈금으로 바꿔 주세요.",
+ "Set the Y axis range from […] to […].": "Y축 범위를 […]에서 […]까지로 해 주세요.",
+ "Make it a line chart, sorted by […].": "[…] 순으로 정렬한 선 그래프로 바꿔 주세요.",
+ "Only show the data where […].": "[…]인 데이터만 보여 주세요.",
+ "Leave out empty values and outliers (say how you define them); keep the original data.": "빈 값과 이상값을 빼 주세요 (기준 설명). 원본 데이터는 남겨 두세요.",
+ "Add the attached files to this chart, one series per […].": "첨부한 파일을 이 차트에 추가해 주세요. […]마다 한 계열.",
+ "Replace the data of this chart with the attached files; keep the axes and titles.": "이 차트의 데이터를 첨부 파일로 바꿔 주세요. 축과 제목은 그대로.",
+ "Use […] for the X axis and […] for the Y axis.": "X축은 […], Y축은 […]로 해 주세요.",
+ "Plot […] and […] in this chart, in different colours.": "[…]와 […]를 이 차트에 다른 색으로 그려 주세요.",
+ "Split it into two panels: […] and […].": "두 패널로 나눠 주세요: […]와 […].",
+ "Add a y = x line to compare the two measurements.": "두 측정을 비교할 수 있게 y = x 선을 추가해 주세요.",
+ "Add a linear trend line with R².": "선형 추세선과 R²를 추가해 주세요.",
+ "Add error bars from the standard deviation of […].": "[…]의 표준편차로 오차 막대를 추가해 주세요.",
+ "Compute the correlation between […] and […] and explain it in plain words in the caption.": "[…]와 […]의 상관계수를 계산하고 캡션에서 쉽게 설명해 주세요.",
+ "Export the data of this chart as CSV, one file per […].": "이 차트의 데이터를 CSV로 내보내 주세요. […]마다 파일 하나.",
+ "Export this figure for publication ([…] column width).": "이 그림을 출판용으로 내보내 주세요 ([…] 단 너비).",
+ "Why are these points different? Compare them with the rest.": "이 점들은 왜 다른가요? 나머지와 비교해 주세요.",
+ "Mark these points and explain what they have in common.": "이 점들을 표시하고 공통점을 설명해 주세요.",
+ "Leave these points out and say why in the caption; keep the original data.": "이 점들을 빼고 이유를 캡션에 적어 주세요. 원본 데이터는 남겨 두세요.",
+ "Fit these points separately from the rest.": "이 점들은 나머지와 따로 피팅해 주세요.",
+ "Sort by […] and show the first […] rows.": "[…] 기준으로 정렬하고 상위 […]행만 보여 주세요.",
+ "Add units to the column headers.": "열 제목에 단위를 붙여 주세요.",
+ "Add a column with […].": "[…] 열을 추가해 주세요.",
+ "Show the mean and standard deviation per […].": "[…]별 평균과 표준편차로 보여 주세요.",
+ "Make it shorter and keep the numbers.": "숫자는 남기고 짧게 해 주세요.",
+ "Give the source dataset for every number.": "모든 숫자에 출처 데이터셋을 밝혀 주세요.",
+ "Make the conclusion more cautious: separate what the data shows from interpretation.": "결론을 신중하게: 데이터가 보여 주는 것과 해석을 구분해 주세요.",
+ "Add a short method paragraph: how the numbers were computed.": "짧은 방법 단락을 추가해 주세요: 숫자를 어떻게 계산했는지.",
+ "Replace it with […].": "[…]로 바꿔 주세요.",
+ "Crop the white space and enlarge […].": "여백을 자르고 […]를 확대해 주세요.",
+ "Write a caption that explains the axes and units.": "축과 단위를 설명하는 캡션을 써 주세요.",
+ "Attach the {n} files ticked in the Folder tab ({sum})": "폴더 탭에서 선택한 파일 {n}개 첨부 ({sum})",
+ "Could not make the image.": "이미지를 만들지 못했습니다.",
+ "Download": "다운로드",
+ "Download this dataset as CSV": "이 데이터셋을 CSV로 다운로드",
+ "Example requests": "요청 예시",
+ "Quick adjustments and download": "빠른 조정과 다운로드",
+ "Send and ask the agent": "보내고 에이전트에게 요청",
+ "Series": "계열",
+ "The data drawn in this chart": "이 차트에 그려진 데이터",
+ "To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).": "데이터, 열, 계열 등 다른 것을 바꾸려면 아래 댓글 상자에 적어 주세요 (\"요청 예시\" 참고)."
 },
 "es": {
  "_name": "Español",
@@ -3445,13 +3612,11 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "added by you": "añadida por ti",
  "{t} Markdown or text, {d} Word and {p} PDF files.": "{t} archivos Markdown o de texto, {d} de Word y {p} PDF.",
  ", and {n} more folders": " y {n} carpetas más",
- "Add a data series": "Añadir una serie de datos",
  "Add to a chart…": "Añadir a un gráfico…",
  "Add these files to the chart": "Añadir estos archivos al gráfico",
  "Replace the data with these files": "Reemplazar los datos con estos archivos",
  "Anything the agent should know, for example: only the CE10 column, one series per round.": "Lo que el agente debe saber, por ejemplo: solo la columna CE10, una serie por ronda.",
  "Create the request": "Crear la petición",
- "Data series": "Series de datos",
  "field|Data series": "Series de datos",
  "Datasets in the report ({n})": "Conjuntos de datos del informe ({n})",
  "Delete selected datasets": "Eliminar los conjuntos seleccionados",
@@ -3459,7 +3624,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Deleted {n} datasets.": "Se eliminaron {n} conjuntos de datos.",
  "Filter datasets…": "Filtrar conjuntos…",
  "Import {n}": "Importar {n}",
- "Name in the legend": "Nombre en la leyenda",
  "None yet. Import files above, or ask your agent.": "Aún ninguno. Importa archivos arriba o pídeselo a tu agente.",
  "Not from a file": "No viene de un archivo",
  "Replace the data of a chart…": "Reemplazar los datos de un gráfico…",
@@ -3470,16 +3634,59 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Still used by: {list}. They will show \"Dataset not found\".": "Todavía los usan: {list}. Mostrarán \"Conjunto de datos no encontrado\".",
  "There is no chart or table yet. Add one in Edit mode first.": "Aún no hay ningún gráfico ni tabla. Añade uno primero en el modo Edición.",
  "Which chart or table?": "¿Qué gráfico o tabla?",
- "With several series, each series has its own colour and marker; \"Colour by\" is not used.": "Con varias series, cada una tiene su color y marcador; \"Colorear por\" no se usa.",
  "not used": "sin usar",
  "the selection": "la selección",
- "the settings above": "la configuración de arriba",
  "used by {list}": "usado en {list}",
  "{n} files selected: {sum}": "{n} archivos seleccionados: {sum}",
  "{n} files: {sum}": "{n} archivos: {sum}",
  "{n} in {dir}": "{n} en {dir}",
  "{n} rows": "{n} filas",
- "{n} selected": "{n} seleccionados"
+ "{n} selected": "{n} seleccionados",
+ "Appearance": "Aspecto",
+ "Range": "Rango",
+ "Compare": "Comparar",
+ "Statistics": "Estadística",
+ "Use a log scale for the Y axis.": "Usa escala logarítmica en el eje Y.",
+ "Set the Y axis range from […] to […].": "Pon el eje Y de […] a […].",
+ "Make it a line chart, sorted by […].": "Hazlo un gráfico de líneas, ordenado por […].",
+ "Only show the data where […].": "Muestra solo los datos donde […].",
+ "Leave out empty values and outliers (say how you define them); keep the original data.": "Quita los valores vacíos y atípicos (explica el criterio); conserva los datos originales.",
+ "Add the attached files to this chart, one series per […].": "Añade los archivos adjuntos a este gráfico, una serie por […].",
+ "Replace the data of this chart with the attached files; keep the axes and titles.": "Reemplaza los datos de este gráfico con los archivos adjuntos; mantén ejes y títulos.",
+ "Use […] for the X axis and […] for the Y axis.": "Usa […] en el eje X y […] en el eje Y.",
+ "Plot […] and […] in this chart, in different colours.": "Dibuja […] y […] en este gráfico con colores distintos.",
+ "Split it into two panels: […] and […].": "Divídelo en dos paneles: […] y […].",
+ "Add a y = x line to compare the two measurements.": "Añade una línea y = x para comparar las dos medidas.",
+ "Add a linear trend line with R².": "Añade una línea de tendencia lineal con R².",
+ "Add error bars from the standard deviation of […].": "Añade barras de error con la desviación estándar de […].",
+ "Compute the correlation between […] and […] and explain it in plain words in the caption.": "Calcula la correlación entre […] y […] y explícala con palabras sencillas en el pie.",
+ "Export the data of this chart as CSV, one file per […].": "Exporta los datos de este gráfico como CSV, un archivo por […].",
+ "Export this figure for publication ([…] column width).": "Exporta esta figura para publicación (ancho de […] columna).",
+ "Why are these points different? Compare them with the rest.": "¿Por qué son distintos estos puntos? Compáralos con el resto.",
+ "Mark these points and explain what they have in common.": "Marca estos puntos y explica qué tienen en común.",
+ "Leave these points out and say why in the caption; keep the original data.": "Excluye estos puntos y explica por qué en el pie; conserva los datos originales.",
+ "Fit these points separately from the rest.": "Ajusta estos puntos por separado del resto.",
+ "Sort by […] and show the first […] rows.": "Ordena por […] y muestra las primeras […] filas.",
+ "Add units to the column headers.": "Añade unidades a los encabezados.",
+ "Add a column with […].": "Añade una columna con […].",
+ "Show the mean and standard deviation per […].": "Muestra la media y la desviación estándar por […].",
+ "Make it shorter and keep the numbers.": "Hazlo más corto y conserva los números.",
+ "Give the source dataset for every number.": "Indica el conjunto de datos de origen de cada número.",
+ "Make the conclusion more cautious: separate what the data shows from interpretation.": "Haz la conclusión más prudente: separa lo que muestran los datos de la interpretación.",
+ "Add a short method paragraph: how the numbers were computed.": "Añade un párrafo breve de método: cómo se calcularon los números.",
+ "Replace it with […].": "Reemplázala por […].",
+ "Crop the white space and enlarge […].": "Recorta el espacio en blanco y amplía […].",
+ "Write a caption that explains the axes and units.": "Escribe un pie que explique los ejes y las unidades.",
+ "Attach the {n} files ticked in the Folder tab ({sum})": "Adjuntar los {n} archivos marcados en la pestaña Carpeta ({sum})",
+ "Could not make the image.": "No se pudo crear la imagen.",
+ "Download": "Descargar",
+ "Download this dataset as CSV": "Descargar este conjunto como CSV",
+ "Example requests": "Ejemplos de peticiones",
+ "Quick adjustments and download": "Ajustes rápidos y descarga",
+ "Send and ask the agent": "Enviar y pedir al agente",
+ "Series": "Serie",
+ "The data drawn in this chart": "Los datos dibujados en este gráfico",
+ "To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).": "Para cambiar los datos, las columnas, las series o cualquier otra cosa, escríbelo en el cuadro de comentarios de abajo (ver Ejemplos de peticiones)."
 }
 }
 </script>
@@ -3604,6 +3811,40 @@ async function saveTextFile(name,text,type){
     catch(e){if(e&&e.code==='declined')return;if(S.cloud){toast(tr('Download is not available here. Copy from the text box below.'));return}}}
   const a=h('a',{href:URL.createObjectURL(new Blob([text],{type:type||'text/plain'})),download:name});document.body.append(a);a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);
+}
+/* Downloads without an agent: the data drawn in a chart (CSV), the chart as SVG or PNG, a dataset (CSV) */
+const fileSlug=s=>String(s||'chart').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60)||'chart';
+const csvCell=v=>{if(v==null)return'';const s=String(v);return/[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+const csvText=rows=>'\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n')+'\r\n'; // with a BOM so Excel reads UTF-8
+function downloadChartCSV(b){
+  const L=seriesOf(b),multi=L.length>1,s0=L.find(s=>s.ds)||L[0],c=b.chart||{},col=!multi&&c.color&&s0&&s0.ds?c.color:null;
+  if(!s0||!s0.ds){toast(tr('Dataset not found: ')+(c.dataset||''));return}
+  const head=[...(multi?[tr('Series')]:[]),'id',c.xLabel||colLabel(s0.ds,s0.x),c.yLabel||colLabel(s0.ds,s0.y),...(col?[colLabel(s0.ds,col)]:[])],rows=[head];
+  L.forEach(s=>{if(s.ds)s.ds.rows.forEach(r=>{if(numv(r[s.x])==null||numv(r[s.y])==null)return;rows.push([...(multi?[seriesName(s)]:[]),r.id,r[s.x],r[s.y],...(col?[r[col]]:[])])})});
+  saveTextFile(fileSlug(b.title||b.id)+'.csv',csvText(rows),'text/csv');
+}
+function downloadDatasetCSV(d){saveTextFile(fileSlug(d.title||d.id)+'.csv',csvText([d.columns.map(c=>c.label||c.key),...d.rows.map(r=>d.columns.map(c=>r[c.key]))]),'text/csv')}
+function chartSVGText(b){ // draw the chart off screen and copy the computed colours and fonts into the SVG, so it looks the same elsewhere
+  const host=$('#measure'),svg=el('svg',{});host.append(svg);
+  try{if(!drawChart(svg,b))return null;
+    svg.querySelectorAll('.over,.pend,.live').forEach(n=>n.remove());
+    const cp=svg.cloneNode(true),src=[svg,...svg.querySelectorAll('*')],dst=[cp,...cp.querySelectorAll('*')];
+    const props=['fill','stroke','stroke-width','stroke-dasharray','opacity','font-family','font-size','font-weight','text-anchor'];
+    src.forEach((n,i)=>{const cs=getComputedStyle(n);dst[i].setAttribute('style',props.map(p=>p+':'+cs.getPropertyValue(p)).join(';'));dst[i].removeAttribute('class')});
+    const vb=(svg.getAttribute('viewBox')||'0 0 680 400').split(/\s+/).map(Number);
+    cp.setAttribute('xmlns','http://www.w3.org/2000/svg');cp.setAttribute('width',vb[2]);cp.setAttribute('height',vb[3]);
+    const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');bg.setAttribute('width','100%');bg.setAttribute('height','100%');bg.setAttribute('fill','#ffffff');cp.insertBefore(bg,cp.firstChild);
+    return{text:new XMLSerializer().serializeToString(cp),w:vb[2],h:vb[3]}}
+  finally{svg.remove()}
+}
+async function downloadChartImage(b,kind){
+  const s=chartSVGText(b);if(!s){toast(tr('Dataset not found: ')+((b.chart||{}).dataset||''));return}
+  const name=fileSlug(b.title||b.id);
+  if(kind==='svg'){saveTextFile(name+'.svg',s.text,'image/svg+xml');return}
+  try{const url=URL.createObjectURL(new Blob([s.text],{type:'image/svg+xml'})),img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=url}),k=3,cv=document.createElement('canvas');
+    cv.width=s.w*k;cv.height=s.h*k;cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);URL.revokeObjectURL(url);
+    const blob=await new Promise(ok=>cv.toBlob(ok,'image/png'));saveTextFile(name+'.png',blob,'image/png')}
+  catch(e){fail(tr('Could not make the image.'),e)}
 }
 function legendNodes(){const dot=c=>h('span',{class:'lg '+c});
   return[dot('me'),tr('You')+'  ',dot('cl'),'Claude  '+tr('Shapes: ● text  ■ chart, table  ▲ image  ◆ page break, order, add/delete')+'  ',dot('an'),tr('comment (green = done). Click a column to show only that round.')]}
@@ -3970,7 +4211,7 @@ function editForm(b){
   box.append(h('input',{type:'text',class:'ed-cap',value:b.caption||'',placeholder:tr('Caption (optional)'),'data-fid':fid(b,'caption'),
     onchange:e=>saveBlock({...b,caption:e.target.value.trim()})}));
   const src=sourceLine(b);if(src)box.append(src);
-  const det=h('details',{class:'set'});det.append(h('summary',{text:tr('{t} settings',{t:typeName(b.type)})}));
+  const det=h('details',{class:'set'});det.append(h('summary',{text:b.type==='chart'?tr('Quick adjustments and download'):tr('{t} settings',{t:typeName(b.type)})}));
   const form=h('div',{class:'form'});det.append(form);box.append(det);
   if(S.openSet===b.id)det.open=true;
   det.addEventListener('toggle',()=>{S.openSet=det.open?b.id:(S.openSet===b.id?null:S.openSet)});
@@ -3980,31 +4221,21 @@ function editForm(b){
   const firstKey=d=>numKeys(d).find(k=>k!=='id')||'id',lastKey=d=>numKeys(d).slice(-1)[0]||d.columns[d.columns.length-1].key;
   if(b.type==='chart'){const c=b.chart,ds=S.datasets.get(c.dataset);
     const up=patch=>{const n={...c,...patch};if(Array.isArray(n.series)&&n.series.length)n.series=[{...n.series[0],dataset:n.dataset,x:n.x,y:n.y},...n.series.slice(1)];saveBlock({...b,chart:n})};
-    if(S.datasets.size>1||!ds)form.append(dsPick(c.dataset,d=>up({dataset:d.id,x:firstKey(d),y:lastKey(d),color:null,xLabel:null,yLabel:null})));
+    // Quick adjustments only; data, columns, series and anything else go through a comment to the agent
     if(ds){
       const kind=h('select',{onchange:e=>up({kind:e.target.value})},[h('option',{value:'scatter',text:tr('Scatter')}),h('option',{value:'line',text:tr('Line')})]);kind.value=c.kind;
-      form.append(L(tr('Chart type'),kind),L(tr('X column'),selectField(ds,c.x,v=>up({x:v}))),L(tr('Y column'),selectField(ds,c.y,v=>up({y:v}))),L(tr('Colour by'),selectField(ds,c.color,v=>up({color:v||null}),true)),
+      form.append(L(tr('Chart type'),kind),
         L(tr('X axis label'),h('input',{type:'text',value:c.xLabel||'',placeholder:colLabel(ds,c.x),onchange:e=>up({xLabel:e.target.value.trim()||null})})),
         L(tr('Y axis label'),h('input',{type:'text',value:c.yLabel||'',placeholder:colLabel(ds,c.y),onchange:e=>up({yLabel:e.target.value.trim()||null})})),
         L(tr('Y min'),h('input',{type:'number',step:'any',value:c.yMin??'',placeholder:tr('Auto'),onchange:e=>up({yMin:e.target.value===''?null:+e.target.value})})),
         L(tr('Y max'),h('input',{type:'number',step:'any',value:c.yMax??'',placeholder:tr('Auto'),onchange:e=>up({yMax:e.target.value===''?null:+e.target.value})})));
       const lg=h('input',{type:'checkbox',onchange:e=>up({logY:e.target.checked})});lg.checked=!!c.logY;
-      form.append(h('label',{class:'chk'},[lg,tr('Log scale for Y')]));
-      // data series: the settings above are the first one; each other series has its own dataset and columns
-      const all=Array.isArray(c.series)&&c.series.length?c.series:[{dataset:c.dataset,x:c.x,y:c.y}];
-      const setAll=list=>{const n={...c};if(list.length>1)n.series=[{...list[0],dataset:c.dataset,x:c.x,y:c.y},...list.slice(1)];else delete n.series;saveBlock({...b,chart:n})};
-      const name=(s,i)=>h('input',{type:'text',value:s.label||'',placeholder:tr('Name in the legend'),onchange:e=>setAll(all.map((x,j)=>j===i?{...x,label:e.target.value.trim()}:x))});
-      const sbox=h('div',{class:'series'},[h('h5',{text:tr('Data series')})]);
-      all.forEach((s,i)=>{const sd=S.datasets.get(s.dataset),put1=patch=>setAll(all.map((x,j)=>j===i?{...x,...patch}:x));
-        sbox.append(h('div',{class:'srow'},i===0?[h('span',{class:'sno',text:'1'}),h('span',{class:'meta',text:tr('the settings above')}),all.length>1?name(s,0):null]
-          :[h('span',{class:'sno',text:String(i+1)}),datasetSelect(s.dataset,d=>put1({dataset:d.id,x:d.columns.some(k=>k.key===s.x)?s.x:firstKey(d),y:d.columns.some(k=>k.key===s.y)?s.y:lastKey(d)})),
-            sd?selectField(sd,s.x,v=>put1({x:v})):null,sd?selectField(sd,s.y,v=>put1({y:v})):null,name(s,i),
-            h('button',{type:'button',class:'linkbtn',text:tr('Remove'),onclick:()=>setAll(all.filter((x,j)=>j!==i))})]))});
-      sbox.append(h('button',{type:'button',class:'btn small',text:tr('Add a data series'),onclick:()=>{
-        const used=new Set(all.map(s=>s.dataset)),d=[...S.datasets.values()].find(x=>!used.has(x.id))||ds;
-        setAll([...all,{dataset:d.id,x:d.columns.some(k=>k.key===c.x)?c.x:firstKey(d),y:d.columns.some(k=>k.key===c.y)?c.y:lastKey(d),label:''}])}}),
-        all.length>1?h('p',{class:'cap',text:tr('With several series, each series has its own colour and marker; "Colour by" is not used.')}):null);
-      det.append(sbox)}
+      form.append(h('label',{class:'chk'},[lg,tr('Log scale for Y')]));}
+    det.append(h('p',{class:'cap',text:tr('To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).')}),
+      h('div',{class:'crow'},[h('span',{class:'meta',text:tr('Download')}),
+        h('button',{type:'button',class:'btn small',text:'CSV',title:tr('The data drawn in this chart'),onclick:()=>downloadChartCSV(b)}),
+        h('button',{type:'button',class:'btn small',text:'SVG',onclick:()=>downloadChartImage(b,'svg')}),
+        h('button',{type:'button',class:'btn small',text:'PNG',onclick:()=>downloadChartImage(b,'png')})]))
   }else if(b.type==='table'){const t=b.table,ds=S.datasets.get(t.dataset);const up=patch=>saveBlock({...b,table:{...t,...patch}});
     if(S.datasets.size>1||!ds)form.append(dsPick(t.dataset,d=>up({dataset:d.id,sortBy:lastKey(d),columns:null})));
     if(ds){const dsc=h('input',{type:'checkbox',onchange:e=>up({desc:e.target.checked})});dsc.checked=!!t.desc;
@@ -4267,20 +4498,49 @@ function commentBox(b){
   }
   if(b.type==='text')tools.push(h('button',{type:'button',class:'btn small',text:tr('Quote selected text'),onclick:()=>{const q=S.lastSel[b.id];if(!q){toast(tr('First select some text in the block above'));return}d.target={kind:'block',blockId:b.id,quote:q};render()}}));
   tools.push(h('span',{class:'sp'}));
-  tools.push(h('button',{type:'button',class:'btn small primary',text:tr('Send comment'),onclick:()=>submitDraft(b.id)}));
-  box.append(ta,h('div',{class:'crow'},tools));
+  tools.push(h('button',{type:'button',class:'btn small',text:tr('Send comment'),onclick:()=>submitDraft(b.id)}));
+  tools.push(h('button',{type:'button',class:'btn small primary',text:tr('Send and ask the agent'),onclick:()=>submitAndAsk(b.id)}));
+  box.append(ta,examplesFor(d.target&&d.target.kind!=='block'&&b.type==='chart'?'region':b.type,ta,d)||'',attachRow(d)||'',h('div',{class:'crow'},tools));
   if(b.type==='chart')box.append(h('p',{class:'chint',text:tr('You can also click a data point on the chart to point at it.')}));
   return box;
 }
 async function submitDraft(id){
   const d=draftOf(id);const text=d.text.trim();
-  if(!text&&!d.tags.length){toast(tr('Write a comment or pick a tag first'));return}
+  if(!text&&!d.tags.length){toast(tr('Write a comment or pick a tag first'));return false}
   const no=S.annos.reduce((m,a)=>Math.max(m,a.no||0),0)+1;
   const a={id:uid('a'),no,target:d.target||{kind:'block',blockId:id},tags:[...d.tags],text,status:'open',reply:'',createdAt:now()};
+  if(d.withFiles!==false&&S.fsel&&S.fsel.size){a.files=[...S.fsel].map(normPath).sort();S.fsel.clear()} // the files ticked in Folder > Data
   S.drafts.delete(id);S.annos=[...S.annos,a];
   const box=document.activeElement,again=!!box&&box.dataset&&box.dataset.fid===fid({id},'comment'); // sent with Ctrl+Enter: keep typing in a fresh box
   if(again)box.blur();render();if(again){const n=$(`[data-fid="${CSS.escape(fid({id},'comment'))}"]`);if(n)n.focus({preventScroll:true})}
   await put('annotations/'+a.id,a);toast(tr('Comment sent #')+no);
+  return true;
+}
+async function submitAndAsk(id){if(await submitDraft(id))await askAgent()}
+
+/* Example requests: general scientific wording the user can insert and edit; [...] marks what to fill in */
+const EXAMPLES={
+  chart:[['Appearance',['Use a log scale for the Y axis.','Set the Y axis range from […] to […].','Make it a line chart, sorted by […].']],
+    ['Range',['Only show the data where […].','Leave out empty values and outliers (say how you define them); keep the original data.']],
+    ['Data',['Add the attached files to this chart, one series per […].','Replace the data of this chart with the attached files; keep the axes and titles.','Use […] for the X axis and […] for the Y axis.']],
+    ['Compare',['Plot […] and […] in this chart, in different colours.','Split it into two panels: […] and […].','Add a y = x line to compare the two measurements.']],
+    ['Statistics',['Add a linear trend line with R².','Add error bars from the standard deviation of […].','Compute the correlation between […] and […] and explain it in plain words in the caption.']],
+    ['Export',['Export the data of this chart as CSV, one file per […].','Export this figure for publication ([…] column width).']]],
+  region:[['',['Why are these points different? Compare them with the rest.','Mark these points and explain what they have in common.','Leave these points out and say why in the caption; keep the original data.','Fit these points separately from the rest.']]],
+  table:[['',['Sort by […] and show the first […] rows.','Add units to the column headers.','Add a column with […].','Show the mean and standard deviation per […].']]],
+  text:[['',['Make it shorter and keep the numbers.','Give the source dataset for every number.','Make the conclusion more cautious: separate what the data shows from interpretation.','Add a short method paragraph: how the numbers were computed.']]],
+  image:[['',['Replace it with […].','Crop the white space and enlarge […].','Write a caption that explains the axes and units.']]]};
+function examplesFor(kind,ta,d){ // a closed list; a click puts the sentence into the comment box, to edit
+  const groups=EXAMPLES[kind];if(!groups)return null;
+  const insert=s=>{const v=ta.value,at=ta.selectionStart??v.length,pre=v.slice(0,at),sep=pre&&!/\s$/.test(pre)?' ':'';
+    ta.value=pre+sep+s+v.slice(at);d.text=ta.value;ta.focus();const i=ta.value.indexOf('[…]',at);if(i>=0)ta.setSelectionRange(i,i+3);else ta.setSelectionRange(at+sep.length+s.length,at+sep.length+s.length)};
+  return h('details',{class:'ex'},[h('summary',{text:tr('Example requests')}),...groups.map(([cat,list])=>h('div',{class:'exrow'},[
+    cat?h('span',{class:'excat',text:tr(cat)}):null,...list.map(s=>h('button',{type:'button',class:'exs',text:tr(s),onclick:()=>insert(tr(s))}))]))]);
+}
+function attachRow(d){ // offer the files ticked in Folder > Data
+  const n=S.fsel?S.fsel.size:0;if(!n)return null;
+  const cb=h('input',{type:'checkbox'});cb.checked=d.withFiles!==false;cb.onchange=()=>{d.withFiles=cb.checked};
+  return h('label',{class:'chk attach'},[cb,h('span',{text:tr('Attach the {n} files ticked in the Folder tab ({sum})',{n,sum:pathsSummary([...S.fsel])})})]);
 }
 function renderEdit(){
   $('#compactBtn').setAttribute('aria-pressed',String(!!S.compact));$('#addrow').hidden=!!S.compact;
@@ -4781,16 +5041,17 @@ function renderQuick(){
   const ta=h('textarea',{rows:'3',placeholder:tr('What should change here? Ctrl + Enter to send.')});ta.value=d.text;
   ta.addEventListener('input',()=>{d.text=ta.value});
   ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();sendQuick()}});
-  kids.push(ta,h('div',{class:'crow'},[h('button',{type:'button',class:'btn small',text:tr('Cancel'),onclick:()=>closeQuick(true)}),h('span',{class:'sp'}),
-    h('button',{type:'button',class:'btn small primary',text:tr('Send comment'),onclick:sendQuick})]));
+  kids.push(ta,examplesFor(b.type==='chart'?'region':b.type,ta,d)||'',attachRow(d)||'',h('div',{class:'crow'},[h('button',{type:'button',class:'btn small',text:tr('Cancel'),onclick:()=>closeQuick(true)}),h('span',{class:'sp'}),
+    h('button',{type:'button',class:'btn small',text:tr('Send comment'),onclick:sendQuick}),
+    h('button',{type:'button',class:'btn small primary',text:tr('Send and ask the agent'),onclick:async()=>{if(await sendQuick())await askAgent()}})]));
   box.replaceChildren(...kids);box.hidden=false;
   const w=box.offsetWidth,hh=box.offsetHeight;
   box.style.left=Math.max(8,Math.min(q.x+14,innerWidth-w-8))+'px';
   box.style.top=(q.y+14+hh>innerHeight-8?Math.max(8,q.y-hh-14):q.y+14)+'px';
 }
-async function sendQuick(){const q=S.quick;if(!q)return;const d=draftOf(q.blockId);
-  if(!d.text.trim()&&!d.tags.length){toast(tr('Write a comment or pick a tag first'));return}
-  S.quick=null;$('#qc').hidden=true;await submitDraft(q.blockId)}
+async function sendQuick(){const q=S.quick;if(!q)return false;const d=draftOf(q.blockId);
+  if(!d.text.trim()&&!d.tags.length){toast(tr('Write a comment or pick a tag first'));return false}
+  S.quick=null;$('#qc').hidden=true;return submitDraft(q.blockId)}
 // A click elsewhere closes the dialog; the draft is kept unless it is still empty
 document.addEventListener('pointerdown',e=>{if(!S.quick||!(e.target instanceof Element)||e.target.closest('#qc,.pt'))return;
   const d=draftOf(S.quick.blockId);closeQuick(!d.text.trim()&&!d.tags.length)},true);
@@ -5542,13 +5803,13 @@ function fselBox(path,range){
   cb.addEventListener('click',e=>{e.stopPropagation();const on=cb.checked;
     if(e.shiftKey&&S.fselLast&&range.includes(S.fselLast)){const a=range.indexOf(S.fselLast),z=range.indexOf(path);range.slice(Math.min(a,z),Math.max(a,z)+1).forEach(p=>on?S.fsel.add(p):S.fsel.delete(p))}
     else if(on)S.fsel.add(path);else S.fsel.delete(path);
-    S.fselLast=path;renderPanel()});
+    S.fselLast=path;render()}); // the comment boxes offer to attach the ticked files, so redraw them too
   return cb;
 }
 function fselGroupBox(paths){
   S.fsel=S.fsel||new Set();const n=paths.filter(p=>S.fsel.has(p)).length,cb=h('input',{type:'checkbox',class:'fsel',title:tr('Select every file in this folder')});
   cb.checked=n>0&&n===paths.length;cb.indeterminate=n>0&&n<paths.length;
-  cb.addEventListener('click',e=>{e.stopPropagation();const on=cb.checked;paths.forEach(p=>on?S.fsel.add(p):S.fsel.delete(p));renderPanel()});
+  cb.addEventListener('click',e=>{e.stopPropagation();const on=cb.checked;paths.forEach(p=>on?S.fsel.add(p):S.fsel.delete(p));render()});
   return cb;
 }
 function pathsSummary(paths){ // "72 in ../Data/R3/, 4 in derived_data/"
@@ -5562,7 +5823,7 @@ function fselBar(F,B){
   return h('div',{class:'fselbar'},[h('span',{text:tr('{n} files selected: {sum}',{n:paths.length,sum:pathsSummary(paths)})}),h('span',{class:'sp'}),
     B(tr('Add to a chart…'),()=>fileRequest('add-data-files'),'primary'),B(tr('Replace the data of a chart…'),()=>fileRequest('replace-data-files')),
     imp.length?B(tr('Import {n}',{n:imp.length}),()=>importAll(imp,tr('the selection'))):null,
-    B(tr('Clear'),()=>{S.fsel.clear();renderPanel()})]);
+    B(tr('Clear'),()=>{S.fsel.clear();render()})]);
 }
 function fileRequest(tag){
   const targets=orderedBlocks().filter(b=>b.type==='chart'||b.type==='table');
@@ -5588,7 +5849,8 @@ function datasetsSection(B){ // every dataset in the report, what uses it, and d
   all.forEach(d=>{const cb=h('input',{type:'checkbox'});cb.checked=S.dsel.has(d.id);cb.onchange=()=>{cb.checked?S.dsel.add(d.id):S.dsel.delete(d.id);renderPanel()};
     const u=usedBy(d.id);
     ul.append(h('li',{},[cb,h('span',{class:'fname',text:d.title||d.id,title:(d.source&&d.source.path)||''}),
-      h('span',{class:'fstat',text:tr('{n} rows',{n:d.rows.length})+' · '+(u.length?tr('used by {list}',{list:u.slice(0,3).map(blockLabel).join(tr(', '))+(u.length>3?' …':'')}):tr('not used'))})]))});
+      h('span',{class:'fstat',text:tr('{n} rows',{n:d.rows.length})+' · '+(u.length?tr('used by {list}',{list:u.slice(0,3).map(blockLabel).join(tr(', '))+(u.length>3?' …':'')}):tr('not used'))}),
+      h('button',{type:'button',class:'linkbtn rv',text:'CSV',title:tr('Download this dataset as CSV'),onclick:()=>downloadDatasetCSV(d)})]))});
   sec.append(ul,h('div',{class:'crow'},S.dsel.size?[h('span',{text:tr('{n} selected',{n:S.dsel.size})}),B(tr('Delete selected datasets'),deleteDatasets),B(tr('Clear'),()=>{S.dsel.clear();renderPanel()})]
     :[unused.length?B(tr('Select unused datasets ({n})',{n:unused.length}),()=>{unused.forEach(d=>S.dsel.add(d.id));renderPanel()}):null]));
   return sec;

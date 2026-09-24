@@ -151,7 +151,8 @@ Raw data can be large. Duetsheet compares size and modification date first and o
 Switch to **Edit**. You can:
 
 - change titles, text and captions directly (every change is recorded);
-- change chart settings (type, dataset, columns, axis labels, range, log scale), and under **Data series** add more series from other datasets, each with its own colour and legend name;
+- make quick chart adjustments (type, axis labels, range, log scale) and download the chart's data (CSV) or the chart itself (SVG, PNG) from **Quick adjustments and download**;
+- for anything else (other data, columns, several series, panels, fits, error bars), write a comment: **Example requests** under each comment box offers general sentences to start from (for example *Plot […] and […] in this chart, in different colours*), with […] for you to fill in. Files you ticked in the Folder tab can be attached, so you never type file names. **Send and ask the agent** sends the comment and asks the agent in one click;
 - drag blocks to reorder them and click the dividers to control page breaks;
 - write a comment under any block, with preset tags such as **Use log scale** or **Highlight key points**.
 
