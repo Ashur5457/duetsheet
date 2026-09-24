@@ -200,6 +200,24 @@ def step_files(step):
             yield role[:-1], r
 
 
+def chart_series(spec):
+    """The series of a chart: chart.series, or the one series chart.dataset / x / y of older reports."""
+    ser = spec.get('series') if isinstance(spec, dict) else None
+    if isinstance(ser, list) and ser:
+        return [s for s in ser if isinstance(s, dict) and s.get('dataset')]
+    return [{'dataset': spec.get('dataset'), 'x': spec.get('x'), 'y': spec.get('y')}] if isinstance(spec, dict) and spec.get('dataset') else []
+
+
+def block_dataset_ids(b):
+    if not isinstance(b, dict):
+        return []
+    if b.get('type') == 'chart':
+        return list(dict.fromkeys(s['dataset'] for s in chart_series(b.get('chart'))))
+    if b.get('type') == 'table' and isinstance(b.get('table'), dict) and b['table'].get('dataset'):
+        return [b['table']['dataset']]
+    return []
+
+
 def check_chain(project, root, rep, deep):
     """Return (errors, warnings, notes) about steps and dataset sources."""
     errors, warnings, notes = [], [], []
@@ -294,10 +312,8 @@ def check_chain(project, root, rep, deep):
 
     uses = {}   # dataset id -> block ids
     for bid, b in blocks.items():
-        if isinstance(b, dict):
-            spec = b.get(b.get('type')) if b.get('type') in ('chart', 'table') else None
-            if isinstance(spec, dict) and spec.get('dataset'):
-                uses.setdefault(spec['dataset'], []).append(bid)
+        for dsid in block_dataset_ids(b):
+            uses.setdefault(dsid, []).append(bid)
 
     stale_ds = {}
     for key, ds in datasets.items():
@@ -457,6 +473,21 @@ def check_report(project, root=None, deep=False):
                 v = spec.get(f)
                 if v is not None and v not in colkeys.get(ds, set()):
                     errors.append(f'{where}.{t}.{f} "{v}" is not a column of dataset "{ds}"')
+            if t == 'chart' and 'series' in spec:
+                ser = spec['series']
+                if not isinstance(ser, list):
+                    errors.append(f'{where}.chart.series must be a list of {{"dataset", "x", "y", "label"}}')
+                    continue
+                for i, s in enumerate(ser):
+                    sd = s.get('dataset') if isinstance(s, dict) else None
+                    if sd not in datasets:
+                        errors.append(f'{where}.chart.series[{i}].dataset "{sd}" is not in datasets')
+                        continue
+                    for f in ('x', 'y'):
+                        if s.get(f) not in colkeys.get(sd, set()):
+                            errors.append(f'{where}.chart.series[{i}].{f} "{s.get(f)}" is not a column of dataset "{sd}"')
+                if ser and isinstance(ser[0], dict) and (ser[0].get('dataset'), ser[0].get('x'), ser[0].get('y')) != (ds, spec.get('x'), spec.get('y')):
+                    warnings.append(f'{where}.chart.series[0] should repeat chart.dataset, x and y (older pages draw only those)')
         if t == 'image':
             im = b.get('image')
             if not isinstance(im, dict):
@@ -472,6 +503,13 @@ def check_report(project, root=None, deep=False):
             continue
         if a.get('status') not in ('open', 'done'):
             errors.append(f'annotations.{key}.status must be open or done')
+        fl = a.get('files', [])
+        if not isinstance(fl, list) or not all(isinstance(p, str) for p in fl):
+            errors.append(f'annotations.{key}.files must be a list of paths')
+        else:
+            out_f = [p for p in fl if not inside(root, project, p)]
+            if out_f:
+                errors.append(f'annotations.{key}.files: "{out_f[0]}" is outside the folder "{root.name}"')
         th = a.get('thread', [])
         if not isinstance(th, list) or not all(isinstance(m, dict) and m.get('by') in ('user', 'claude') and isinstance(m.get('text'), str) for m in th):
             errors.append(f'annotations.{key}.thread must be a list of {{"by": "user" | "claude", "text", "at"}}')
@@ -632,19 +670,29 @@ def open_annotations(root):
         blk = {k: v for k, v in b.items() if k not in ('createdAt', 'updatedAt')}
         if isinstance(blk.get('image'), dict):   # no image data in the output
             blk['image'] = {k: v for k, v in blk['image'].items() if k != 'src'}
-        spec = b.get(b.get('type')) if b.get('type') in ('chart', 'table') else None
-        ds = datasets.get(spec.get('dataset')) if isinstance(spec, dict) else None
         item = {'annotation': a, 'block': blk}
-        if isinstance(ds, dict):
-            item['dataset'] = {'id': ds.get('id'), 'title': ds.get('title'), 'columns': ds.get('columns'),
-                               'rows': len(ds.get('rows') or []), 'source': (ds.get('source') or {}).get('path')}
-            ids = [t['rowId']] if 'rowId' in t else t.get('enclosed') or []
-            if ids:
-                want = set(ids)
-                rows = [r for r in ds.get('rows') or [] if isinstance(r, dict) and r.get('id') in want]
-                item['targetRows'] = rows[:30]
-                if len(rows) > 30:
-                    item['targetRowsNote'] = f'{len(rows) - 30} more rows not shown'
+        info = lambda ds: {'id': ds.get('id'), 'title': ds.get('title'), 'columns': ds.get('columns'),
+                           'rows': len(ds.get('rows') or []), 'source': (ds.get('source') or {}).get('path')}
+        dss = [datasets[i] for i in block_dataset_ids(b) if isinstance(datasets.get(i), dict)]
+        if len(dss) == 1:
+            item['dataset'] = info(dss[0])
+        elif dss:
+            item['datasets'] = [info(d) for d in dss]   # a chart with several series (see block.chart.series)
+        # the rows a point, box or lasso points at: {dataset id: [row ids]}
+        if 'rowId' in t:
+            want = {t.get('datasetId') or (dss[0].get('id') if dss else None): [t['rowId']]}
+        elif isinstance(t.get('enclosedBy'), dict):
+            want = t['enclosedBy']
+        else:
+            want = {dss[0].get('id'): t.get('enclosed') or []} if dss else {}
+        rows = []
+        for dsid, ids in want.items():
+            ids = set(ids or [])
+            rows += [{'dataset': dsid, **r} for r in (datasets.get(dsid) or {}).get('rows') or [] if isinstance(r, dict) and r.get('id') in ids]
+        if rows:
+            item['targetRows'] = rows[:30]
+            if len(rows) > 30:
+                item['targetRowsNote'] = f'{len(rows) - 30} more rows not shown'
         out.append(item)
     style = rep.get('style') if isinstance(rep.get('style'), dict) else {}
     rules = [r.get('text') for r in ((style.get('writing') or {}).get('rules') or []) if isinstance(r, dict) and r.get('text')]

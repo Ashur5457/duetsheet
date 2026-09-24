@@ -106,7 +106,13 @@
             "yLabel": { "type": ["string", "null"] },
             "logY": { "type": "boolean" },
             "yMin": { "type": ["number", "null"] },
-            "yMax": { "type": ["number", "null"] }
+            "yMax": { "type": ["number", "null"] },
+            "series": {
+              "type": "array",
+              "description": "Several series in one chart, each in its own colour and marker. series[0] repeats dataset, x and y.",
+              "items": { "type": "object", "required": ["dataset", "x", "y"], "properties": {
+                "dataset": { "type": "string" }, "x": { "type": "string" }, "y": { "type": "string" }, "label": { "type": "string", "description": "Name in the legend." } } }
+            }
           }
         },
         "table": {
@@ -209,7 +215,9 @@
             "x": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
             "y": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
             "polygon": { "type": "array", "items": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 } },
-            "enclosed": { "type": "array", "items": { "type": "number" }, "description": "Row ids inside the region (charts only)." }
+            "enclosed": { "type": "array", "items": { "type": "number" }, "description": "Row ids inside the region (charts only; the first series)." },
+            "enclosedBy": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "number" } }, "description": "With several series: row ids inside the region, per dataset id." },
+            "datasetId": { "type": "string", "description": "For a point in a chart with several series: the dataset of rowId." }
           }
         },
         "tags": {
@@ -218,6 +226,7 @@
           "description": "Tag ids such as add-trend-line. Reports from duetsheet/0.2 may contain the visible button text instead."
         },
         "text": { "type": "string" },
+        "files": { "type": "array", "items": { "type": "string" }, "description": "With the tags add-data-files or replace-data-files: the files the user chose, relative to the folder of report.json." },
         "status": { "enum": ["open", "done"] },
         "reply": { "type": "string", "description": "The agent's latest answer (the same text as its last thread message)." },
         "thread": {

@@ -60,6 +60,18 @@ button,input,select,textarea{font:inherit;color:inherit}
 #agentbar[hidden]{display:none}
 .reply.me{border-left-color:var(--c2)}
 .linkbtn.rv{font-size:12px;color:var(--muted)}
+.series{margin:8px 0 4px;padding-top:6px;border-top:1px dashed var(--line)}
+.srow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0;font-size:13px}
+.srow .sno{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--soft);font-size:11px}
+.srow select,.srow input{font:inherit;font-size:13px;max-width:210px}
+.fsel{margin:0;flex:0 0 auto;align-self:center}
+.fselbar{position:sticky;bottom:0;z-index:2;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin:8px 0 0;padding:8px 10px;
+  border:1px solid var(--accent);border-radius:8px;background:var(--paper);font-size:13px;box-shadow:0 -2px 8px rgba(0,0,0,.08)}
+.fselbar .sp{flex:1}
+.picklist{display:flex;flex-direction:column;gap:4px;max-height:40vh;overflow:auto;margin:0 0 8px}
+.langbox textarea{width:100%;box-sizing:border-box;font:inherit;font-size:13px}
+.afiles{font-size:12.5px;margin:4px 0}.afiles summary{cursor:pointer;color:var(--muted)}.afiles ul{margin:4px 0;padding-left:16px;max-height:180px;overflow:auto}
+.dspick{display:inline-flex;flex-direction:column;gap:3px}.dspick input{font:inherit;font-size:12.5px}
 .flist li.grp{background:var(--soft);font-weight:500;padding:5px 6px}
 .flist li.sub{padding-left:14px}
 .ftop{margin:0 0 6px}
@@ -1007,7 +1019,43 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "You have personal habits: a figure style and {n} writing rules. Load them to use them in this report.": "你有個人習慣：一套作圖樣式和 {n} 條寫作規則。載入後就能用在這份報告。",
  "Your writing habits ({n})": "你的寫作習慣（{n}）",
  "added by you": "你自己加的",
- "{t} Markdown or text, {d} Word and {p} PDF files.": "{t} 個 Markdown 或文字檔、{d} 個 Word、{p} 個 PDF。"
+ "{t} Markdown or text, {d} Word and {p} PDF files.": "{t} 個 Markdown 或文字檔、{d} 個 Word、{p} 個 PDF。",
+ ", and {n} more folders": "，還有另外 {n} 個資料夾",
+ "Add a data series": "加入一組數據",
+ "Add to a chart…": "加入圖表…",
+ "Add these files to the chart": "把這些檔案加入圖表",
+ "Replace the data with these files": "用這些檔案取代圖表的數據",
+ "Anything the agent should know, for example: only the CE10 column, one series per round.": "有什麼要 agent 注意的，例如：只要 CE10 那一欄、每一輪畫成一組。",
+ "Create the request": "建立請求",
+ "Data series": "數據組",
+ "field|Data series": "數據組",
+ "Datasets in the report ({n})": "報告裡的資料集（{n}）",
+ "Delete selected datasets": "刪除選取的資料集",
+ "Delete {n} datasets from the report? The files stay where they are.": "要從報告刪除 {n} 個資料集嗎？檔案本身不會動。",
+ "Deleted {n} datasets.": "已刪除 {n} 個資料集。",
+ "Filter datasets…": "篩選資料集…",
+ "Import {n}": "匯入 {n} 個",
+ "Name in the legend": "圖例名稱",
+ "None yet. Import files above, or ask your agent.": "還沒有。從上方匯入檔案，或請 agent 處理。",
+ "Not from a file": "不是來自檔案",
+ "Replace the data of a chart…": "取代圖表的數據…",
+ "Request added as comment #{n}. Click \"Ask the agent to revise\" when you are ready.": "已建立為第 {n} 則註記。準備好後按「請 agent 修改」。",
+ "Select every file in this folder": "選取這個資料夾的所有檔案",
+ "Select unused datasets ({n})": "選取沒用到的資料集（{n}）",
+ "Source: {n} datasets ({files})": "來源：{n} 個資料集（{files}）",
+ "Still used by: {list}. They will show \"Dataset not found\".": "還有這些在用：{list}。刪除後它們會顯示「找不到資料集」。",
+ "There is no chart or table yet. Add one in Edit mode first.": "還沒有圖表或表格。請先在編輯模式新增一個。",
+ "Which chart or table?": "哪一張圖表或表格？",
+ "With several series, each series has its own colour and marker; \"Colour by\" is not used.": "有多組數據時，每組各有自己的顏色和標記，「顏色依據」不會使用。",
+ "not used": "沒有用到",
+ "the selection": "選取的檔案",
+ "the settings above": "上方的設定",
+ "used by {list}": "用在 {list}",
+ "{n} files selected: {sum}": "已選 {n} 個檔案：{sum}",
+ "{n} files: {sum}": "{n} 個檔案：{sum}",
+ "{n} in {dir}": "{dir} 裡 {n} 個",
+ "{n} rows": "{n} 列",
+ "{n} selected": "已選 {n} 個"
 },
 "zh-Hans": {
  "_name": "简体中文",
@@ -1577,7 +1625,43 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "You have personal habits: a figure style and {n} writing rules. Load them to use them in this report.": "你有个人习惯：一套作图样式和 {n} 条写作规则。加载后就能用在这份报告。",
  "Your writing habits ({n})": "你的写作习惯（{n}）",
  "added by you": "你自己加的",
- "{t} Markdown or text, {d} Word and {p} PDF files.": "{t} 个 Markdown 或文本文件、{d} 个 Word、{p} 个 PDF。"
+ "{t} Markdown or text, {d} Word and {p} PDF files.": "{t} 个 Markdown 或文本文件、{d} 个 Word、{p} 个 PDF。",
+ ", and {n} more folders": "，还有另外 {n} 个文件夹",
+ "Add a data series": "添加一组数据",
+ "Add to a chart…": "加入图表…",
+ "Add these files to the chart": "把这些文件加入图表",
+ "Replace the data with these files": "用这些文件替换图表的数据",
+ "Anything the agent should know, for example: only the CE10 column, one series per round.": "有什么要 agent 注意的，例如：只要 CE10 那一栏、每一轮画成一组。",
+ "Create the request": "创建请求",
+ "Data series": "数据组",
+ "field|Data series": "数据组",
+ "Datasets in the report ({n})": "报告里的数据集（{n}）",
+ "Delete selected datasets": "删除选中的数据集",
+ "Delete {n} datasets from the report? The files stay where they are.": "要从报告删除 {n} 个数据集吗？文件本身不会动。",
+ "Deleted {n} datasets.": "已删除 {n} 个数据集。",
+ "Filter datasets…": "筛选数据集…",
+ "Import {n}": "导入 {n} 个",
+ "Name in the legend": "图例名称",
+ "None yet. Import files above, or ask your agent.": "还没有。从上方导入文件，或请 agent 处理。",
+ "Not from a file": "不是来自文件",
+ "Replace the data of a chart…": "替换图表的数据…",
+ "Request added as comment #{n}. Click \"Ask the agent to revise\" when you are ready.": "已创建为第 {n} 条注记。准备好后按“请 agent 修改”。",
+ "Select every file in this folder": "选中这个文件夹的所有文件",
+ "Select unused datasets ({n})": "选中没用到的数据集（{n}）",
+ "Source: {n} datasets ({files})": "来源：{n} 个数据集（{files}）",
+ "Still used by: {list}. They will show \"Dataset not found\".": "还有这些在用：{list}。删除后它们会显示“找不到数据集”。",
+ "There is no chart or table yet. Add one in Edit mode first.": "还没有图表或表格。请先在编辑模式新增一个。",
+ "Which chart or table?": "哪一张图表或表格？",
+ "With several series, each series has its own colour and marker; \"Colour by\" is not used.": "有多组数据时，每组各有自己的颜色和标记，“颜色依据”不会使用。",
+ "not used": "没有用到",
+ "the selection": "选中的文件",
+ "the settings above": "上方的设置",
+ "used by {list}": "用在 {list}",
+ "{n} files selected: {sum}": "已选 {n} 个文件：{sum}",
+ "{n} files: {sum}": "{n} 个文件：{sum}",
+ "{n} in {dir}": "{dir} 里 {n} 个",
+ "{n} rows": "{n} 行",
+ "{n} selected": "已选 {n} 个"
 },
 "ja": {
  "_name": "日本語",
@@ -2147,7 +2231,43 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "You have personal habits: a figure style and {n} writing rules. Load them to use them in this report.": "個人の習慣があります：作図スタイルと {n} 件の文章ルール。読み込むとこのレポートで使えます。",
  "Your writing habits ({n})": "あなたの文章の習慣（{n}）",
  "added by you": "あなたが追加",
- "{t} Markdown or text, {d} Word and {p} PDF files.": "Markdown・テキスト {t}、Word {d}、PDF {p} ファイル。"
+ "{t} Markdown or text, {d} Word and {p} PDF files.": "Markdown・テキスト {t}、Word {d}、PDF {p} ファイル。",
+ ", and {n} more folders": "、ほか {n} フォルダ",
+ "Add a data series": "データ系列を追加",
+ "Add to a chart…": "グラフに追加…",
+ "Add these files to the chart": "これらのファイルをグラフに追加",
+ "Replace the data with these files": "これらのファイルでデータを置き換え",
+ "Anything the agent should know, for example: only the CE10 column, one series per round.": "エージェントに伝えたいこと（例：CE10 の列だけ、ラウンドごとに 1 系列）。",
+ "Create the request": "依頼を作成",
+ "Data series": "データ系列",
+ "field|Data series": "データ系列",
+ "Datasets in the report ({n})": "レポートのデータセット（{n}）",
+ "Delete selected datasets": "選択したデータセットを削除",
+ "Delete {n} datasets from the report? The files stay where they are.": "レポートから {n} 個のデータセットを削除しますか？ファイルはそのまま残ります。",
+ "Deleted {n} datasets.": "{n} 個のデータセットを削除しました。",
+ "Filter datasets…": "データセットを絞り込む…",
+ "Import {n}": "{n} 個を取り込む",
+ "Name in the legend": "凡例の名前",
+ "None yet. Import files above, or ask your agent.": "まだありません。上でファイルを取り込むか、エージェントに頼んでください。",
+ "Not from a file": "ファイル以外",
+ "Replace the data of a chart…": "グラフのデータを置き換え…",
+ "Request added as comment #{n}. Click \"Ask the agent to revise\" when you are ready.": "コメント #{n} として追加しました。準備ができたら「エージェントに修正を依頼」を押してください。",
+ "Select every file in this folder": "このフォルダのファイルをすべて選択",
+ "Select unused datasets ({n})": "未使用のデータセットを選択（{n}）",
+ "Source: {n} datasets ({files})": "出典：{n} 個のデータセット（{files}）",
+ "Still used by: {list}. They will show \"Dataset not found\".": "まだ使われています：{list}。削除すると「データセットが見つかりません」と表示されます。",
+ "There is no chart or table yet. Add one in Edit mode first.": "グラフや表がまだありません。先に編集モードで追加してください。",
+ "Which chart or table?": "どのグラフまたは表？",
+ "With several series, each series has its own colour and marker; \"Colour by\" is not used.": "複数の系列があるときは系列ごとに色と記号が変わり、「色分け」は使われません。",
+ "not used": "未使用",
+ "the selection": "選択したファイル",
+ "the settings above": "上の設定",
+ "used by {list}": "{list} で使用",
+ "{n} files selected: {sum}": "{n} 個のファイルを選択：{sum}",
+ "{n} files: {sum}": "{n} 個のファイル：{sum}",
+ "{n} in {dir}": "{dir} に {n} 個",
+ "{n} rows": "{n} 行",
+ "{n} selected": "{n} 個を選択"
 },
 "ko": {
  "_name": "한국어",
@@ -2717,7 +2837,43 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "You have personal habits: a figure style and {n} writing rules. Load them to use them in this report.": "개인 습관이 있습니다: 그래프 스타일과 글쓰기 규칙 {n}개. 불러오면 이 보고서에 쓸 수 있습니다.",
  "Your writing habits ({n})": "나의 글쓰기 습관 ({n})",
  "added by you": "직접 추가함",
- "{t} Markdown or text, {d} Word and {p} PDF files.": "Markdown·텍스트 {t}개, Word {d}개, PDF {p}개 파일."
+ "{t} Markdown or text, {d} Word and {p} PDF files.": "Markdown·텍스트 {t}개, Word {d}개, PDF {p}개 파일.",
+ ", and {n} more folders": ", 외 폴더 {n}개",
+ "Add a data series": "데이터 계열 추가",
+ "Add to a chart…": "차트에 추가…",
+ "Add these files to the chart": "이 파일들을 차트에 추가",
+ "Replace the data with these files": "이 파일들로 데이터 교체",
+ "Anything the agent should know, for example: only the CE10 column, one series per round.": "에이전트가 알아야 할 것 (예: CE10 열만, 라운드마다 한 계열).",
+ "Create the request": "요청 만들기",
+ "Data series": "데이터 계열",
+ "field|Data series": "데이터 계열",
+ "Datasets in the report ({n})": "보고서의 데이터셋 ({n})",
+ "Delete selected datasets": "선택한 데이터셋 삭제",
+ "Delete {n} datasets from the report? The files stay where they are.": "보고서에서 데이터셋 {n}개를 삭제할까요? 파일은 그대로 남습니다.",
+ "Deleted {n} datasets.": "데이터셋 {n}개를 삭제했습니다.",
+ "Filter datasets…": "데이터셋 필터…",
+ "Import {n}": "{n}개 가져오기",
+ "Name in the legend": "범례 이름",
+ "None yet. Import files above, or ask your agent.": "아직 없습니다. 위에서 파일을 가져오거나 에이전트에게 요청하세요.",
+ "Not from a file": "파일이 아님",
+ "Replace the data of a chart…": "차트 데이터 교체…",
+ "Request added as comment #{n}. Click \"Ask the agent to revise\" when you are ready.": "주석 #{n}(으)로 추가했습니다. 준비되면 \"에이전트에게 수정 요청\"을 누르세요.",
+ "Select every file in this folder": "이 폴더의 파일 모두 선택",
+ "Select unused datasets ({n})": "사용하지 않는 데이터셋 선택 ({n})",
+ "Source: {n} datasets ({files})": "출처: 데이터셋 {n}개 ({files})",
+ "Still used by: {list}. They will show \"Dataset not found\".": "아직 사용 중: {list}. 삭제하면 \"데이터셋을 찾을 수 없음\"으로 표시됩니다.",
+ "There is no chart or table yet. Add one in Edit mode first.": "아직 차트나 표가 없습니다. 먼저 편집 모드에서 추가하세요.",
+ "Which chart or table?": "어느 차트 또는 표?",
+ "With several series, each series has its own colour and marker; \"Colour by\" is not used.": "계열이 여러 개면 계열마다 색과 표시가 달라지며 \"색상 기준\"은 쓰지 않습니다.",
+ "not used": "사용 안 함",
+ "the selection": "선택한 파일",
+ "the settings above": "위의 설정",
+ "used by {list}": "{list}에서 사용",
+ "{n} files selected: {sum}": "파일 {n}개 선택됨: {sum}",
+ "{n} files: {sum}": "파일 {n}개: {sum}",
+ "{n} in {dir}": "{dir}에 {n}개",
+ "{n} rows": "{n}행",
+ "{n} selected": "{n}개 선택됨"
 },
 "es": {
  "_name": "Español",
@@ -3287,7 +3443,43 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "You have personal habits: a figure style and {n} writing rules. Load them to use them in this report.": "Tienes hábitos personales: un estilo de figuras y {n} reglas de escritura. Cárgalos para usarlos en este informe.",
  "Your writing habits ({n})": "Tus hábitos de escritura ({n})",
  "added by you": "añadida por ti",
- "{t} Markdown or text, {d} Word and {p} PDF files.": "{t} archivos Markdown o de texto, {d} de Word y {p} PDF."
+ "{t} Markdown or text, {d} Word and {p} PDF files.": "{t} archivos Markdown o de texto, {d} de Word y {p} PDF.",
+ ", and {n} more folders": " y {n} carpetas más",
+ "Add a data series": "Añadir una serie de datos",
+ "Add to a chart…": "Añadir a un gráfico…",
+ "Add these files to the chart": "Añadir estos archivos al gráfico",
+ "Replace the data with these files": "Reemplazar los datos con estos archivos",
+ "Anything the agent should know, for example: only the CE10 column, one series per round.": "Lo que el agente debe saber, por ejemplo: solo la columna CE10, una serie por ronda.",
+ "Create the request": "Crear la petición",
+ "Data series": "Series de datos",
+ "field|Data series": "Series de datos",
+ "Datasets in the report ({n})": "Conjuntos de datos del informe ({n})",
+ "Delete selected datasets": "Eliminar los conjuntos seleccionados",
+ "Delete {n} datasets from the report? The files stay where they are.": "¿Eliminar {n} conjuntos de datos del informe? Los archivos se quedan donde están.",
+ "Deleted {n} datasets.": "Se eliminaron {n} conjuntos de datos.",
+ "Filter datasets…": "Filtrar conjuntos…",
+ "Import {n}": "Importar {n}",
+ "Name in the legend": "Nombre en la leyenda",
+ "None yet. Import files above, or ask your agent.": "Aún ninguno. Importa archivos arriba o pídeselo a tu agente.",
+ "Not from a file": "No viene de un archivo",
+ "Replace the data of a chart…": "Reemplazar los datos de un gráfico…",
+ "Request added as comment #{n}. Click \"Ask the agent to revise\" when you are ready.": "Petición añadida como comentario #{n}. Pulsa \"Pedir al agente que revise\" cuando estés listo.",
+ "Select every file in this folder": "Seleccionar todos los archivos de esta carpeta",
+ "Select unused datasets ({n})": "Seleccionar los conjuntos sin usar ({n})",
+ "Source: {n} datasets ({files})": "Origen: {n} conjuntos de datos ({files})",
+ "Still used by: {list}. They will show \"Dataset not found\".": "Todavía los usan: {list}. Mostrarán \"Conjunto de datos no encontrado\".",
+ "There is no chart or table yet. Add one in Edit mode first.": "Aún no hay ningún gráfico ni tabla. Añade uno primero en el modo Edición.",
+ "Which chart or table?": "¿Qué gráfico o tabla?",
+ "With several series, each series has its own colour and marker; \"Colour by\" is not used.": "Con varias series, cada una tiene su color y marcador; \"Colorear por\" no se usa.",
+ "not used": "sin usar",
+ "the selection": "la selección",
+ "the settings above": "la configuración de arriba",
+ "used by {list}": "usado en {list}",
+ "{n} files selected: {sum}": "{n} archivos seleccionados: {sum}",
+ "{n} files: {sum}": "{n} archivos: {sum}",
+ "{n} in {dir}": "{n} en {dir}",
+ "{n} rows": "{n} filas",
+ "{n} selected": "{n} seleccionados"
 }
 }
 </script>
@@ -3303,6 +3495,13 @@ const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const r3=v=>+Number(v).toFixed(3);
 // A cell as a number, or null when it is empty or not a number: +null and +'' are 0 in JavaScript, which would draw empty cells at 0
 const numv=v=>typeof v==='number'?(isFinite(v)?v:null):typeof v==='string'&&v.trim()!==''&&isFinite(+v)?+v:null;
+// A chart draws one or more series: chart.series = [{dataset, x, y, label}]. chart.dataset, x and y are always the first
+// series, so reports and pages from before series keep working.
+function seriesOf(b){const c=(b&&b.chart)||{},list=Array.isArray(c.series)&&c.series.length?c.series:[{dataset:c.dataset,x:c.x,y:c.y}];
+  return list.filter(s=>s&&s.dataset).map((s,i)=>({...s,i,ds:S.datasets.get(s.dataset)}))}
+const blockDatasetIds=b=>b.type==='chart'?[...new Set(seriesOf(b).map(s=>s.dataset))]:b.type==='table'&&b.table&&b.table.dataset?[b.table.dataset]:[];
+const seriesFor=(b,dsId)=>{const L=seriesOf(b);return L.find(s=>s.dataset===dsId)||L[0]||{}};
+const seriesName=s=>s.label||(s.ds&&(s.ds.title||s.ds.id))||s.dataset;
 const fmt=v=>{if(v==null||v==='')return'';const n=Number(v);if(!isFinite(n))return String(v);const a=Math.abs(n);return String(+n.toFixed(a>=100?1:a>=1?2:3))};
 function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
 function h(tag,props,kids){const e=document.createElement(tag);for(const k in(props||{})){const v=props[k];if(v==null)continue;
@@ -3523,18 +3722,20 @@ function styleNow(){const s0=S.style||{};const d=clone(STYLE_DEFAULT);
 const unitsPerPt=st=>680/(PRESET_PT[st.figure.preset]||PRESET_PT.free);
 const palColor=(st,i)=>st.palette[i%6]||cssv(PALETTE[i%6]);
 function drawChart(svg,b){
-  const ds=S.datasets.get(b.chart.dataset);svg.replaceChildren();
+  const SER=seriesOf(b),multi=SER.length>1,ds=(SER.find(s=>s.ds)||{}).ds;svg.replaceChildren();
   const st=styleNow(),u=unitsPerPt(st),fs=+(st.font.size*u).toFixed(2),ls=+(st.font.label*u).toFixed(2),tl=5*u/1.476;
   const W=680,H=b.chart.kind==='line'?340:400,m={l:Math.round(22+fs*3.2+(st.ticks==='out'?tl:0)),r:18,t:Math.round(18+fs*1.4),b:Math.round(14+fs*1.3+ls*1.4+(st.ticks==='out'?tl:0))};
   svg.style.fontFamily=st.font.family||'';
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('class','chart');
   if(!ds){const t=el('text',{x:W/2,y:H/2,'text-anchor':'middle',class:'axl','font-size':14},svg);t.textContent=tr('Dataset not found: ')+b.chart.dataset;return null}
-  const c=b.chart,rows=ds.rows.filter(r=>numv(r[c.x])!=null&&numv(r[c.y])!=null&&(!c.logY||numv(r[c.y])>0)); // rows with an empty x or y are not drawn
-  const X=linAxis(rows.map(r=>+r[c.x]),null,null);
-  const Y=c.logY?logAxis(rows.map(r=>+r[c.y]),c.yMin,c.yMax):linAxis(rows.map(r=>+r[c.y]),c.yMin,c.yMax);
+  const c=b.chart,P=[]; // the points of every series; rows with an empty x or y are not drawn
+  SER.forEach(s=>{if(s.ds)s.ds.rows.forEach(r=>{const x=numv(r[s.x]),y=numv(r[s.y]);if(x!=null&&y!=null&&(!c.logY||y>0))P.push({r,id:r.id,x,y,s:s.i,ds:s.dataset})})});
+  const X=linAxis(P.map(p=>p.x),null,null);
+  const Y=c.logY?logAxis(P.map(p=>p.y),c.yMin,c.yMax):linAxis(P.map(p=>p.y),c.yMin,c.yMax);
+  const S0=SER.find(s=>s.ds)||SER[0];
   const iw=W-m.l-m.r,ih=H-m.t-m.b;
   const ty=v=>Y.log?Math.log10(v):v;
-  const G={b,W,H,m,iw,ih,X,Y,xKey:c.x,yKey:c.y,rows,space:'data',
+  const G={b,W,H,m,iw,ih,X,Y,xKey:S0.x,yKey:S0.y,pts:P,multi,space:'data',
     sx:v=>m.l+(v-X.lo)/(X.hi-X.lo)*iw,
     sy:v=>m.t+ih-(ty(v)-ty(Y.lo))/(ty(Y.hi)-ty(Y.lo))*ih,
     ix:p=>X.lo+(p-m.l)/iw*(X.hi-X.lo),
@@ -3549,11 +3750,15 @@ function drawChart(svg,b){
     el('line',{class:'axis',x1:m.l-out,x2:m.l+tin,y1:G.sy(v),y2:G.sy(v)},grid);
     const t=el('text',{x:m.l-out-4,y:G.sy(v)+fs*0.35,'text-anchor':'end',...tkA},grid);t.textContent=fmt(v)});
   el('path',{class:'axis',d:st.frame?`M${m.l},${m.t}H${m.l+iw}V${m.t+ih}H${m.l}Z`:`M${m.l},${m.t}V${m.t+ih}H${m.l+iw}`,fill:'none'},grid);
-  let t=el('text',{x:m.l+iw/2,y:H-6,'text-anchor':'middle',...axA},grid);t.textContent=c.xLabel||colLabel(ds,c.x);
-  const yx=Math.max(ls*0.9,8);t=el('text',{x:yx,y:m.t+ih/2,'text-anchor':'middle',transform:`rotate(-90 ${yx} ${m.t+ih/2})`,...axA},grid);t.textContent=(c.yLabel||colLabel(ds,c.y))+(Y.log?tr(' (log)'):'');
-  // color mapping
+  let t=el('text',{x:m.l+iw/2,y:H-6,'text-anchor':'middle',...axA},grid);t.textContent=c.xLabel||colLabel(S0.ds||ds,S0.x);
+  const yx=Math.max(ls*0.9,8);t=el('text',{x:yx,y:m.t+ih/2,'text-anchor':'middle',transform:`rotate(-90 ${yx} ${m.t+ih/2})`,...axA},grid);t.textContent=(c.yLabel||colLabel(S0.ds||ds,S0.y))+(Y.log?tr(' (log)'):'');
+  // color mapping: one colour and marker per series, or by the colour column of a single series
   let colorOf=()=>palColor(st,0),shapeOf=()=>0;
-  if(c.color){const vals=[...new Set(ds.rows.map(r=>r[c.color]))];
+  if(multi){colorOf=p=>palColor(st,p.s);shapeOf=p=>p.s%4;
+    const k=fs/11,ly=m.t-8,lg=el('g',{},grid);let x=m.l;
+    SER.forEach(s=>{const mk=marker(s.i%4,x+5*k,ly-fs*0.35,4.5*k);mk.setAttribute('fill',palColor(st,s.i));lg.appendChild(mk);
+      const tt=el('text',{x:x+14*k,y:ly,...tkA},lg);tt.textContent=seriesName(s);x+=(22+textW(tt.textContent))*k})}
+  else if(c.color){const vals=[...new Set(ds.rows.map(r=>r[c.color]))];
     if(vals.length<=6){const idx=new Map(vals.sort((p,q)=>p>q?1:-1).map((v,i)=>[v,i]));colorOf=r=>palColor(st,idx.get(r[c.color]));shapeOf=r=>idx.get(r[c.color])%4;
       const k=fs/11,ly=m.t-8;const lg=el('g',{},grid);let x=m.l;const lab=el('text',{x,y:ly,...tkA},lg);lab.textContent=colLabel(ds,c.color)+tr(': ');x+=textW(lab.textContent)*k+4;
       vals.forEach(v=>{const mk=marker(idx.get(v)%4,x+5*k,ly-fs*0.35,4.5*k);mk.setAttribute('fill',palColor(st,idx.get(v)));mk.setAttribute('class','pt');lg.appendChild(mk);const tt=el('text',{x:x+14*k,y:ly,...tkA},lg);tt.textContent=String(v);x+=(22+String(v).length*8)*k})}
@@ -3561,9 +3766,12 @@ function drawChart(svg,b){
       colorOf=r=>{const v=numv(r[c.color]);return v==null?String(cssv('--c0')).trim():ramp((v-lo)/((hi-lo)||1))}; // no colour value: grey
       const k=fs/11,ly=m.t-8;const lg=el('g',{},grid);const lab=el('text',{x:m.l,y:ly,...tkA},lg);lab.textContent=colLabel(ds,c.color)+tr(' low');
       const x0=m.l+textW(lab.textContent)*k+4;for(let i=0;i<5;i++)el('rect',{x:x0+i*16*k,y:ly-fs*0.8,width:16*k,height:fs*0.85,fill:ramp(i/4)},lg);const hiT=el('text',{x:x0+86*k,y:ly,...tkA},lg);hiT.textContent=tr('high')}}
-  if(c.kind==='line'&&rows.length>1){const srt=[...rows].sort((p,q)=>+p[c.x]-+q[c.x]);el('path',{class:'ln','stroke-width':+(st.line*u).toFixed(2),d:srt.map((r,i)=>(i?'L':'M')+G.sx(+r[c.x]).toFixed(1)+','+G.sy(+r[c.y]).toFixed(1)).join(' ')},svg)}
+  const colOf=p=>multi?colorOf(p):colorOf(p.r),shpOf=p=>multi?shapeOf(p):shapeOf(p.r);
+  if(c.kind==='line')SER.forEach(s=>{const srt=P.filter(p=>p.s===s.i).sort((p,q)=>p.x-q.x);if(srt.length<2)return;
+    const ln=el('path',{class:'ln','stroke-width':+(st.line*u).toFixed(2),d:srt.map((p,i)=>(i?'L':'M')+G.sx(p.x).toFixed(1)+','+G.sy(p.y).toFixed(1)).join(' ')},svg);
+    if(multi)ln.style.stroke=palColor(st,s.i)});
   const pts=el('g',{},svg);
-  rows.forEach(r=>{const mk=marker(shapeOf(r),G.sx(+r[c.x]),G.sy(+r[c.y]),+(st.marker/2*u).toFixed(2));mk.setAttribute('class','pt');mk.setAttribute('fill',colorOf(r));mk.dataset.row=r.id;pts.appendChild(mk)});
+  P.forEach(p=>{const mk=marker(shpOf(p),G.sx(p.x),G.sy(p.y),+(st.marker/2*u).toFixed(2));mk.setAttribute('class','pt');mk.setAttribute('fill',colOf(p));mk.dataset.row=p.id;mk.dataset.ds=p.ds;pts.appendChild(mk)});
   G.over=el('g',{class:'over'},svg);G.pend=el('g',{class:'pend'},svg);G.live=el('g',{class:'live'},svg);
   G.hit=el('rect',{class:'hit',x:m.l,y:m.t,width:iw,height:ih},svg);
   svg.insertBefore(G.hit,pts); // points stay clickable above the hit area
@@ -3717,6 +3925,20 @@ function breakBar(b){
     onclick:()=>saveBlock({...b,breakBefore:BREAK_NEXT[bb]})},
     [h('span',{class:'rule'}),h('span',{class:'lbl',text:label}),h('span',{class:'rule'})]);
 }
+function datasetSelect(cur,onPick){ // datasets grouped by the folder of their file; a filter box when there are many
+  const groups=new Map();
+  S.datasets.forEach(d=>{const p=d.source&&d.source.path?normPath(d.source.path):'',i=p.lastIndexOf('/'),k=p?(i<0?'./':p.slice(0,i+1)):tr('Not from a file');(groups.get(k)||groups.set(k,[]).get(k)).push(d)});
+  const sel=h('select',{onchange:e=>{const d=S.datasets.get(e.target.value);if(d)onPick(d)}});
+  const fill=q=>{sel.replaceChildren();q=(q||'').toLowerCase();
+    [...groups.entries()].sort((a,b)=>a[0]<b[0]?-1:1).forEach(([k,list])=>{const og=h('optgroup',{label:k});
+      list.filter(d=>!q||d.id===cur||(d.title||d.id).toLowerCase().includes(q)).forEach(d=>og.append(h('option',{value:d.id,text:(d.title||d.id)+' · '+tr('{n} rows',{n:d.rows.length})})));
+      if(og.children.length)sel.append(og)});
+    sel.value=cur};
+  fill('');
+  if(S.datasets.size<=8)return sel;
+  const f=h('input',{type:'search',placeholder:tr('Filter datasets…'),oninput:()=>fill(f.value)});
+  return h('span',{class:'dspick'},[f,sel]);
+}
 function selectField(ds,val,onchange,allowNone){
   const s=h('select',{onchange:e=>onchange(e.target.value)});
   if(allowNone)s.append(h('option',{value:'',text:tr('(none)')}));
@@ -3753,11 +3975,11 @@ function editForm(b){
   if(S.openSet===b.id)det.open=true;
   det.addEventListener('toggle',()=>{S.openSet=det.open?b.id:(S.openSet===b.id?null:S.openSet)});
   const L=(t,ctrl)=>h('label',{},[t,ctrl]);
-  const dsPick=(cur,onPick)=>{const sel=h('select',{onchange:e=>{const d=S.datasets.get(e.target.value);if(d)onPick(d)}},
-    [...S.datasets.values()].map(d=>h('option',{value:d.id,text:d.title||d.id})));sel.value=cur;return L(tr('Dataset'),sel)};
+  const dsPick=(cur,onPick)=>L(tr('Dataset'),datasetSelect(cur,onPick));
   const numKeys=d=>d.columns.map(c=>c.key).filter(k=>d.rows.some(r=>typeof r[k]==='number'));
   const firstKey=d=>numKeys(d).find(k=>k!=='id')||'id',lastKey=d=>numKeys(d).slice(-1)[0]||d.columns[d.columns.length-1].key;
-  if(b.type==='chart'){const c=b.chart,ds=S.datasets.get(c.dataset);const up=patch=>saveBlock({...b,chart:{...c,...patch}});
+  if(b.type==='chart'){const c=b.chart,ds=S.datasets.get(c.dataset);
+    const up=patch=>{const n={...c,...patch};if(Array.isArray(n.series)&&n.series.length)n.series=[{...n.series[0],dataset:n.dataset,x:n.x,y:n.y},...n.series.slice(1)];saveBlock({...b,chart:n})};
     if(S.datasets.size>1||!ds)form.append(dsPick(c.dataset,d=>up({dataset:d.id,x:firstKey(d),y:lastKey(d),color:null,xLabel:null,yLabel:null})));
     if(ds){
       const kind=h('select',{onchange:e=>up({kind:e.target.value})},[h('option',{value:'scatter',text:tr('Scatter')}),h('option',{value:'line',text:tr('Line')})]);kind.value=c.kind;
@@ -3767,7 +3989,22 @@ function editForm(b){
         L(tr('Y min'),h('input',{type:'number',step:'any',value:c.yMin??'',placeholder:tr('Auto'),onchange:e=>up({yMin:e.target.value===''?null:+e.target.value})})),
         L(tr('Y max'),h('input',{type:'number',step:'any',value:c.yMax??'',placeholder:tr('Auto'),onchange:e=>up({yMax:e.target.value===''?null:+e.target.value})})));
       const lg=h('input',{type:'checkbox',onchange:e=>up({logY:e.target.checked})});lg.checked=!!c.logY;
-      form.append(h('label',{class:'chk'},[lg,tr('Log scale for Y')]));}
+      form.append(h('label',{class:'chk'},[lg,tr('Log scale for Y')]));
+      // data series: the settings above are the first one; each other series has its own dataset and columns
+      const all=Array.isArray(c.series)&&c.series.length?c.series:[{dataset:c.dataset,x:c.x,y:c.y}];
+      const setAll=list=>{const n={...c};if(list.length>1)n.series=[{...list[0],dataset:c.dataset,x:c.x,y:c.y},...list.slice(1)];else delete n.series;saveBlock({...b,chart:n})};
+      const name=(s,i)=>h('input',{type:'text',value:s.label||'',placeholder:tr('Name in the legend'),onchange:e=>setAll(all.map((x,j)=>j===i?{...x,label:e.target.value.trim()}:x))});
+      const sbox=h('div',{class:'series'},[h('h5',{text:tr('Data series')})]);
+      all.forEach((s,i)=>{const sd=S.datasets.get(s.dataset),put1=patch=>setAll(all.map((x,j)=>j===i?{...x,...patch}:x));
+        sbox.append(h('div',{class:'srow'},i===0?[h('span',{class:'sno',text:'1'}),h('span',{class:'meta',text:tr('the settings above')}),all.length>1?name(s,0):null]
+          :[h('span',{class:'sno',text:String(i+1)}),datasetSelect(s.dataset,d=>put1({dataset:d.id,x:d.columns.some(k=>k.key===s.x)?s.x:firstKey(d),y:d.columns.some(k=>k.key===s.y)?s.y:lastKey(d)})),
+            sd?selectField(sd,s.x,v=>put1({x:v})):null,sd?selectField(sd,s.y,v=>put1({y:v})):null,name(s,i),
+            h('button',{type:'button',class:'linkbtn',text:tr('Remove'),onclick:()=>setAll(all.filter((x,j)=>j!==i))})]))});
+      sbox.append(h('button',{type:'button',class:'btn small',text:tr('Add a data series'),onclick:()=>{
+        const used=new Set(all.map(s=>s.dataset)),d=[...S.datasets.values()].find(x=>!used.has(x.id))||ds;
+        setAll([...all,{dataset:d.id,x:d.columns.some(k=>k.key===c.x)?c.x:firstKey(d),y:d.columns.some(k=>k.key===c.y)?c.y:lastKey(d),label:''}])}}),
+        all.length>1?h('p',{class:'cap',text:tr('With several series, each series has its own colour and marker; "Colour by" is not used.')}):null);
+      det.append(sbox)}
   }else if(b.type==='table'){const t=b.table,ds=S.datasets.get(t.dataset);const up=patch=>saveBlock({...b,table:{...t,...patch}});
     if(S.datasets.size>1||!ds)form.append(dsPick(t.dataset,d=>up({dataset:d.id,sortBy:lastKey(d),columns:null})));
     if(ds){const dsc=h('input',{type:'checkbox',onchange:e=>up({desc:e.target.checked})});dsc.checked=!!t.desc;
@@ -3796,12 +4033,12 @@ async function drop(path){try{await db.doc(path).delete()}catch(e){fail(writeErr
 
 /* ---------- Change log: field definitions ---------- */
 const FIELDS=['title','text','caption','breakBefore',
-  'chart.dataset','chart.kind','chart.x','chart.y','chart.color','chart.xLabel','chart.yLabel','chart.yMin','chart.yMax','chart.logY',
+  'chart.dataset','chart.series','chart.kind','chart.x','chart.y','chart.color','chart.xLabel','chart.yLabel','chart.yMin','chart.yMax','chart.logY',
   'table.dataset','table.sortBy','table.desc','table.limit','image.width','image.crop','image.src','image.asset',
   'image.source.tool','image.source.file','image.source.note','image.source.script','image.source.data'];
 const STYLE_FIELDS=['font.family','font.size','font.label','marker','line','ticks','frame','grid','palette','figure.preset','chartDefaults.kind','chartDefaults.logY'];
 const FIELD_LABEL={title:'Title',text:'Text',caption:'Caption',breakBefore:'Page break','style.writing':'Writing habits',
-  'chart.dataset':'Dataset','table.dataset':'Dataset',dataset:'Imported data',
+  'chart.dataset':'Dataset','chart.series':'Data series','table.dataset':'Dataset',dataset:'Imported data',
   'chart.kind':'Chart type','chart.x':'X column','chart.y':'Y column','chart.color':'Colour by','chart.xLabel':'X axis label','chart.yLabel':'Y axis label',
   'chart.yMin':'Y min','chart.yMax':'Y max','chart.logY':'Y scale',
   'table.sortBy':'Sort by','table.desc':'Sort direction','table.limit':'Rows shown',
@@ -3817,6 +4054,7 @@ function category(f){if(f==='title'||f==='text'||f==='caption')return tr('Text')
 function valueText(f,v,blockId){
   if(f==='dataset')return v?tr('{n} rows, {c} columns',{n:v.rows,c:v.columns}):tr('(none)');
   if(f==='chart.dataset'||f==='table.dataset'){const d=S.datasets.get(v);return d?(d.title||d.id):String(v??'')}
+  if(f==='chart.series')return Array.isArray(v)&&v.length?v.map(s=>s.label||((S.datasets.get(s.dataset)||{}).title)||s.dataset).join(tr(', ')):tr('(none)');
   if((v==null||v==='')&&f==='style.font.family')return tr('Page default');
   if(v==null||v==='')return f==='chart.color'?tr('(none)'):f.startsWith('chart.y')||f.endsWith('Label')?tr('Auto'):tr('(empty)');
   if(f==='chart.kind'||f==='style.chartDefaults.kind')return v==='line'?tr('Line'):tr('Scatter');
@@ -3996,6 +4234,7 @@ const PRESETS={
   image:['Crop','Add labels','Replace image','Add caption']};
 const tagId=label=>label.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 const TAG_LABEL=new Map(Object.values(PRESETS).flat().map(l=>[tagId(l),l]));
+[['add-data-files','Add these files to the chart'],['replace-data-files','Replace the data with these files']].forEach(([id,l])=>TAG_LABEL.set(id,l)); // requests made from Folder > Data
 // v0.2 stored the visible tag text in the interface language of the time; map any known translation back to its id
 const LEGACY_TAGS={'\u63db\u4e00\u5f35':'replace-image'};
 let TAG_ALIAS=null;
@@ -4058,7 +4297,7 @@ function renderEdit(){
     card.append(h('div',{class:'chead'},[
       h('span',{class:'hdl',title:tr('Drag to reorder'),text:'⠿'}),h('span',{text:typeName(b.type)}),
       tooTall?h('span',{class:'warn',text:tr('Taller than one page; it will shrink or scroll in view mode')}):null,
-      S.stale.has((b.chart||b.table||{}).dataset)?h('span',{class:'warn',text:tr('Source data changed since import')}):
+      blockDatasetIds(b).some(id=>S.stale.has(id))?h('span',{class:'warn',text:tr('Source data changed since import')}):
         blockChainState(b)==='stale'?h('span',{class:'warn',text:tr('Needs recomputing')}):null,
       h('span',{class:'sp'}),
       h('button',{type:'button',class:'btn small',text:tr('Up'),disabled:i===0?'':null,onclick:()=>move(b.id,-1)}),
@@ -4096,12 +4335,13 @@ function blockName(id){const b=S.blocks.get(id);if(!b){const c=S.changes.find(c=
 function describe(t){
   try{const nm=blockName(t.blockId);
     if(t.kind==='block')return nm+(t.quote?tr(': "{q}"',{q:t.quote.length>40?t.quote.slice(0,40)+'…':t.quote}):'');
-    if(t.kind==='point'){const b=S.blocks.get(t.blockId),ds=b&&b.chart&&S.datasets.get(b.chart.dataset),r=ds&&ds.rows.find(r=>r.id===t.rowId);
-      return tr('{nm}: data point #{id}',{nm,id:t.rowId})+(r?tr(' ({xl} {xv}, {yl} {yv})',{xl:colLabel(ds,b.chart.x),xv:fmt(r[b.chart.x]),yl:colLabel(ds,b.chart.y),yv:fmt(r[b.chart.y])}):'')}
+    if(t.kind==='point'){const b=S.blocks.get(t.blockId),ds=b&&b.chart&&pointDataset(b,t),r=ds&&ds.rows.find(r=>r.id===t.rowId),s=b&&ds?seriesFor(b,ds.id):{};
+      return tr('{nm}: data point #{id}',{nm,id:t.rowId})+(t.datasetId&&ds?' · '+seriesName(s):'')+(r?tr(' ({xl} {xv}, {yl} {yv})',{xl:colLabel(ds,s.x),xv:fmt(r[s.x]),yl:colLabel(ds,s.y),yv:fmt(r[s.y])}):'')}
     const b=S.blocks.get(t.blockId);
     if(t.space==='image')return tr(t.kind==='box'?tr('{nm}: box on an image region'):tr('{nm}: lasso on an image region'),{nm});
     const ds=b&&b.chart&&S.datasets.get(b.chart.dataset);const xl=ds?colLabel(ds,t.xKey):t.xKey,yl=ds?colLabel(ds,t.yKey):t.yKey;
-    const enc=t.enclosed&&t.enclosed.length?tr(', {n} points ({ids})',{n:t.enclosed.length,ids:ids(t.enclosed)}):tr(', no data points in range');
+    const all=t.enclosedBy&&typeof t.enclosedBy==='object'?Object.values(t.enclosedBy).flat():t.enclosed||[];
+    const enc=all.length?tr(', {n} points ({ids})',{n:all.length,ids:ids(all)}):tr(', no data points in range');
     if(t.kind==='box')return tr('{nm}: {xl} {x0}–{x1}, {yl} {y0}–{y1}{enc}',{nm,xl,x0:fmt(t.x[0]),x1:fmt(t.x[1]),yl,y0:fmt(t.y[0]),y1:fmt(t.y[1]),enc});
     return tr('{nm}: lasso{enc}',{nm,enc});
   }catch(e){return tr('(location unavailable)')}
@@ -4134,6 +4374,8 @@ function renderAnnos(){
       h('div',{class:'atop'},[h('span',{class:'no',text:String(a.no||'?')}),h('span',{class:'kind',text:KIND[t.kind]?tr(KIND[t.kind]):tr('Comments')}),h('span',{class:'chip2',text:done?tr('Done'):tr('Open')})]),
       h('p',{class:'where',text:describe(t)}),
       a.tags&&a.tags.length?h('p',{class:'tags'},a.tags.map(x=>h('span',{class:'tag',text:tagText(x)}))):null,
+      Array.isArray(a.files)&&a.files.length?h('details',{class:'afiles'},[h('summary',{text:tr('{n} files: {sum}',{n:a.files.length,sum:pathsSummary(a.files)})}),
+        h('ul',{},a.files.slice(0,300).map(p=>h('li',{class:'mono',text:p})))]):null,
       a.text?h('p',{class:'txt',text:a.text}):null,
       ...threadOf(a).map(m=>h('p',{class:'reply'+(m.by==='user'?' me':'')},[h('strong',{text:m.by==='user'?tr('You: '):tr('Agent: ')}),m.text])),
       !S.readonly&&threadOf(a).some(m=>m.by!=='user')?replyBox(a):null,
@@ -4428,7 +4670,7 @@ function badge(g,x,y,no,r){const b=el('g',{class:'badge'},g);el('circle',{cx:x,c
 function drawTarget(G,t,g,cls){
   if(t.space&&t.space!==G.space)return null;
   if(G.space==='data'){
-    if(t.kind==='point'){const r=G.rows.find(r=>r.id===t.rowId);if(!r)return null;const cx=G.sx(+r[G.xKey]),cy=G.sy(+r[G.yKey]);el('circle',{class:'ring',cx,cy,r:11},g);return[cx+9,cy-9]}
+    if(t.kind==='point'){const p=G.pts.find(p=>p.id===t.rowId&&(t.datasetId?p.ds===t.datasetId:p.s===0));if(!p)return null;const cx=G.sx(p.x),cy=G.sy(p.y);el('circle',{class:'ring',cx,cy,r:11},g);return[cx+9,cy-9]}
     if(t.xKey!==G.xKey||t.yKey!==G.yKey)return null;
   }
   if(t.kind==='box'){const x0=G.sx(t.x[0]),x1=G.sx(t.x[1]),y0=G.sy(t.y[1]),y1=G.sy(t.y[0]);
@@ -4477,17 +4719,19 @@ function bindDraw(G,svg){
   function finish(dd,ev){
     const scale=G.space==='image'?G.W/680:1;
     const base={blockId:G.b.id,space:G.space};if(G.space==='data'){base.xKey=G.xKey;base.yKey=G.yKey}
-    const inside=G.space==='data'?(pred=>G.rows.filter(r=>pred(+r[G.xKey],+r[G.yKey])).map(r=>r.id)):null;
+    // the rows inside: enclosed (first series) and, with several series, enclosedBy = {datasetId: [row ids]}
+    const inside=G.space==='data'?(pred=>{const hit=G.pts.filter(p=>pred(p.x,p.y)),o={enclosed:hit.filter(p=>p.s===0).map(p=>p.id)};
+      if(G.multi){o.enclosedBy={};hit.forEach(p=>(o.enclosedBy[p.ds]=o.enclosedBy[p.ds]||[]).push(p.id))}return o}):null;
     let t;
     if(dd.tool==='box'){const[x0,y0]=dd.start,[x1,y1]=dd.cur;
       if(Math.abs(x1-x0)<6*scale||Math.abs(y1-y0)<6*scale){toast(tr('Area too small. Drag a larger rectangle'));return}
       const xa=[G.ix(Math.min(x0,x1)),G.ix(Math.max(x0,x1))],ya=[G.iy(y0),G.iy(y1)].sort((p,q)=>p-q);
       t={...base,kind:'box',x:xa.map(r3),y:ya.map(r3)};
-      if(inside)t.enclosed=inside((x,y)=>x>=xa[0]&&x<=xa[1]&&y>=ya[0]&&y<=ya[1]);
+      if(inside)Object.assign(t,inside((x,y)=>x>=xa[0]&&x<=xa[1]&&y>=ya[0]&&y<=ya[1]));
     }else{
       if(dd.pts.length<8||polyArea(dd.pts)<300*scale*scale){toast(tr('Lasso too small. Draw a larger closed shape'));return}
       const poly=decimate(dd.pts,48).map(p=>[r3(G.ix(p[0])),r3(G.iy(p[1]))]);
-      t={...base,kind:'lasso',polygon:poly};if(inside)t.enclosed=inside((x,y)=>inPoly(x,y,poly));
+      t={...base,kind:'lasso',polygon:poly};if(inside)Object.assign(t,inside((x,y)=>inPoly(x,y,poly)));
     }
     draftOf(G.b.id).target=t;S.draw=null;document.body.dataset.draw='';render();
     openQuick(G.b.id,ev.clientX,ev.clientY);
@@ -4495,22 +4739,26 @@ function bindDraw(G,svg){
 }
 // One line per column: the chart's x, y and colour columns first
 function pointLines(b,ds,r,max){
-  const c=b.chart||{},first=[c.x,c.y,c.color].filter((k,i,a)=>k&&a.indexOf(k)===i);
+  const c=b.chart||{},s=seriesFor(b,ds.id),first=[s.x,s.y,seriesOf(b).length>1?null:c.color].filter((k,i,a)=>k&&a.indexOf(k)===i);
   const cols=[...first.map(k=>ds.columns.find(x=>x.key===k)).filter(Boolean),...ds.columns.filter(x=>!first.includes(x.key))];
   const lines=cols.map(x=>x.label+': '+(x.key==='id'?'#'+r[x.key]:fmt(r[x.key])));
+  if(seriesOf(b).length>1)lines.unshift(seriesName(s));
   return lines.length>max?[...lines.slice(0,max),tr('… {n} more',{n:lines.length-max})]:lines}
+// the dataset of a point target: its datasetId, or the chart's first series
+const pointDataset=(b,t)=>S.datasets.get(t.datasetId||(b&&b.chart&&b.chart.dataset));
 // Clicking a data point in edit mode (not while drawing) opens the comment dialog next to it; view mode is for reading
 document.addEventListener('click',e=>{
   if(S.readonly||S.draw||S.mode!=='edit')return;const pt=e.target.closest&&e.target.closest('#flow .pt');if(!pt||!pt.dataset.row)return;
   const host=pt.closest('.cw'),id=host&&host.dataset.id;if(!id||!S.blocks.has(id))return;
-  draftOf(id).target={kind:'point',blockId:id,rowId:+pt.dataset.row};
+  const t={kind:'point',blockId:id,rowId:+pt.dataset.row};if(seriesOf(S.blocks.get(id)).length>1&&pt.dataset.ds)t.datasetId=pt.dataset.ds;
+  draftOf(id).target=t;
   render();
   openQuick(id,e.clientX,e.clientY);
 });
 document.addEventListener('pointermove',e=>{
   const tip=$('#tip');const n=e.target instanceof Element?e.target.closest('.pt'):null;
   if(!n||!n.dataset.row||S.draw||S.quick){tip.hidden=true;return}
-  const blk=n.closest('[data-id]');const b=blk&&S.blocks.get(blk.dataset.id);const ds=b&&b.chart&&S.datasets.get(b.chart.dataset);
+  const blk=n.closest('[data-id]');const b=blk&&S.blocks.get(blk.dataset.id);const ds=b&&b.chart&&S.datasets.get(n.dataset.ds||b.chart.dataset);
   const r=ds&&ds.rows.find(r=>r.id===+n.dataset.row);if(!r){tip.hidden=true;return}
   tip.textContent=pointLines(b,ds,r,8).join('\n');
   tip.hidden=false;tip.style.left=Math.max(8,Math.min(e.clientX+14,innerWidth-tip.offsetWidth-8))+'px';
@@ -4526,7 +4774,7 @@ function renderQuick(){
   const box=$('#qc'),q=S.quick;if(!q){box.hidden=true;return}
   const b=S.blocks.get(q.blockId),d=draftOf(q.blockId),t=d.target;if(!b||!t){closeQuick(false);return}
   const kids=[h('p',{class:'qwhere',text:describe(t)})];
-  if(t.kind==='point'&&b.chart){const ds=S.datasets.get(b.chart.dataset),r=ds&&ds.rows.find(r=>r.id===t.rowId);if(r)kids.push(h('p',{class:'qrow',text:pointLines(b,ds,r,8).join('\n')}))}
+  if(t.kind==='point'&&b.chart){const ds=pointDataset(b,t),r=ds&&ds.rows.find(r=>r.id===t.rowId);if(r)kids.push(h('p',{class:'qrow',text:pointLines(b,ds,r,8).join('\n')}))}
   kids.push(h('div',{class:'chips'},(PRESETS[b.type]||[]).map(label=>{const id=tagId(label);
     const c=h('button',{type:'button',class:'chip','aria-pressed':String(d.tags.includes(id)),text:tr(label)});
     c.onclick=()=>{d.tags=d.tags.includes(id)?d.tags.filter(x=>x!==id):[...d.tags,id];c.setAttribute('aria-pressed',String(d.tags.includes(id)))};return c})));
@@ -5033,7 +5281,7 @@ function chain(){ // the graph of steps, files, datasets and blocks; rebuilt on 
   // files that match a step's inputPatterns but were not among its inputs: new data the step has not used yet
   const newIn=S.newInputs||new Map(),fresh=new Set();
   steps.forEach(s=>(newIn.get(s.id)||[]).forEach(p=>{add(usedBy,p,s);fresh.add(p);if(!refOf.has(p))refOf.set(p,{path:p})}));
-  orderedBlocks().forEach(b=>{const id=(b.type==='chart'||b.type==='table')&&(b.chart||b.table||{}).dataset;if(id)add(blocksOf,id,b)});
+  orderedBlocks().forEach(b=>blockDatasetIds(b).forEach(id=>add(blocksOf,id,b)));
   const memo=new Map();
   function stepStatus(s,trail){
     if(memo.has(s.id))return memo.get(s.id);
@@ -5058,14 +5306,18 @@ function chain(){ // the graph of steps, files, datasets and blocks; rebuilt on 
   return S.chainMemo={steps,madeBy,refOf,stepStatus,datasetStatus,downstream,fresh:[...fresh].sort(),isNew:p=>fresh.has(normPath(p)),
     derived:[...madeBy.keys()],raw:[...inputs].filter(p=>!madeBy.has(p)).sort(),scripts:[...scripts].sort()};
 }
-function blockDataset(b){const id=(b.type==='chart'||b.type==='table')&&(b.chart||b.table||{}).dataset,d=id&&S.datasets.get(id);return d&&d.source&&d.source.path?d:null}
-function blockChainState(b){const d=blockDataset(b);return d?chain().datasetStatus(d).state:null}
+const blockSources=b=>blockDatasetIds(b).map(id=>S.datasets.get(id)).filter(d=>d&&d.source&&d.source.path); // datasets of a block that come from files
+function blockChainState(b){const L=blockSources(b);return L.length?worst(L.map(d=>chain().datasetStatus(d).state)):null}
 const STATE_TEXT={ok:'Up to date',stale:'Needs recomputing',unchecked:'Not checked'};
 const dot=st=>h('span',{class:'dot '+(st||''),title:tr(STATE_TEXT[st]||'Not checked')});
 const scriptName=s=>s.script&&s.script.path?baseName(s.script.path):s.id;
 function inputCount(C,s){const ins=(s.inputs||[]).filter(r=>r&&r.path),d=ins.filter(r=>C.madeBy.has(normPath(r.path))).length;return{d,r:ins.length-d}}
 function sourceLine(b){ // under a chart or table: where its data comes from, with the state of the whole chain
-  const d=blockDataset(b);if(!d)return null;
+  const L=blockSources(b);if(!L.length)return null;
+  if(L.length>1){const C=chain(),state=worst(L.map(d=>C.datasetStatus(d).state));
+    return h('button',{type:'button',class:'srcl',title:tr(STATE_TEXT[state])+'. '+tr('Click to see the whole data chain.'),onclick:e=>{e.stopPropagation();openChainMany(L,b)}},
+      [dot(state),h('span',{class:'t',text:tr('Source: {n} datasets ({files})',{n:L.length,files:L.slice(0,3).map(d=>baseName(d.source.path)).join(', ')+(L.length>3?', …':'')})})])}
+  const d=L[0];
   const C=chain(),st=C.datasetStatus(d),s=st.step,parts=[tr('Source: {file}',{file:baseName(d.source.path)})];
   if(s){parts.push(scriptName(s));const n=inputCount(C,s),ins=[];
     if(n.d)ins.push(n.d===1?tr('1 derived file'):tr('{n} derived files',{n:n.d}));
@@ -5142,6 +5394,13 @@ function openChain(d,b){ // from a chart, table or dataset: all the way up to th
     h('h5',{text:tr('Dataset')}),h('div',{class:'fr'},[h('span',{text:d.title||d.id}),h('span',{class:'meta',text:tr('{n} rows, imported {t}',{n:(d.rows||[]).length,t:shortTime(d.source.importedAt)})})]),
     h('h5',{text:tr('Imported from')}),fileNode(d.source,C,new Set(),true),chainNote()])]);
 }
+function openChainMany(L,b){ // a chart with several series: the chain of each dataset
+  const C=chain(),state=worst(L.map(d=>C.datasetStatus(d).state));
+  openModal(tr('Data chain: {name}',{name:(b&&b.title)||blockLabel(b)}),[h('div',{class:'chain'},[
+    h('div',{class:'chsum'},[dot(state),h('span',{class:'st',text:tr(STATE_TEXT[state])})]),
+    ...L.flatMap(d=>{const st=C.datasetStatus(d);return[h('h5',{text:tr('Dataset')+': '+(d.title||d.id)}),whyList(st.why),fileNode(d.source,C,new Set(),st.state==='stale')]}),
+    chainNote()])]);
+}
 function openFile(path){ // from the overview: where a file comes from, and what depends on it
   const C=chain(),p=normPath(path),r=C.refOf.get(p)||{path:p};
   openModal(tr('Data chain: {name}',{name:baseName(p)}),[h('div',{class:'chain'},[
@@ -5167,14 +5426,15 @@ function chainSection(){ // Folder tab: every derived file, raw file and script,
   const dl=h('ul',{class:'flist'});
   C.steps.forEach(s=>{const st=C.stepStatus(s).state,n=inputCount(C,s);
     s.outputs.filter(r=>r&&r.path&&C.madeBy.get(normPath(r.path))===s).forEach(r=>{const p=normPath(r.path),D=C.downstream([p]);
-      dl.append(h('li',{},[dot(st),link(p,()=>openFile(p)),h('span',{class:'fstat'+(st==='stale'?' stale':''),
+      dl.append(h('li',{},[fselBox(p,C.derived),dot(st),link(p,()=>openFile(p)),h('span',{class:'fstat'+(st==='stale'?' stale':''),
         text:'← '+scriptName(s)+' ← '+tr('{d} derived, {r} raw',{d:n.d,r:n.r})+(D.blocks.length?' · '+tr('used by {n} charts or tables',{n:D.blocks.length}):'')})]))})});
   sec.append(h('h5',{text:tr('Derived files ← script ← inputs')}),dl);
   const rl=h('ul',{class:'flist'});
-  groupByFolder([...C.raw,...C.fresh].map(p=>C.refOf.get(p))).forEach(([dir,list])=>{const k=list.filter(r=>C.isNew(r.path)).length;rl.append(h('li',{},[lazyDetails(
-    [dot(worst(list.map(fileDot))),h('span',{class:'fname',text:dir}),h('span',{class:'fstat'+(k?' stale':''),text:tr('{n} files',{n:list.length})+(k?' · '+tr('{n} new',{n:k}):'')})],
+  groupByFolder([...C.raw,...C.fresh].map(p=>C.refOf.get(p))).forEach(([dir,list])=>{const k=list.filter(r=>C.isNew(r.path)).length,range=list.map(r=>r.path),shorts=shortNames(list.map(r=>baseName(r.path)));
+    rl.append(h('li',{},[lazyDetails(
+    [fselGroupBox(range),dot(worst(list.map(fileDot))),h('span',{class:'fname',text:dir}),h('span',{class:'fstat'+(k?' stale':''),text:tr('{n} files',{n:list.length})+(k?' · '+tr('{n} new',{n:k}):'')})],
     ()=>[h('button',{type:'button',class:'linkbtn',text:tr('What depends on these {n} files?',{n:list.length}),onclick:()=>openFiles(list.map(r=>r.path),dir)}),
-      h('ul',{class:'chlinks'},list.map(r=>h('li',{class:'fr'},[dot(fileDot(r)),link(baseName(r.path),()=>openFile(r.path)),
+      h('ul',{class:'chlinks'},list.map((r,i)=>h('li',{class:'fr'},[fselBox(r.path,range),dot(fileDot(r)),h('button',{type:'button',class:'linkbtn fname',text:shorts[i],title:baseName(r.path),onclick:()=>openFile(r.path)}),
         C.isNew(r.path)?h('span',{class:'fstat stale',text:tr('new, not used yet')}):null,revealBtn(r.path)])))],'raw:'+dir)]))});
   sec.append(h('h5',{text:tr('Raw data ({n} files): click a folder or file to see what depends on it',{n:C.raw.length})}),rl);
   if(C.scripts.length)sec.append(h('h5',{text:tr('Scripts ({n})',{n:C.scripts.length})}),
@@ -5263,6 +5523,85 @@ function revealBtn(path){
       if(!r.ok)throw new Error(r.status+' '+await r.text())}catch(x){fail(tr('Could not open the folder.'),x)}}});
 }
 const datasetOf=f=>[...S.datasets.values()].find(d=>d.source&&normPath(d.source.path)===normPath(f.path));
+function shortNames(names){ // what differs between file names of one folder: "raw data_ch001-020.xlsx" -> "ch001-020"
+  if(names.length<2)return names;
+  const base=names.map(n=>n.replace(/\.[^.]+$/,''));let pre=base[0],suf=base[0];
+  base.forEach(b=>{while(!b.startsWith(pre))pre=pre.slice(0,-1);while(!b.endsWith(suf))suf=suf.slice(1)});
+  pre=pre.replace(/[^ _.-]*$/,'');suf=suf.replace(/^[^ _.-]*/,''); // cut at word boundaries
+  const out=base.map(b=>b.slice(pre.length,b.length-suf.length));
+  return pre.length+suf.length>=4&&out.every(x=>x.length)&&new Set(out).size===out.length?out:names;
+}
+
+/* ---------- Choosing files for the agent ----------
+   Tick files in Folder > Data (Shift-click ticks a range, the folder box ticks the folder), then ask for them to be added
+   to a chart or to replace its data. That makes a comment with the exact list of files; the agent does the work
+   (combines them, records the step, updates the chart), so nobody types long file names. */
+const FILE_TAGS={'add-data-files':'Add these files to the chart','replace-data-files':'Replace the data with these files'};
+function fselBox(path,range){
+  S.fsel=S.fsel||new Set();const cb=h('input',{type:'checkbox',class:'fsel',title:path});cb.checked=S.fsel.has(path);
+  cb.addEventListener('click',e=>{e.stopPropagation();const on=cb.checked;
+    if(e.shiftKey&&S.fselLast&&range.includes(S.fselLast)){const a=range.indexOf(S.fselLast),z=range.indexOf(path);range.slice(Math.min(a,z),Math.max(a,z)+1).forEach(p=>on?S.fsel.add(p):S.fsel.delete(p))}
+    else if(on)S.fsel.add(path);else S.fsel.delete(path);
+    S.fselLast=path;renderPanel()});
+  return cb;
+}
+function fselGroupBox(paths){
+  S.fsel=S.fsel||new Set();const n=paths.filter(p=>S.fsel.has(p)).length,cb=h('input',{type:'checkbox',class:'fsel',title:tr('Select every file in this folder')});
+  cb.checked=n>0&&n===paths.length;cb.indeterminate=n>0&&n<paths.length;
+  cb.addEventListener('click',e=>{e.stopPropagation();const on=cb.checked;paths.forEach(p=>on?S.fsel.add(p):S.fsel.delete(p));renderPanel()});
+  return cb;
+}
+function pathsSummary(paths){ // "72 in ../Data/R3/, 4 in derived_data/"
+  const g=new Map();paths.forEach(p=>{const n=normPath(p),i=n.lastIndexOf('/'),k=i<0?'./':n.slice(0,i+1);g.set(k,(g.get(k)||0)+1)});
+  const parts=[...g.entries()].map(([dir,n])=>tr('{n} in {dir}',{n,dir}));
+  return parts.slice(0,3).join(tr(', '))+(parts.length>3?tr(', and {n} more folders',{n:parts.length-3}):'');
+}
+function fselBar(F,B){
+  const paths=[...(S.fsel||[])];if(!paths.length)return null;
+  const imp=[...F.data,...(F.derived||[])].filter(f=>S.fsel.has(f.path));
+  return h('div',{class:'fselbar'},[h('span',{text:tr('{n} files selected: {sum}',{n:paths.length,sum:pathsSummary(paths)})}),h('span',{class:'sp'}),
+    B(tr('Add to a chart…'),()=>fileRequest('add-data-files'),'primary'),B(tr('Replace the data of a chart…'),()=>fileRequest('replace-data-files')),
+    imp.length?B(tr('Import {n}',{n:imp.length}),()=>importAll(imp,tr('the selection'))):null,
+    B(tr('Clear'),()=>{S.fsel.clear();renderPanel()})]);
+}
+function fileRequest(tag){
+  const targets=orderedBlocks().filter(b=>b.type==='chart'||b.type==='table');
+  if(!targets.length){toast(tr('There is no chart or table yet. Add one in Edit mode first.'));return}
+  const paths=[...S.fsel].map(normPath).sort();let pick=targets[0].id;
+  const list=h('div',{class:'picklist'},targets.map((b,i)=>{const r=h('input',{type:'radio',name:'fq',value:b.id});r.checked=!i;r.onchange=()=>{pick=b.id};
+    return h('label',{class:'chk'},[r,h('span',{text:blockLabel(b)||typeName(b.type)})])}));
+  const note=h('textarea',{rows:'3',placeholder:tr('Anything the agent should know, for example: only the CE10 column, one series per round.')});
+  openModal(tr(FILE_TAGS[tag]),[h('div',{class:'langbox'},[h('p',{text:tr('{n} files: {sum}',{n:paths.length,sum:pathsSummary(paths)})}),
+    h('h5',{text:tr('Which chart or table?')}),list,note,
+    h('div',{class:'crow'},[h('span',{class:'sp'}),h('button',{type:'button',class:'btn small primary',text:tr('Create the request'),onclick:async()=>{
+      const no=S.annos.reduce((m,a)=>Math.max(m,a.no||0),0)+1;
+      const a={id:uid('a'),no,target:{kind:'block',blockId:pick},tags:[tag],text:note.value.trim(),files:paths,status:'open',reply:'',createdAt:now()};
+      S.annos=[...S.annos,a];S.fsel.clear();closeModal();renderPanel();paintAllOverlays();await put('annotations/'+a.id,a);
+      toast(tr('Request added as comment #{n}. Click "Ask the agent to revise" when you are ready.',{n:no}))}})])])]);
+}
+function datasetsSection(B){ // every dataset in the report, what uses it, and deleting several at once
+  const all=[...S.datasets.values()].sort((a,b)=>(a.title||a.id)<(b.title||b.id)?-1:1);S.dsel=S.dsel||new Set();
+  const usedBy=id=>orderedBlocks().filter(b=>blockDatasetIds(b).includes(id)),unused=all.filter(d=>!usedBy(d.id).length);
+  const sec=h('div',{class:'stsec'},[h('h4',{text:tr('Datasets in the report ({n})',{n:all.length})})]);
+  if(!all.length){sec.append(h('p',{class:'cap',text:tr('None yet. Import files above, or ask your agent.')}));return sec}
+  const ul=h('ul',{class:'flist'});
+  all.forEach(d=>{const cb=h('input',{type:'checkbox'});cb.checked=S.dsel.has(d.id);cb.onchange=()=>{cb.checked?S.dsel.add(d.id):S.dsel.delete(d.id);renderPanel()};
+    const u=usedBy(d.id);
+    ul.append(h('li',{},[cb,h('span',{class:'fname',text:d.title||d.id,title:(d.source&&d.source.path)||''}),
+      h('span',{class:'fstat',text:tr('{n} rows',{n:d.rows.length})+' · '+(u.length?tr('used by {list}',{list:u.slice(0,3).map(blockLabel).join(tr(', '))+(u.length>3?' …':'')}):tr('not used'))})]))});
+  sec.append(ul,h('div',{class:'crow'},S.dsel.size?[h('span',{text:tr('{n} selected',{n:S.dsel.size})}),B(tr('Delete selected datasets'),deleteDatasets),B(tr('Clear'),()=>{S.dsel.clear();renderPanel()})]
+    :[unused.length?B(tr('Select unused datasets ({n})',{n:unused.length}),()=>{unused.forEach(d=>S.dsel.add(d.id));renderPanel()}):null]));
+  return sec;
+}
+async function deleteDatasets(){
+  const ids=[...S.dsel].filter(id=>S.datasets.has(id)),used=orderedBlocks().filter(b=>blockDatasetIds(b).some(id=>ids.includes(id)));
+  if(!confirm(tr('Delete {n} datasets from the report? The files stay where they are.',{n:ids.length})+
+    (used.length?'\n\n'+tr('Still used by: {list}. They will show "Dataset not found".',{list:used.map(blockLabel).join(tr(', '))}):'')))return;
+  for(const id of ids){const d=S.datasets.get(id);S.datasets.delete(id);
+    const c={id:uid('c'),by:'user',at:now(),blockId:null,datasetId:id,field:'dataset',before:{rows:d.rows.length,columns:d.columns.length,sha256:(d.source&&d.source.sha256)||null},after:null,name:d.title||id,revertible:false};
+    S.changes=[...S.changes,c];await drop('datasets/'+id);await put('changes/'+c.id,c)}
+  S.dsel.clear();render();toast(tr('Deleted {n} datasets.',{n:ids.length}));
+}
 async function importAll(list,dir){ // every file of one folder that is not imported yet or changed since
   if(list.length>20&&!confirm(tr('Import {n} files from {dir}? Each one becomes a dataset in the report.',{n:list.length,dir})))return;
   let n=0;for(const f of list)if(await importDataFile(f,true))n++;
@@ -5273,11 +5612,12 @@ function fileList(files,empty){ // raw or derived data files that can be importe
   if(!files.length){if(empty)dl.append(h('li',{class:'empty',text:empty}));return dl}
   const groups=new Map();files.forEach(f=>{const i=f.name.lastIndexOf('/'),k=i<0?'':f.name.slice(0,i+1);(groups.get(k)||groups.set(k,[]).get(k)).push(f)});
   groups.forEach((list,dir)=>{
-    const todo=list.filter(f=>{const ds=datasetOf(f);return!ds||S.stale.has(ds.id)});
-    if(groups.size>1||list.length>1)dl.append(h('li',{class:'grp'},[h('span',{class:'fname',text:dir||'./'}),h('span',{class:'fstat',text:tr('{n} files',{n:list.length})}),
+    const todo=list.filter(f=>{const ds=datasetOf(f);return!ds||S.stale.has(ds.id)}),range=list.map(f=>f.path);
+    const shorts=shortNames(list.map(f=>dir?f.name.slice(dir.length):f.name));
+    if(groups.size>1||list.length>1)dl.append(h('li',{class:'grp'},[fselGroupBox(range),h('span',{class:'fname',text:dir||'./'}),h('span',{class:'fstat',text:tr('{n} files',{n:list.length})}),
       todo.length>1?B(tr('Import all {n}',{n:todo.length}),()=>importAll(todo,dir||'./'),'primary'):todo.length?null:h('span',{class:'fstat',text:tr('all imported')})]));
-    list.forEach(f=>{const ds=datasetOf(f),stale=!!ds&&S.stale.has(ds.id);
-      dl.append(h('li',{class:dir?'sub':''},[h('span',{class:'fname',text:dir?f.name.slice(dir.length):f.name}),
+    list.forEach((f,i)=>{const ds=datasetOf(f),stale=!!ds&&S.stale.has(ds.id);
+      dl.append(h('li',{class:dir?'sub':''},[fselBox(f.path,range),h('span',{class:'fname',text:shorts[i],title:f.name}),
         h('span',{class:'fstat'+(stale?' stale':''),text:!ds?tr('not imported'):stale?tr('changed since import'):tr('imported as "{t}", {n} rows',{t:ds.title||ds.id,n:ds.rows.length})}),
         revealBtn(f.path),B(ds?tr('Update'):tr('Import'),()=>importDataFile(f),stale?'primary':'')]))})});
   return dl;
@@ -5297,6 +5637,8 @@ function renderFolder(){
     fileList(F.data,S.folder.prefix==='../'?tr('No CSV, TSV or JSON files in this folder yet. Add some, then click Refresh.'):tr('No files yet. Put CSV, TSV or JSON files in the data/ folder, then click Refresh.')),
     h('p',{class:'cap',text:tr('Each import records the file path and a fingerprint (SHA-256), so you can see when the file changes. Excel files: save them as CSV, or ask your agent.')})]));
   if((F.derived||[]).length)box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Derived data (derived_data/)')}),fileList(F.derived,'')]));
+  box.append(datasetsSection(B));
+  const bar=fselBar(F,B);if(bar)box.append(bar);
 }
 function figureHabitsSection(F,B){
   const cnt=re=>F.habits.filter(x=>re.test(x)).length,svg=cnt(/\.svg$/i),mpl=cnt(/\.mplstyle$/i),ras=cnt(/\.(png|jpe?g|webp|gif)$/i),prof=F.habits.includes('profile.json');

@@ -122,6 +122,8 @@ Open the **Folder** tab in the panel. Files in `data/` are listed with their sta
 
 The file becomes a dataset. Duetsheet records where it came from: the path and a SHA-256 fingerprint of the file. If the file changes later, the Folder tab says "changed since import", charts that use it show a warning in Edit mode, and **Update** imports the new version (the change log keeps both).
 
+**Many files at once.** Tick files (Shift-click ticks a range; the box on a folder ticks the whole folder). A bar appears at the bottom: **Add to a chart…** or **Replace the data of a chart…** asks which chart, lets you add a note (for example *one series per round*), and creates a comment with the exact file list for your agent; **Ask the agent to revise** sends it. **Datasets in the report** lists every dataset with the charts that use it; tick several and **Delete selected datasets** (the files are never touched).
+
 Files are grouped by folder: **Import all** imports every file of one folder at once. **Show in folder** opens the file's folder in File Explorer or Finder (with the launcher; otherwise it copies the path).
 
 To plot the new data, switch to **Edit**, click **Add chart**, open **Chart settings** and pick the dataset.
@@ -149,7 +151,7 @@ Raw data can be large. Duetsheet compares size and modification date first and o
 Switch to **Edit**. You can:
 
 - change titles, text and captions directly (every change is recorded);
-- change chart settings (type, dataset, columns, axis labels, range, log scale);
+- change chart settings (type, dataset, columns, axis labels, range, log scale), and under **Data series** add more series from other datasets, each with its own colour and legend name;
 - drag blocks to reorder them and click the dividers to control page breaks;
 - write a comment under any block, with preset tags such as **Use log scale** or **Highlight key points**.
 

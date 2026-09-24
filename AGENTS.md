@@ -119,7 +119,8 @@ Common fields:
 Type-specific fields:
 
 - `text`: `text` (string). Supported markup: `**bold**`, `*italic*`, lines starting with `- ` form a list, a blank line starts a new paragraph. Raw HTML is not rendered.
-- `chart`: `chart` = `{ kind: "scatter" | "line", dataset, x, y, color, xLabel, yLabel, logY, yMin, yMax }`. `dataset` is a dataset id; `x`, `y`, `color` are column keys of that dataset. `color` with 6 or fewer distinct values is categorical (colour and marker shape); otherwise it is a numeric colour ramp. `null` means automatic.
+- `chart`: `chart` = `{ kind: "scatter" | "line", dataset, x, y, color, xLabel, yLabel, logY, yMin, yMax }`. `dataset` is a dataset id; `x`, `y`, `color` are column keys of that dataset. `color` with 6 or fewer distinct values is categorical (colour and marker shape); otherwise it is a numeric colour ramp. `null` means automatic. Rows with an empty x or y are not drawn (empty is not zero).
+  - Several series in one chart: `series` = `[{ dataset, x, y, label }, ...]`, each with its own dataset and columns, drawn in its own colour and marker with `label` in the legend. `series[0]` must repeat `dataset`, `x`, `y` (older pages draw only those). With several series, `color` is not used. Prefer one combined dataset with a `color` column when the data comes from the same kind of file; use series to compare different sources (for example two instruments).
 - `table`: `table` = `{ dataset, sortBy, desc, limit, columns? }`.
 - `image`: `image` = `{ asset | src, mime, w, h, name, crop: { t, r, b, l }, width, source }`.
   - `asset` is a 32-character hex id. In an Artifact it is an asset id (displayed from `/_blob/<id>`); in a project folder the file is `assets/<id>.<ext>`. Older reports may instead have `src`, a `data:image/...` URL, which works everywhere.
@@ -167,11 +168,11 @@ Both attach to the block right before in `order`, so put a discussion right afte
 | `kind` | Fields | Meaning |
 |---|---|---|
 | `block` | `blockId`, optional `quote` | The whole block, or a quoted passage of its text |
-| `point` | `blockId`, `rowId` | One data point of a chart |
+| `point` | `blockId`, `rowId`, and `datasetId` in a chart with several series | One data point of a chart |
 | `box` | `blockId`, `space`, `x: [min, max]`, `y: [min, max]`, and for charts `xKey`, `yKey`, `enclosed` | A rectangle |
 | `lasso` | `blockId`, `space`, `polygon: [[x, y], ...]`, and for charts `xKey`, `yKey`, `enclosed` | A free-hand region |
 
-`space: "data"` means coordinates are in the chart's data units for the columns `xKey` and `yKey`, and `enclosed` lists the row ids inside the region. `space: "image"` means coordinates are normalised to the visible (cropped) image, from 0 to 1, with y pointing down.
+`space: "data"` means coordinates are in the chart's data units for the columns `xKey` and `yKey`, and `enclosed` lists the row ids inside the region (of the first series; with several series, `enclosedBy` = `{ "<dataset id>": [row ids] }` lists them per dataset). `space: "image"` means coordinates are normalised to the visible (cropped) image, from 0 to 1, with y pointing down.
 
 Tags come from preset buttons and are stored as stable ids, whatever the interface language:
 
@@ -179,6 +180,9 @@ Tags come from preset buttons and are stored as stable ids, whatever the interfa
 |---|---|
 | `text` | `more-concise`, `more-formal`, `add-data`, `add-citation`, `claim-too-strong`, `translate` |
 | `chart` | `change-chart-type`, `change-axes`, `use-log-scale`, `add-error-bars`, `add-trend-line`, `highlight-key-points`, `change-colours` |
+| `chart`, `table` (from Folder > Data) | `add-data-files`, `replace-data-files`, with `files` |
+
+**File requests.** In Folder > Data the user ticks files and asks for them to be added to a chart or to replace its data. That makes an annotation on the chart or table with the tag `add-data-files` or `replace-data-files`, the exact list in `files` (paths relative to the folder of `report.json`), and the user's note in `text` (for example "only the CE10 column, one series per round"). To handle it: read the files; combine or convert them with a script in `scripts/` into `derived_data/` and record the step; import the result as a dataset; then add it to the chart as a new series (or a new dataset for a table), or replace the chart's data, keeping the axes and labels unless asked. Never modify the listed files.
 | `table` | `add-units`, `change-sort`, `add-remove-columns`, `highlight-key-points` |
 | `image` | `crop`, `add-labels`, `replace-image`, `add-caption` |
 
