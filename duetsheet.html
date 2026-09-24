@@ -56,6 +56,11 @@ button,input,select,textarea{font:inherit;color:inherit}
 .seg button+button{border-left:1px solid var(--line)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .hint{color:var(--muted);font-size:13px;flex:1 1 220px}
+#agentbar{display:inline-flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+#agentbar:empty{display:none}
+#agentbar .ast{font-size:12.5px;color:var(--muted);max-width:360px}
+#agentbar .ast.bad{color:var(--c5)}
+#agentbar .ast.ok{color:var(--ok)}
 #lang{border:1px solid var(--line);border-radius:7px;padding:5px 8px;background:var(--paper)}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .langbox{max-width:560px;font-size:14px}
@@ -93,6 +98,29 @@ main{min-width:0}
 .flist .fstat{color:var(--muted);font-size:12px;flex:1 1 120px}
 .flist .fstat.stale{color:var(--c2);font-weight:500}
 .flist .btn{margin-left:auto}
+/* data chain */
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c0);flex:0 0 auto}
+.dot.ok{background:var(--ok)}.dot.stale{background:var(--c5)}
+.srcl{display:flex;align-items:center;gap:6px;margin:3px 0 0;padding:0;border:0;background:none;color:var(--muted);font:inherit;font-size:12px;line-height:1.4;cursor:pointer;text-align:left;max-width:100%}
+.srcl .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.srcl:hover .t{text-decoration:underline}
+.chain{font-size:13px;width:min(760px,86vw);line-height:1.45}
+.chain .fr{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:center;padding:2px 0}
+.chain .mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;overflow-wrap:anywhere}
+.chain .meta{color:var(--muted);font-size:12px}
+.chain .why{color:var(--c5);margin:2px 0;padding-left:16px}
+.chain details{margin:3px 0 3px 12px;padding-left:8px;border-left:2px solid var(--line)}
+.chain summary{cursor:pointer;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.chain .kv{display:grid;grid-template-columns:auto 1fr;gap:1px 10px;margin:4px 0}
+.chain .kv>span:nth-child(odd){color:var(--muted);font-size:12px}
+.chain h5,.stsec h5{margin:10px 0 3px;font-size:12.5px;font-weight:500;color:var(--muted)}
+.chain ul,.chlinks{list-style:none;margin:2px 0;padding:0}
+.chain .st{font-weight:500}
+.chsum{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;margin:4px 0}
+.chain .bad{color:var(--c5);font-size:12px;font-weight:500}
+.chlinks li{display:flex;gap:6px;align-items:center;padding:2px 0 2px 14px}
+.flist details{width:100%}.flist summary{cursor:pointer;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.flist .dot{align-self:center}
 
 /* page (view) */
 .page{width:var(--pw);height:var(--ph);margin:0 auto;background:var(--paper);border-radius:6px;
@@ -321,6 +349,7 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
     <button type="button" data-mode="edit" aria-pressed="false">Edit</button>
   </div>
   <span class="hint" id="hint"></span>
+  <span id="agentbar"></span>
   <button type="button" class="btn issues" id="issuesBtn" hidden aria-label="Problems"></button>
   <select id="lang" aria-label="Language"></select>
   <button type="button" class="btn" id="helpBtn" aria-label="Help">?</button>
@@ -825,7 +854,94 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "This file": "這個檔案",
  "What should change here? Ctrl + Enter to send.": "這裡想怎麼改？Ctrl + Enter 送出。",
  "{title} (read-only)": "{title}（唯讀）",
- "… {n} more": "…還有 {n} 項"
+ "… {n} more": "…還有 {n} 項",
+ "1 derived file": "1 個衍生檔",
+ "1 raw file": "1 個原始檔",
+ "{n} derived files": "{n} 個衍生檔",
+ "{n} raw files": "{n} 個原始檔",
+ "Source: {file}": "來源：{file}",
+ "Click to see the whole data chain.": "點一下看整條資料鏈。",
+ "Up to date": "一致",
+ "Needs recomputing": "需重算",
+ "Not checked": "未核對",
+ "changed": "已變更",
+ "missing": "不見了",
+ "no fingerprint": "沒有指紋",
+ "{file} is missing": "找不到 {file}",
+ "{file} changed": "{file} 已變更",
+ "{file} changed after the step was recorded": "{file} 在步驟記錄之後又變更了",
+ "{file} changed since import": "{file} 在匯入後已變更",
+ "{file} comes from a step that needs recomputing": "{file} 來自需重算的步驟",
+ "and {n} more": "還有 {n} 項",
+ "Made by step \"{id}\"": "由步驟「{id}」產生",
+ "Made by step \"{id}\", shown above.": "由步驟「{id}」產生，見上方。",
+ "Script": "計算程式",
+ "none (done by hand, see the note)": "無（手動完成，見備註）",
+ "Command": "指令",
+ "Parameters": "參數",
+ "When": "時間",
+ "by the agent": "由 agent 執行",
+ "by you": "由你執行",
+ "Derived inputs ({n})": "衍生的輸入檔（{n}）",
+ "Raw inputs ({n})": "原始輸入檔（{n}）",
+ "Everything this step wrote ({n})": "這個步驟寫出的所有檔案（{n}）",
+ "Green: as recorded. Red: changed or missing, so everything computed from it needs recomputing. Grey: not checked yet.": "綠色：和紀錄一致。紅色：已變更或不見了，由它算出來的東西都要重算。灰色：還沒核對。",
+ "Files can only be checked when the report is opened from its folder, so the chain is shown in grey here.": "只有從報告所在的資料夾打開時才能核對檔案，所以這裡的資料鏈都顯示為灰色。",
+ "What depends on it": "哪些東西用到它",
+ "Nothing recorded uses it yet.": "目前沒有紀錄用到它。",
+ "Derived files ({n})": "衍生檔（{n}）",
+ "Datasets ({n})": "資料集（{n}）",
+ "Charts and tables ({n})": "圖表與表格（{n}）",
+ "Data chain: {name}": "資料鏈：{name}",
+ "{n} rows, imported {t}": "{n} 列，{t} 匯入",
+ "Imported from": "匯入自",
+ "Where it comes from": "它從哪裡來",
+ "What depends on {name}": "哪些東西用到 {name}",
+ "{n} files in {dir}": "{dir} 裡的 {n} 個檔案",
+ "Data chain": "資料鏈",
+ "Keep raw data in data/; Duetsheet only reads it. Put the files computed from it in derived_data/ and the scripts that compute them in scripts/.": "原始數據放在 data/，Duetsheet 只讀不寫。由它算出來的檔案放在 derived_data/，計算程式放在 scripts/。",
+ "No computation steps are recorded yet. Ask your agent to record each script it runs (see AGENTS.md); every chart can then be traced back to its raw files.": "還沒有記錄任何計算步驟。請 agent 每執行一支計算程式就記一筆（見 AGENTS.md），之後每張圖表都能追到原始檔。",
+ "{s} steps, {d} derived files, {r} raw files.": "{s} 個步驟、{d} 個衍生檔、{r} 個原始檔。",
+ "Checking files…": "正在核對檔案…",
+ "{n} steps need recomputing.": "{n} 個步驟需重算。",
+ "All up to date.": "全部一致。",
+ "Some files are not checked.": "有些檔案還沒核對。",
+ "Check again": "重新核對",
+ "{d} derived, {r} raw": "{d} 個衍生、{r} 個原始",
+ "used by {n} charts or tables": "用在 {n} 張圖表或表格",
+ "Derived files ← script ← inputs": "衍生檔 ← 計算程式 ← 輸入",
+ "{n} files": "{n} 個檔案",
+ "What depends on these {n} files?": "哪些東西用到這 {n} 個檔案？",
+ "Raw data ({n} files): click a folder or file to see what depends on it": "原始數據（{n} 個檔案）：點資料夾或檔案，看有哪些東西用到它",
+ "Scripts ({n})": "計算程式（{n}）",
+ "Could not check the files of the data chain.": "無法核對資料鏈的檔案。",
+ "Derived data (derived_data/)": "衍生數據（derived_data/）",
+ "Agent listening": "agent 已連線",
+ "An agent is listening and will revise the report now.": "有 agent 在監看，會立刻修改報告。",
+ "Ask the agent to revise": "請 agent 修改",
+ "Ask the agent to revise ({n})": "請 agent 修改（{n}）",
+ "Copy": "複製",
+ "Could not send the request to the agent.": "無法把請求送給 agent。",
+ "Finish this round ({n})": "完成這一輪（{n}）",
+ "Get a prompt to paste": "取得可貼上的提示詞",
+ "Go back to Claude, paste this, and add the link of this Artifact.": "回到 Claude，貼上這段，再貼上這個 Artifact 的連結。",
+ "Handle the open comments of the Duetsheet report in \"{folder}\". First read {agents} and follow \"Revise the report from the user's annotations\"; list the comments with: python \"{py}\" annotations \"{folder}\". When you are done, keep listening: run python \"{py}\" wait \"{folder}\" in the background and handle each new request the same way.": "請處理「{folder}」裡 Duetsheet 報告的未處理註記。先讀 {agents}，依照其中 \"Revise the report from the user's annotations\" 一節修改；用這個指令列出註記：python \"{py}\" annotations \"{folder}\"。改完後繼續監看：在背景執行 python \"{py}\" wait \"{folder}\"，之後每次收到請求都照同樣方式處理。",
+ "Handle the open comments of the Duetsheet report in the folder \"{name}\" ({file}): read AGENTS.md of Duetsheet and follow \"Revise the report from the user's annotations\".": "請處理資料夾「{name}」裡 Duetsheet 報告（{file}）的未處理註記：讀 Duetsheet 的 AGENTS.md，依照 \"Revise the report from the user's annotations\" 一節修改。",
+ "Move the current changes into the history as one round.": "把目前的修改收進歷史，算作一輪。",
+ "No agent has answered yet.": "還沒有 agent 回應。",
+ "No agent is listening for this report right now. Your request is saved: paste this into your agent (Claude Code, Codex, Gemini CLI, ...). It picks up the request and then keeps listening for the next one.": "目前沒有 agent 在監看這份報告。你的請求已經記下來了：把下面這段貼給你的 agent（Claude Code、Codex、Gemini CLI 等），它會接手這個請求，之後繼續監看下一次。",
+ "No agent is listening. You will get a prompt to paste into your agent.": "目前沒有 agent 在監看。按下後會給你一段可貼給 agent 的提示詞。",
+ "Read the Duetsheet annotations in this Artifact and revise the report:": "請讀這個 Artifact 的 Duetsheet 註記並修改報告：",
+ "Request sent. Waiting for the agent…": "已送出請求，等 agent 接手…",
+ "Save the report file, give it to your agent, and ask it to handle the open comments following AGENTS.md of Duetsheet.": "請先存下報告檔，交給你的 agent，請它依照 Duetsheet 的 AGENTS.md 處理未處理的註記。",
+ "Sent. The agent will revise the report; this page updates by itself.": "已送出。agent 會修改報告，這個頁面會自動更新。",
+ "The agent could not finish.": "agent 沒有完成。",
+ "The agent handled {n} comments.": "agent 已處理 {n} 則註記。",
+ "The agent is revising the report…": "agent 正在修改報告…",
+ "This page cannot reach an agent by itself. Paste this into your agent:": "這個頁面無法自己聯絡 agent。請把這段貼給你的 agent：",
+ "{file} is outside \"{folder}\"": "{file} 在「{folder}」外面",
+ "outside \"{folder}\"": "在「{folder}」外面",
+ "Keep raw data inside \"{folder}\" but outside duetsheet/; Duetsheet only reads it. Put the files computed from it in duetsheet/derived_data/ and the scripts that compute them in duetsheet/scripts/.": "原始數據放在「{folder}」裡面、duetsheet/ 外面，Duetsheet 只讀不寫。由它算出來的檔案放在 duetsheet/derived_data/，計算程式放在 duetsheet/scripts/。"
 },
 "zh-Hans": {
  "_name": "简体中文",
@@ -1254,7 +1370,94 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "This file": "此文件",
  "What should change here? Ctrl + Enter to send.": "这里想怎么改？Ctrl + Enter 发送。",
  "{title} (read-only)": "{title}（只读）",
- "… {n} more": "…还有 {n} 项"
+ "… {n} more": "…还有 {n} 项",
+ "1 derived file": "1 个衍生文件",
+ "1 raw file": "1 个原始文件",
+ "{n} derived files": "{n} 个衍生文件",
+ "{n} raw files": "{n} 个原始文件",
+ "Source: {file}": "来源：{file}",
+ "Click to see the whole data chain.": "点击查看整条数据链。",
+ "Up to date": "一致",
+ "Needs recomputing": "需重算",
+ "Not checked": "未核对",
+ "changed": "已更改",
+ "missing": "丢失",
+ "no fingerprint": "没有指纹",
+ "{file} is missing": "找不到 {file}",
+ "{file} changed": "{file} 已更改",
+ "{file} changed after the step was recorded": "{file} 在步骤记录之后又更改了",
+ "{file} changed since import": "{file} 在导入后已更改",
+ "{file} comes from a step that needs recomputing": "{file} 来自需重算的步骤",
+ "and {n} more": "还有 {n} 项",
+ "Made by step \"{id}\"": "由步骤“{id}”生成",
+ "Made by step \"{id}\", shown above.": "由步骤“{id}”生成，见上方。",
+ "Script": "计算程序",
+ "none (done by hand, see the note)": "无（手动完成，见备注）",
+ "Command": "命令",
+ "Parameters": "参数",
+ "When": "时间",
+ "by the agent": "由 agent 运行",
+ "by you": "由你运行",
+ "Derived inputs ({n})": "衍生的输入文件（{n}）",
+ "Raw inputs ({n})": "原始输入文件（{n}）",
+ "Everything this step wrote ({n})": "这个步骤写出的所有文件（{n}）",
+ "Green: as recorded. Red: changed or missing, so everything computed from it needs recomputing. Grey: not checked yet.": "绿色：与记录一致。红色：已更改或丢失，由它算出来的东西都要重算。灰色：尚未核对。",
+ "Files can only be checked when the report is opened from its folder, so the chain is shown in grey here.": "只有从报告所在的文件夹打开时才能核对文件，所以这里的数据链都显示为灰色。",
+ "What depends on it": "哪些东西用到它",
+ "Nothing recorded uses it yet.": "目前没有记录用到它。",
+ "Derived files ({n})": "衍生文件（{n}）",
+ "Datasets ({n})": "数据集（{n}）",
+ "Charts and tables ({n})": "图表与表格（{n}）",
+ "Data chain: {name}": "数据链：{name}",
+ "{n} rows, imported {t}": "{n} 行，{t} 导入",
+ "Imported from": "导入自",
+ "Where it comes from": "它从哪里来",
+ "What depends on {name}": "哪些东西用到 {name}",
+ "{n} files in {dir}": "{dir} 中的 {n} 个文件",
+ "Data chain": "数据链",
+ "Keep raw data in data/; Duetsheet only reads it. Put the files computed from it in derived_data/ and the scripts that compute them in scripts/.": "原始数据放在 data/，Duetsheet 只读不写。由它算出来的文件放在 derived_data/，计算程序放在 scripts/。",
+ "No computation steps are recorded yet. Ask your agent to record each script it runs (see AGENTS.md); every chart can then be traced back to its raw files.": "还没有记录任何计算步骤。请 agent 每运行一个计算程序就记一条（见 AGENTS.md），之后每张图表都能追溯到原始文件。",
+ "{s} steps, {d} derived files, {r} raw files.": "{s} 个步骤、{d} 个衍生文件、{r} 个原始文件。",
+ "Checking files…": "正在核对文件…",
+ "{n} steps need recomputing.": "{n} 个步骤需重算。",
+ "All up to date.": "全部一致。",
+ "Some files are not checked.": "有些文件尚未核对。",
+ "Check again": "重新核对",
+ "{d} derived, {r} raw": "{d} 个衍生、{r} 个原始",
+ "used by {n} charts or tables": "用在 {n} 张图表或表格",
+ "Derived files ← script ← inputs": "衍生文件 ← 计算程序 ← 输入",
+ "{n} files": "{n} 个文件",
+ "What depends on these {n} files?": "哪些东西用到这 {n} 个文件？",
+ "Raw data ({n} files): click a folder or file to see what depends on it": "原始数据（{n} 个文件）：点击文件夹或文件，查看哪些东西用到它",
+ "Scripts ({n})": "计算程序（{n}）",
+ "Could not check the files of the data chain.": "无法核对数据链的文件。",
+ "Derived data (derived_data/)": "衍生数据（derived_data/）",
+ "Agent listening": "agent 已连接",
+ "An agent is listening and will revise the report now.": "有 agent 在监看，会立刻修改报告。",
+ "Ask the agent to revise": "请 agent 修改",
+ "Ask the agent to revise ({n})": "请 agent 修改（{n}）",
+ "Copy": "复制",
+ "Could not send the request to the agent.": "无法把请求发送给 agent。",
+ "Finish this round ({n})": "完成这一轮（{n}）",
+ "Get a prompt to paste": "获取可粘贴的提示词",
+ "Go back to Claude, paste this, and add the link of this Artifact.": "回到 Claude，粘贴这段，再粘贴这个 Artifact 的链接。",
+ "Handle the open comments of the Duetsheet report in \"{folder}\". First read {agents} and follow \"Revise the report from the user's annotations\"; list the comments with: python \"{py}\" annotations \"{folder}\". When you are done, keep listening: run python \"{py}\" wait \"{folder}\" in the background and handle each new request the same way.": "请处理“{folder}”里 Duetsheet 报告的未处理注记。先读 {agents}，按照其中 \"Revise the report from the user's annotations\" 一节修改；用这个命令列出注记：python \"{py}\" annotations \"{folder}\"。改完后继续监看：在后台运行 python \"{py}\" wait \"{folder}\"，之后每次收到请求都照同样方式处理。",
+ "Handle the open comments of the Duetsheet report in the folder \"{name}\" ({file}): read AGENTS.md of Duetsheet and follow \"Revise the report from the user's annotations\".": "请处理文件夹“{name}”里 Duetsheet 报告（{file}）的未处理注记：读 Duetsheet 的 AGENTS.md，按照 \"Revise the report from the user's annotations\" 一节修改。",
+ "Move the current changes into the history as one round.": "把当前的修改收进历史，算作一轮。",
+ "No agent has answered yet.": "还没有 agent 回应。",
+ "No agent is listening for this report right now. Your request is saved: paste this into your agent (Claude Code, Codex, Gemini CLI, ...). It picks up the request and then keeps listening for the next one.": "目前没有 agent 在监看这份报告。你的请求已经记下来了：把下面这段粘贴给你的 agent（Claude Code、Codex、Gemini CLI 等），它会接手这个请求，之后继续监看下一次。",
+ "No agent is listening. You will get a prompt to paste into your agent.": "目前没有 agent 在监看。按下后会给你一段可粘贴给 agent 的提示词。",
+ "Read the Duetsheet annotations in this Artifact and revise the report:": "请读这个 Artifact 的 Duetsheet 注记并修改报告：",
+ "Request sent. Waiting for the agent…": "已发送请求，等 agent 接手…",
+ "Save the report file, give it to your agent, and ask it to handle the open comments following AGENTS.md of Duetsheet.": "请先保存报告文件，交给你的 agent，请它按照 Duetsheet 的 AGENTS.md 处理未处理的注记。",
+ "Sent. The agent will revise the report; this page updates by itself.": "已发送。agent 会修改报告，这个页面会自动更新。",
+ "The agent could not finish.": "agent 没有完成。",
+ "The agent handled {n} comments.": "agent 已处理 {n} 条注记。",
+ "The agent is revising the report…": "agent 正在修改报告…",
+ "This page cannot reach an agent by itself. Paste this into your agent:": "这个页面无法自己联系 agent。请把这段粘贴给你的 agent：",
+ "{file} is outside \"{folder}\"": "{file} 在“{folder}”外面",
+ "outside \"{folder}\"": "在“{folder}”外面",
+ "Keep raw data inside \"{folder}\" but outside duetsheet/; Duetsheet only reads it. Put the files computed from it in duetsheet/derived_data/ and the scripts that compute them in duetsheet/scripts/.": "原始数据放在“{folder}”里面、duetsheet/ 外面，Duetsheet 只读不写。由它算出来的文件放在 duetsheet/derived_data/，计算程序放在 duetsheet/scripts/。"
 },
 "ja": {
  "_name": "日本語",
@@ -1683,7 +1886,94 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "This file": "このファイル",
  "What should change here? Ctrl + Enter to send.": "ここをどう直しますか？Ctrl + Enter で送信。",
  "{title} (read-only)": "{title}（閲覧専用）",
- "… {n} more": "…ほか {n} 項目"
+ "… {n} more": "…ほか {n} 項目",
+ "1 derived file": "派生ファイル 1 件",
+ "1 raw file": "元データ 1 件",
+ "{n} derived files": "派生ファイル {n} 件",
+ "{n} raw files": "元データ {n} 件",
+ "Source: {file}": "出典：{file}",
+ "Click to see the whole data chain.": "クリックするとデータの流れ全体を表示します。",
+ "Up to date": "最新",
+ "Needs recomputing": "再計算が必要",
+ "Not checked": "未確認",
+ "changed": "変更あり",
+ "missing": "見つからない",
+ "no fingerprint": "フィンガープリントなし",
+ "{file} is missing": "{file} が見つかりません",
+ "{file} changed": "{file} が変更されました",
+ "{file} changed after the step was recorded": "{file} は手順の記録後に変更されました",
+ "{file} changed since import": "{file} は取り込み後に変更されました",
+ "{file} comes from a step that needs recomputing": "{file} は再計算が必要な手順で作られています",
+ "and {n} more": "ほか {n} 件",
+ "Made by step \"{id}\"": "手順「{id}」で作成",
+ "Made by step \"{id}\", shown above.": "手順「{id}」で作成（上に表示）。",
+ "Script": "スクリプト",
+ "none (done by hand, see the note)": "なし（手作業。備考を参照）",
+ "Command": "コマンド",
+ "Parameters": "パラメータ",
+ "When": "日時",
+ "by the agent": "エージェントが実行",
+ "by you": "あなたが実行",
+ "Derived inputs ({n})": "派生データの入力（{n}）",
+ "Raw inputs ({n})": "元データの入力（{n}）",
+ "Everything this step wrote ({n})": "この手順が書き出したすべてのファイル（{n}）",
+ "Green: as recorded. Red: changed or missing, so everything computed from it needs recomputing. Grey: not checked yet.": "緑：記録どおり。赤：変更または欠落しているため、そこから計算したものはすべて再計算が必要です。灰色：未確認。",
+ "Files can only be checked when the report is opened from its folder, so the chain is shown in grey here.": "ファイルはレポートをそのフォルダから開いたときだけ確認できるため、ここでは灰色で表示します。",
+ "What depends on it": "これに依存するもの",
+ "Nothing recorded uses it yet.": "これを使う記録はまだありません。",
+ "Derived files ({n})": "派生ファイル（{n}）",
+ "Datasets ({n})": "データセット（{n}）",
+ "Charts and tables ({n})": "グラフと表（{n}）",
+ "Data chain: {name}": "データの流れ：{name}",
+ "{n} rows, imported {t}": "{n} 行、{t} に取り込み",
+ "Imported from": "取り込み元",
+ "Where it comes from": "どこから来たか",
+ "What depends on {name}": "{name} に依存するもの",
+ "{n} files in {dir}": "{dir} の {n} ファイル",
+ "Data chain": "データの流れ",
+ "Keep raw data in data/; Duetsheet only reads it. Put the files computed from it in derived_data/ and the scripts that compute them in scripts/.": "元データは data/ に置きます（Duetsheet は読むだけです）。そこから計算したファイルは derived_data/ に、計算スクリプトは scripts/ に置きます。",
+ "No computation steps are recorded yet. Ask your agent to record each script it runs (see AGENTS.md); every chart can then be traced back to its raw files.": "計算の手順はまだ記録されていません。スクリプトを実行するたびに記録するようエージェントに頼んでください（AGENTS.md 参照）。そうすれば各グラフを元データまでたどれます。",
+ "{s} steps, {d} derived files, {r} raw files.": "手順 {s}・派生ファイル {d}・元データ {r}。",
+ "Checking files…": "ファイルを確認中…",
+ "{n} steps need recomputing.": "{n} 個の手順で再計算が必要です。",
+ "All up to date.": "すべて最新です。",
+ "Some files are not checked.": "一部のファイルは未確認です。",
+ "Check again": "再確認",
+ "{d} derived, {r} raw": "派生 {d}・元データ {r}",
+ "used by {n} charts or tables": "{n} 個のグラフ・表で使用",
+ "Derived files ← script ← inputs": "派生ファイル ← スクリプト ← 入力",
+ "{n} files": "{n} ファイル",
+ "What depends on these {n} files?": "この {n} ファイルに依存するものは？",
+ "Raw data ({n} files): click a folder or file to see what depends on it": "元データ（{n} ファイル）：フォルダやファイルをクリックすると、それに依存するものを表示します",
+ "Scripts ({n})": "スクリプト（{n}）",
+ "Could not check the files of the data chain.": "データの流れのファイルを確認できませんでした。",
+ "Derived data (derived_data/)": "派生データ（derived_data/）",
+ "Agent listening": "エージェント待機中",
+ "An agent is listening and will revise the report now.": "エージェントが待機中です。すぐにレポートを修正します。",
+ "Ask the agent to revise": "エージェントに修正を依頼",
+ "Ask the agent to revise ({n})": "エージェントに修正を依頼（{n}）",
+ "Copy": "コピー",
+ "Could not send the request to the agent.": "エージェントに依頼を送れませんでした。",
+ "Finish this round ({n})": "このラウンドを完了（{n}）",
+ "Get a prompt to paste": "貼り付け用の指示文を表示",
+ "Go back to Claude, paste this, and add the link of this Artifact.": "Claude に戻ってこれを貼り付け、この Artifact のリンクを添えてください。",
+ "Handle the open comments of the Duetsheet report in \"{folder}\". First read {agents} and follow \"Revise the report from the user's annotations\"; list the comments with: python \"{py}\" annotations \"{folder}\". When you are done, keep listening: run python \"{py}\" wait \"{folder}\" in the background and handle each new request the same way.": "「{folder}」にある Duetsheet レポートの未処理のコメントに対応してください。まず {agents} を読み、\"Revise the report from the user's annotations\" に従って修正してください。コメントの一覧は python \"{py}\" annotations \"{folder}\" で表示できます。終わったら待機を続けてください：python \"{py}\" wait \"{folder}\" をバックグラウンドで実行し、新しい依頼が来るたびに同じように対応してください。",
+ "Handle the open comments of the Duetsheet report in the folder \"{name}\" ({file}): read AGENTS.md of Duetsheet and follow \"Revise the report from the user's annotations\".": "フォルダ「{name}」にある Duetsheet レポート（{file}）の未処理のコメントに対応してください：Duetsheet の AGENTS.md を読み、\"Revise the report from the user's annotations\" に従ってください。",
+ "Move the current changes into the history as one round.": "現在の変更を 1 ラウンドとして履歴に移します。",
+ "No agent has answered yet.": "まだエージェントから応答がありません。",
+ "No agent is listening for this report right now. Your request is saved: paste this into your agent (Claude Code, Codex, Gemini CLI, ...). It picks up the request and then keeps listening for the next one.": "今このレポートを待機しているエージェントはいません。依頼は保存されています。下の文をエージェント（Claude Code、Codex、Gemini CLI など）に貼り付けてください。依頼を引き継ぎ、その後も次の依頼を待ちます。",
+ "No agent is listening. You will get a prompt to paste into your agent.": "待機中のエージェントはいません。エージェントに貼り付ける指示文を表示します。",
+ "Read the Duetsheet annotations in this Artifact and revise the report:": "この Artifact の Duetsheet のコメントを読んで、レポートを修正してください：",
+ "Request sent. Waiting for the agent…": "依頼を送りました。エージェントを待っています…",
+ "Save the report file, give it to your agent, and ask it to handle the open comments following AGENTS.md of Duetsheet.": "レポートファイルを保存してエージェントに渡し、Duetsheet の AGENTS.md に従って未処理のコメントに対応するよう頼んでください。",
+ "Sent. The agent will revise the report; this page updates by itself.": "送信しました。エージェントがレポートを修正し、このページは自動で更新されます。",
+ "The agent could not finish.": "エージェントは完了できませんでした。",
+ "The agent handled {n} comments.": "エージェントが {n} 件のコメントに対応しました。",
+ "The agent is revising the report…": "エージェントがレポートを修正中…",
+ "This page cannot reach an agent by itself. Paste this into your agent:": "このページからはエージェントに直接連絡できません。これをエージェントに貼り付けてください：",
+ "{file} is outside \"{folder}\"": "{file} は「{folder}」の外にあります",
+ "outside \"{folder}\"": "「{folder}」の外",
+ "Keep raw data inside \"{folder}\" but outside duetsheet/; Duetsheet only reads it. Put the files computed from it in duetsheet/derived_data/ and the scripts that compute them in duetsheet/scripts/.": "元データは「{folder}」の中、duetsheet/ の外に置きます（Duetsheet は読むだけです）。そこから計算したファイルは duetsheet/derived_data/ に、計算スクリプトは duetsheet/scripts/ に置きます。"
 },
 "ko": {
  "_name": "한국어",
@@ -2112,7 +2402,94 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "This file": "이 파일",
  "What should change here? Ctrl + Enter to send.": "여기를 어떻게 바꿀까요? Ctrl + Enter로 보내기.",
  "{title} (read-only)": "{title} (읽기 전용)",
- "… {n} more": "… 외 {n}개"
+ "… {n} more": "… 외 {n}개",
+ "1 derived file": "파생 파일 1개",
+ "1 raw file": "원본 파일 1개",
+ "{n} derived files": "파생 파일 {n}개",
+ "{n} raw files": "원본 파일 {n}개",
+ "Source: {file}": "출처: {file}",
+ "Click to see the whole data chain.": "클릭하면 데이터 체인 전체를 봅니다.",
+ "Up to date": "최신",
+ "Needs recomputing": "다시 계산 필요",
+ "Not checked": "확인 안 함",
+ "changed": "바뀜",
+ "missing": "없음",
+ "no fingerprint": "지문 없음",
+ "{file} is missing": "{file}이(가) 없습니다",
+ "{file} changed": "{file}이(가) 바뀌었습니다",
+ "{file} changed after the step was recorded": "{file}이(가) 단계 기록 후에 바뀌었습니다",
+ "{file} changed since import": "{file}이(가) 가져온 뒤 바뀌었습니다",
+ "{file} comes from a step that needs recomputing": "{file}은(는) 다시 계산해야 하는 단계에서 나왔습니다",
+ "and {n} more": "외 {n}개",
+ "Made by step \"{id}\"": "단계 \"{id}\"에서 생성",
+ "Made by step \"{id}\", shown above.": "단계 \"{id}\"에서 생성 (위에 표시).",
+ "Script": "스크립트",
+ "none (done by hand, see the note)": "없음 (수작업, 메모 참고)",
+ "Command": "명령",
+ "Parameters": "매개변수",
+ "When": "시각",
+ "by the agent": "에이전트가 실행",
+ "by you": "직접 실행",
+ "Derived inputs ({n})": "파생 입력 ({n})",
+ "Raw inputs ({n})": "원본 입력 ({n})",
+ "Everything this step wrote ({n})": "이 단계가 쓴 모든 파일 ({n})",
+ "Green: as recorded. Red: changed or missing, so everything computed from it needs recomputing. Grey: not checked yet.": "초록: 기록과 같음. 빨강: 바뀌었거나 없어서 여기서 계산한 모든 것을 다시 계산해야 함. 회색: 아직 확인 안 함.",
+ "Files can only be checked when the report is opened from its folder, so the chain is shown in grey here.": "파일은 보고서를 해당 폴더에서 열었을 때만 확인할 수 있어서 여기서는 회색으로 표시합니다.",
+ "What depends on it": "이것에 의존하는 것",
+ "Nothing recorded uses it yet.": "아직 이것을 쓰는 기록이 없습니다.",
+ "Derived files ({n})": "파생 파일 ({n})",
+ "Datasets ({n})": "데이터셋 ({n})",
+ "Charts and tables ({n})": "차트와 표 ({n})",
+ "Data chain: {name}": "데이터 체인: {name}",
+ "{n} rows, imported {t}": "{n}행, {t}에 가져옴",
+ "Imported from": "가져온 파일",
+ "Where it comes from": "어디에서 왔는지",
+ "What depends on {name}": "{name}에 의존하는 것",
+ "{n} files in {dir}": "{dir}의 파일 {n}개",
+ "Data chain": "데이터 체인",
+ "Keep raw data in data/; Duetsheet only reads it. Put the files computed from it in derived_data/ and the scripts that compute them in scripts/.": "원본 데이터는 data/에 둡니다. Duetsheet는 읽기만 합니다. 여기서 계산한 파일은 derived_data/에, 계산 스크립트는 scripts/에 둡니다.",
+ "No computation steps are recorded yet. Ask your agent to record each script it runs (see AGENTS.md); every chart can then be traced back to its raw files.": "아직 기록된 계산 단계가 없습니다. 에이전트에게 스크립트를 실행할 때마다 기록하도록 요청하세요 (AGENTS.md 참고). 그러면 모든 차트를 원본 파일까지 추적할 수 있습니다.",
+ "{s} steps, {d} derived files, {r} raw files.": "단계 {s}개, 파생 파일 {d}개, 원본 파일 {r}개.",
+ "Checking files…": "파일 확인 중…",
+ "{n} steps need recomputing.": "{n}개 단계를 다시 계산해야 합니다.",
+ "All up to date.": "모두 최신입니다.",
+ "Some files are not checked.": "일부 파일은 확인하지 않았습니다.",
+ "Check again": "다시 확인",
+ "{d} derived, {r} raw": "파생 {d}개, 원본 {r}개",
+ "used by {n} charts or tables": "차트·표 {n}개에서 사용",
+ "Derived files ← script ← inputs": "파생 파일 ← 스크립트 ← 입력",
+ "{n} files": "파일 {n}개",
+ "What depends on these {n} files?": "이 {n}개 파일에 의존하는 것은?",
+ "Raw data ({n} files): click a folder or file to see what depends on it": "원본 데이터 (파일 {n}개): 폴더나 파일을 클릭하면 그것에 의존하는 것을 봅니다",
+ "Scripts ({n})": "스크립트 ({n})",
+ "Could not check the files of the data chain.": "데이터 체인의 파일을 확인하지 못했습니다.",
+ "Derived data (derived_data/)": "파생 데이터 (derived_data/)",
+ "Agent listening": "에이전트 대기 중",
+ "An agent is listening and will revise the report now.": "에이전트가 대기 중이며 바로 보고서를 수정합니다.",
+ "Ask the agent to revise": "에이전트에게 수정 요청",
+ "Ask the agent to revise ({n})": "에이전트에게 수정 요청 ({n})",
+ "Copy": "복사",
+ "Could not send the request to the agent.": "에이전트에게 요청을 보내지 못했습니다.",
+ "Finish this round ({n})": "이번 라운드 완료 ({n})",
+ "Get a prompt to paste": "붙여 넣을 프롬프트 받기",
+ "Go back to Claude, paste this, and add the link of this Artifact.": "Claude로 돌아가 이것을 붙여 넣고 이 Artifact 링크를 덧붙이세요.",
+ "Handle the open comments of the Duetsheet report in \"{folder}\". First read {agents} and follow \"Revise the report from the user's annotations\"; list the comments with: python \"{py}\" annotations \"{folder}\". When you are done, keep listening: run python \"{py}\" wait \"{folder}\" in the background and handle each new request the same way.": "\"{folder}\"에 있는 Duetsheet 보고서의 미처리 주석을 처리해 주세요. 먼저 {agents}를 읽고 \"Revise the report from the user's annotations\" 절을 따르세요. 주석 목록은 python \"{py}\" annotations \"{folder}\"로 볼 수 있습니다. 끝나면 계속 대기하세요: python \"{py}\" wait \"{folder}\"를 백그라운드에서 실행하고, 새 요청이 올 때마다 같은 방식으로 처리하세요.",
+ "Handle the open comments of the Duetsheet report in the folder \"{name}\" ({file}): read AGENTS.md of Duetsheet and follow \"Revise the report from the user's annotations\".": "폴더 \"{name}\"에 있는 Duetsheet 보고서({file})의 미처리 주석을 처리해 주세요: Duetsheet의 AGENTS.md를 읽고 \"Revise the report from the user's annotations\" 절을 따르세요.",
+ "Move the current changes into the history as one round.": "현재 변경 사항을 한 라운드로 기록에 넣습니다.",
+ "No agent has answered yet.": "아직 에이전트가 응답하지 않았습니다.",
+ "No agent is listening for this report right now. Your request is saved: paste this into your agent (Claude Code, Codex, Gemini CLI, ...). It picks up the request and then keeps listening for the next one.": "지금 이 보고서를 대기 중인 에이전트가 없습니다. 요청은 저장되었습니다. 아래 내용을 에이전트(Claude Code, Codex, Gemini CLI 등)에 붙여 넣으세요. 요청을 이어받고 다음 요청도 계속 기다립니다.",
+ "No agent is listening. You will get a prompt to paste into your agent.": "대기 중인 에이전트가 없습니다. 에이전트에 붙여 넣을 프롬프트를 드립니다.",
+ "Read the Duetsheet annotations in this Artifact and revise the report:": "이 Artifact의 Duetsheet 주석을 읽고 보고서를 수정해 주세요:",
+ "Request sent. Waiting for the agent…": "요청을 보냈습니다. 에이전트를 기다리는 중…",
+ "Save the report file, give it to your agent, and ask it to handle the open comments following AGENTS.md of Duetsheet.": "보고서 파일을 저장해 에이전트에게 주고, Duetsheet의 AGENTS.md에 따라 미처리 주석을 처리해 달라고 하세요.",
+ "Sent. The agent will revise the report; this page updates by itself.": "보냈습니다. 에이전트가 보고서를 수정하며 이 페이지는 자동으로 갱신됩니다.",
+ "The agent could not finish.": "에이전트가 끝내지 못했습니다.",
+ "The agent handled {n} comments.": "에이전트가 주석 {n}개를 처리했습니다.",
+ "The agent is revising the report…": "에이전트가 보고서를 수정하는 중…",
+ "This page cannot reach an agent by itself. Paste this into your agent:": "이 페이지는 에이전트에 직접 연락할 수 없습니다. 이것을 에이전트에 붙여 넣으세요:",
+ "{file} is outside \"{folder}\"": "{file}은(는) \"{folder}\" 밖에 있습니다",
+ "outside \"{folder}\"": "\"{folder}\" 밖",
+ "Keep raw data inside \"{folder}\" but outside duetsheet/; Duetsheet only reads it. Put the files computed from it in duetsheet/derived_data/ and the scripts that compute them in duetsheet/scripts/.": "원본 데이터는 \"{folder}\" 안, duetsheet/ 밖에 둡니다. Duetsheet는 읽기만 합니다. 여기서 계산한 파일은 duetsheet/derived_data/에, 계산 스크립트는 duetsheet/scripts/에 둡니다."
 },
 "es": {
  "_name": "Español",
@@ -2541,7 +2918,94 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "This file": "Este archivo",
  "What should change here? Ctrl + Enter to send.": "¿Qué debería cambiar aquí? Ctrl + Enter para enviar.",
  "{title} (read-only)": "{title} (solo lectura)",
- "… {n} more": "… {n} más"
+ "… {n} more": "… {n} más",
+ "1 derived file": "1 archivo derivado",
+ "1 raw file": "1 archivo original",
+ "{n} derived files": "{n} archivos derivados",
+ "{n} raw files": "{n} archivos originales",
+ "Source: {file}": "Origen: {file}",
+ "Click to see the whole data chain.": "Haz clic para ver toda la cadena de datos.",
+ "Up to date": "Al día",
+ "Needs recomputing": "Hay que recalcular",
+ "Not checked": "Sin comprobar",
+ "changed": "cambió",
+ "missing": "falta",
+ "no fingerprint": "sin huella",
+ "{file} is missing": "Falta {file}",
+ "{file} changed": "{file} cambió",
+ "{file} changed after the step was recorded": "{file} cambió después de registrar el paso",
+ "{file} changed since import": "{file} cambió desde la importación",
+ "{file} comes from a step that needs recomputing": "{file} viene de un paso que hay que recalcular",
+ "and {n} more": "y {n} más",
+ "Made by step \"{id}\"": "Generado por el paso \"{id}\"",
+ "Made by step \"{id}\", shown above.": "Generado por el paso \"{id}\", mostrado arriba.",
+ "Script": "Script",
+ "none (done by hand, see the note)": "ninguno (hecho a mano, ver la nota)",
+ "Command": "Comando",
+ "Parameters": "Parámetros",
+ "When": "Cuándo",
+ "by the agent": "por el agente",
+ "by you": "por ti",
+ "Derived inputs ({n})": "Entradas derivadas ({n})",
+ "Raw inputs ({n})": "Entradas originales ({n})",
+ "Everything this step wrote ({n})": "Todo lo que escribió este paso ({n})",
+ "Green: as recorded. Red: changed or missing, so everything computed from it needs recomputing. Grey: not checked yet.": "Verde: igual que lo registrado. Rojo: cambió o falta, así que todo lo calculado a partir de ello debe recalcularse. Gris: aún sin comprobar.",
+ "Files can only be checked when the report is opened from its folder, so the chain is shown in grey here.": "Los archivos solo se pueden comprobar cuando el informe se abre desde su carpeta; por eso aquí la cadena aparece en gris.",
+ "What depends on it": "Qué depende de él",
+ "Nothing recorded uses it yet.": "Todavía nada registrado lo usa.",
+ "Derived files ({n})": "Archivos derivados ({n})",
+ "Datasets ({n})": "Conjuntos de datos ({n})",
+ "Charts and tables ({n})": "Gráficos y tablas ({n})",
+ "Data chain: {name}": "Cadena de datos: {name}",
+ "{n} rows, imported {t}": "{n} filas, importado el {t}",
+ "Imported from": "Importado de",
+ "Where it comes from": "De dónde viene",
+ "What depends on {name}": "Qué depende de {name}",
+ "{n} files in {dir}": "{n} archivos en {dir}",
+ "Data chain": "Cadena de datos",
+ "Keep raw data in data/; Duetsheet only reads it. Put the files computed from it in derived_data/ and the scripts that compute them in scripts/.": "Guarda los datos originales en data/; Duetsheet solo los lee. Pon los archivos calculados a partir de ellos en derived_data/ y los scripts que los calculan en scripts/.",
+ "No computation steps are recorded yet. Ask your agent to record each script it runs (see AGENTS.md); every chart can then be traced back to its raw files.": "Aún no hay pasos de cálculo registrados. Pide a tu agente que registre cada script que ejecute (ver AGENTS.md); así cada gráfico se podrá rastrear hasta sus archivos originales.",
+ "{s} steps, {d} derived files, {r} raw files.": "{s} pasos, {d} archivos derivados, {r} archivos originales.",
+ "Checking files…": "Comprobando archivos…",
+ "{n} steps need recomputing.": "{n} pasos necesitan recalcularse.",
+ "All up to date.": "Todo está al día.",
+ "Some files are not checked.": "Algunos archivos no se han comprobado.",
+ "Check again": "Volver a comprobar",
+ "{d} derived, {r} raw": "{d} derivados, {r} originales",
+ "used by {n} charts or tables": "usado en {n} gráficos o tablas",
+ "Derived files ← script ← inputs": "Archivos derivados ← script ← entradas",
+ "{n} files": "{n} archivos",
+ "What depends on these {n} files?": "¿Qué depende de estos {n} archivos?",
+ "Raw data ({n} files): click a folder or file to see what depends on it": "Datos originales ({n} archivos): haz clic en una carpeta o archivo para ver qué depende de él",
+ "Scripts ({n})": "Scripts ({n})",
+ "Could not check the files of the data chain.": "No se pudieron comprobar los archivos de la cadena de datos.",
+ "Derived data (derived_data/)": "Datos derivados (derived_data/)",
+ "Agent listening": "Agente a la escucha",
+ "An agent is listening and will revise the report now.": "Hay un agente a la escucha; revisará el informe ahora.",
+ "Ask the agent to revise": "Pedir al agente que revise",
+ "Ask the agent to revise ({n})": "Pedir al agente que revise ({n})",
+ "Copy": "Copiar",
+ "Could not send the request to the agent.": "No se pudo enviar la petición al agente.",
+ "Finish this round ({n})": "Terminar esta ronda ({n})",
+ "Get a prompt to paste": "Obtener un texto para pegar",
+ "Go back to Claude, paste this, and add the link of this Artifact.": "Vuelve a Claude, pega esto y añade el enlace de este Artifact.",
+ "Handle the open comments of the Duetsheet report in \"{folder}\". First read {agents} and follow \"Revise the report from the user's annotations\"; list the comments with: python \"{py}\" annotations \"{folder}\". When you are done, keep listening: run python \"{py}\" wait \"{folder}\" in the background and handle each new request the same way.": "Atiende los comentarios abiertos del informe de Duetsheet en \"{folder}\". Primero lee {agents} y sigue \"Revise the report from the user's annotations\"; lista los comentarios con: python \"{py}\" annotations \"{folder}\". Cuando termines, sigue a la escucha: ejecuta python \"{py}\" wait \"{folder}\" en segundo plano y atiende cada nueva petición de la misma forma.",
+ "Handle the open comments of the Duetsheet report in the folder \"{name}\" ({file}): read AGENTS.md of Duetsheet and follow \"Revise the report from the user's annotations\".": "Atiende los comentarios abiertos del informe de Duetsheet en la carpeta \"{name}\" ({file}): lee el AGENTS.md de Duetsheet y sigue \"Revise the report from the user's annotations\".",
+ "Move the current changes into the history as one round.": "Pasa los cambios actuales al historial como una ronda.",
+ "No agent has answered yet.": "Ningún agente ha respondido todavía.",
+ "No agent is listening for this report right now. Your request is saved: paste this into your agent (Claude Code, Codex, Gemini CLI, ...). It picks up the request and then keeps listening for the next one.": "Ahora no hay ningún agente a la escucha de este informe. Tu petición está guardada: pega esto en tu agente (Claude Code, Codex, Gemini CLI, ...). Retomará la petición y seguirá a la escucha de la siguiente.",
+ "No agent is listening. You will get a prompt to paste into your agent.": "No hay ningún agente a la escucha. Recibirás un texto para pegar en tu agente.",
+ "Read the Duetsheet annotations in this Artifact and revise the report:": "Lee las anotaciones de Duetsheet de este Artifact y revisa el informe:",
+ "Request sent. Waiting for the agent…": "Petición enviada. Esperando al agente…",
+ "Save the report file, give it to your agent, and ask it to handle the open comments following AGENTS.md of Duetsheet.": "Guarda el archivo del informe, dáselo a tu agente y pídele que atienda los comentarios abiertos siguiendo el AGENTS.md de Duetsheet.",
+ "Sent. The agent will revise the report; this page updates by itself.": "Enviado. El agente revisará el informe; esta página se actualiza sola.",
+ "The agent could not finish.": "El agente no pudo terminar.",
+ "The agent handled {n} comments.": "El agente atendió {n} comentarios.",
+ "The agent is revising the report…": "El agente está revisando el informe…",
+ "This page cannot reach an agent by itself. Paste this into your agent:": "Esta página no puede contactar a un agente por sí sola. Pega esto en tu agente:",
+ "{file} is outside \"{folder}\"": "{file} está fuera de \"{folder}\"",
+ "outside \"{folder}\"": "fuera de \"{folder}\"",
+ "Keep raw data inside \"{folder}\" but outside duetsheet/; Duetsheet only reads it. Put the files computed from it in duetsheet/derived_data/ and the scripts that compute them in duetsheet/scripts/.": "Guarda los datos originales dentro de \"{folder}\" pero fuera de duetsheet/; Duetsheet solo los lee. Pon los archivos calculados a partir de ellos en duetsheet/derived_data/ y los scripts que los calculan en duetsheet/scripts/."
 }
 }
 </script>
@@ -2719,7 +3183,7 @@ function memDB(initial,onWrite){
 
 /* ---------- State ---------- */
 const S={mode:'view',page:0,tab:'annos',filter:'all',showHist:false,histRound:null,
-  meta:null,blocks:new Map(),datasets:new Map(),annos:[],changes:[],rounds:[],
+  meta:null,blocks:new Map(),datasets:new Map(),annos:[],changes:[],rounds:[],steps:new Map(),fstate:null,
   pages:[],starts:new Map(),heights:new Map(),geo:{},
   drafts:new Map(),draw:null,lastSel:{},deferred:false,cloud:false,openSet:null,
   style:null,examples:[],caps:{},assetURL:new Map(),proposal:null,learning:false,
@@ -2875,6 +3339,7 @@ function buildViewBlock(b,interactive){
   else if(b.type==='image')buildImage(b,d,interactive);
   else if(b.type==='outline')d.append(buildOutline(b));
   if(b.caption&&b.type!=='text'&&b.type!=='outline')d.append(h('p',{class:'cap',text:b.caption}));
+  const src=sourceLine(b);if(src)d.append(src);
   return d;
 }
 /* Outline: the titled blocks after this one, with their page; text titles are headings, figure and table titles sit under them */
@@ -2996,6 +3461,7 @@ function editForm(b){
   else if(b.type==='image')buildImage(b,preview,true);
   box.append(h('input',{type:'text',class:'ed-cap',value:b.caption||'',placeholder:tr('Caption (optional)'),'data-fid':fid(b,'caption'),
     onchange:e=>saveBlock({...b,caption:e.target.value.trim()})}));
+  const src=sourceLine(b);if(src)box.append(src);
   const det=h('details',{class:'set'});det.append(h('summary',{text:tr('{t} settings',{t:typeName(b.type)})}));
   const form=h('div',{class:'form'});det.append(form);box.append(det);
   if(S.openSet===b.id)det.open=true;
@@ -3306,7 +3772,8 @@ function renderEdit(){
     card.append(h('div',{class:'chead'},[
       h('span',{class:'hdl',title:tr('Drag to reorder'),text:'⠿'}),h('span',{text:typeName(b.type)}),
       tooTall?h('span',{class:'warn',text:tr('Taller than one page; it will shrink or scroll in view mode')}):null,
-      S.stale.has((b.chart||b.table||{}).dataset)?h('span',{class:'warn',text:tr('Source data changed since import')}):null,
+      S.stale.has((b.chart||b.table||{}).dataset)?h('span',{class:'warn',text:tr('Source data changed since import')}):
+        blockChainState(b)==='stale'?h('span',{class:'warn',text:tr('Needs recomputing')}):null,
       h('span',{class:'sp'}),
       h('button',{type:'button',class:'btn small',text:tr('Up'),disabled:i===0?'':null,onclick:()=>move(b.id,-1)}),
       h('button',{type:'button',class:'btn small',text:tr('Down'),disabled:i===blocks.length-1?'':null,onclick:()=>move(b.id,1)}),
@@ -3433,6 +3900,7 @@ function renderChanges(){
       h('ol',{class:'chlist'},list.map(changeItem))]);if(S.histRound===r.id)det.open=true;hl.append(det)});
 }
 function renderPanel(){
+  S.chainMemo=null;renderAgentBar();
   const open=S.annos.filter(a=>a.status!=='done').length,curN=currentChanges().length;
   $('#togglePanel').textContent=tr('Panel (comments {a}, changes {b})',{a:open,b:curN});
   $$('#tabs button').forEach(b=>{b.setAttribute('aria-selected',String(b.dataset.tab===S.tab));
@@ -3730,12 +4198,12 @@ function pointLines(b,ds,r,max){
   const cols=[...first.map(k=>ds.columns.find(x=>x.key===k)).filter(Boolean),...ds.columns.filter(x=>!first.includes(x.key))];
   const lines=cols.map(x=>x.label+': '+(x.key==='id'?'#'+r[x.key]:fmt(r[x.key])));
   return lines.length>max?[...lines.slice(0,max),tr('… {n} more',{n:lines.length-max})]:lines}
-// Clicking a data point (view or edit mode, not while drawing) opens the comment dialog next to it
+// Clicking a data point in edit mode (not while drawing) opens the comment dialog next to it; view mode is for reading
 document.addEventListener('click',e=>{
-  if(S.readonly||S.draw)return;const pt=e.target.closest&&e.target.closest('#flow .pt, #pagehost .pt');if(!pt||!pt.dataset.row)return;
-  const host=pt.closest('.cw,.blk'),id=host&&host.dataset.id;if(!id||!S.blocks.has(id))return;
+  if(S.readonly||S.draw||S.mode!=='edit')return;const pt=e.target.closest&&e.target.closest('#flow .pt');if(!pt||!pt.dataset.row)return;
+  const host=pt.closest('.cw'),id=host&&host.dataset.id;if(!id||!S.blocks.has(id))return;
   draftOf(id).target={kind:'point',blockId:id,rowId:+pt.dataset.row};
-  if(S.mode==='edit')render();else paintAllOverlays();
+  render();
   openQuick(id,e.clientX,e.clientY);
 });
 document.addEventListener('pointermove',e=>{
@@ -3785,7 +4253,7 @@ function editingNow(){const a=document.activeElement;return a&&a.closest&&a.clos
 function render(){
   if(!S.meta)return;
   if(editingNow()){S.deferred=true;return}
-  S.deferred=false;
+  S.deferred=false;S.chainMemo=null;
   const focusF=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.fid;
   paginate();
   $('#doc-title').textContent=S.meta.title||'Duetsheet';document.title=(S.meta.title||'Duetsheet')+tr(' | Duetsheet');
@@ -3910,10 +4378,11 @@ async function connectServer(){
   try{if(token){sessionStorage.setItem('duetsheet-token',token);history.replaceState(null,'',location.pathname+location.search)}else token=sessionStorage.getItem('duetsheet-token')}catch(e){}
   if(!token)return false;
   let info;try{const r=await fetch('/api/info',{headers:{'X-Duetsheet-Token':token}});if(!r.ok)return false;info=await r.json()}catch(e){return false}
-  S.server={info,log:e=>fetch('/api/log',{method:'POST',headers:{'X-Duetsheet-Token':token,'Content-Type':'application/json'},body:JSON.stringify(e)}).catch(()=>{})};
+  S.server={info,token,log:e=>fetch('/api/log',{method:'POST',headers:{'X-Duetsheet-Token':token,'Content-Type':'application/json'},body:JSON.stringify(e)}).catch(()=>{})};
   LOG.forEach(e=>S.server.log(e)); // problems logged before the connection
   await openFolder(httpRoot(token,info.name),false);
   if(!S.folder)renderLocalBar();
+  pollAgent();setInterval(pollAgent,2000); // is an agent listening, and what is it doing
   return true;
 }
 
@@ -3922,12 +4391,14 @@ async function connectServer(){
 //   report.json  the report: { "schema": ..., "<collection>": { "<id>": document } }
 //   assets/      uploaded images and files, named <asset id>.<ext>
 //   data/        raw data put there by the user or an agent; imported into datasets with their source recorded
+//                (in a raw data folder, the raw data is the folder itself, outside duetsheet/)
+//   derived_data/, scripts/  tables computed from the raw data and the scripts that compute them (see steps, the data chain)
 //   habits/      example figures, .mplstyle files and profile.json, used to learn the user's figure style
 //   exports/     files the page exports (styles, report copies, translation templates)
 //   lang/        extra interface translations
 // An agent can edit report.json while the page is open: the page reloads it, and merges by document when both wrote.
 const FS_OK=typeof window.showDirectoryPicker==='function';
-const REPORT_FILE='report.json',SCHEMA='duetsheet/0.5';
+const REPORT_FILE='report.json',SCHEMA='duetsheet/0.6';
 const DATA_EXT=/\.(csv|tsv|txt|json)$/i,HABIT_EXT=/\.(svg|mplstyle|png|jpe?g|webp|gif|json)$/i;
 const ASSET_EXT={'image/svg+xml':'svg','image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/gif':'gif','text/csv':'csv','text/plain':'txt','application/json':'json'};
 function docsFromReport(j){
@@ -3944,7 +4415,7 @@ function reportFromState(){ // the report as shown now, in report.json form (sam
   const d={'report/meta':S.meta};
   S.blocks.forEach((b,id)=>{d['blocks/'+id]=b});S.datasets.forEach((x,id)=>{d['datasets/'+id]=x});
   S.annos.forEach(a=>{d['annotations/'+a.id]=a});S.changes.forEach(c=>{d['changes/'+c.id]=c});S.rounds.forEach(r=>{d['rounds/'+r.id]=r});
-  S.examples.forEach(x=>{d['examples/'+x.id]=x});if(S.style)d['style/profile']=S.style;
+  S.examples.forEach(x=>{d['examples/'+x.id]=x});S.steps.forEach((x,id)=>{d['steps/'+id]=x});if(S.style)d['style/profile']=S.style;
   return reportFromDocs(d);
 }
 const hex=buf=>[...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
@@ -4018,7 +4489,7 @@ function starterDocs(name){const t=now(),id='b-start';
     ['blocks/'+id]:{id,type:'text',title:'',caption:'',breakBefore:'auto',createdAt:t,
       text:tr('Raw data files in this folder are listed in the Folder tab. Ask your agent to write the report (see AGENTS.md), or add blocks yourself in Edit mode.')}}}
 function useDB(next){db=next;
-  Object.assign(S,{meta:null,blocks:new Map(),datasets:new Map(),annos:[],changes:[],rounds:[],style:null,examples:[],agentProposal:null,proposal:null,drafts:new Map(),page:0,stale:new Set(),folderFiles:null});
+  Object.assign(S,{meta:null,blocks:new Map(),datasets:new Map(),annos:[],changes:[],rounds:[],steps:new Map(),fstate:null,style:null,examples:[],agentProposal:null,proposal:null,drafts:new Map(),page:0,stale:new Set(),folderFiles:null});
   subscribe()}
 async function pickFolder(){let dir;try{dir=await window.showDirectoryPicker({mode:'readwrite',id:'duetsheet'})}catch(e){return}await openFolder(dir,true)}
 async function openFolder(root,ask){
@@ -4107,13 +4578,11 @@ async function refreshFolderFiles(){
   const data=await Promise.all(found.map(async({fh,rel})=>{const f=fh.meta||await fh.getFile();
     return{name:rel,path:F.prefix+rel,fh,size:f.size,modified:new Date(f.lastModified).toISOString()}}));
   const habits=(await listFiles(await subdir(dir,'habits'),HABIT_EXT)).map(fh=>fh.name);
-  // a dataset is stale when its source file changed after the import: size and date first, then the content hash
-  const stale=new Set();
-  for(const ds of S.datasets.values()){const src=ds.source,f=src&&data.find(x=>x.path===src.path);if(!f)continue;
-    if(f.size===src.size&&f.modified===src.modified)continue;
-    if(await sha256(await(await f.fh.getFile()).arrayBuffer())!==src.sha256)stale.add(ds.id)}
-  const changed=!same([...stale].sort(),[...(S.stale||[])].sort());
-  S.folderFiles={data,habits};S.stale=stale;renderPanel();if(changed&&S.mode==='edit')render();
+  const der=(await listDeep(await subdir(dir,'derived_data'),DATA_EXT,'derived_data/')).sort((a,b)=>a.rel<b.rel?-1:1);
+  const derived=await Promise.all(der.map(async({fh,rel})=>{const f=fh.meta||await fh.getFile();
+    return{name:rel,path:rel,fh,size:f.size,modified:new Date(f.lastModified).toISOString()}}));
+  S.folderFiles={data,derived,habits};renderPanel();
+  scheduleVerify(); // whether imported files changed: see verifyChain()
 }
 function parseDelimited(txt){
   const first=txt.split(/\r?\n/,1)[0];const d=[',','\t',';'].map(c=>[c,first.split(c).length]).sort((a,b)=>b[1]-a[1])[0][0];
@@ -4222,26 +4691,304 @@ async function saveHabits(){
     toast(tr('Saved to {p}',{p:'habits/profile.json'}));refreshFolderFiles()}
   catch(e){fail(tr('Save failed. Please try again.'),e)}
 }
-function renderFolder(){
-  const box=$('#tab-folder');box.replaceChildren();if(!S.folder)return;
-  const F=S.folderFiles||{data:[],habits:[]},B=(t,fn,cls,dis)=>h('button',{type:'button',class:'btn small'+(cls?' '+cls:''),text:t,disabled:dis?'':null,onclick:fn});
-  box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Project folder')}),
-    h('p',{class:'cap',text:tr('"{name}". The report is saved to {file} automatically. An agent can read and edit the same folder (see AGENTS.md).',{name:S.folder.name,file:S.folder.file})}),
-    h('div',{class:'crow'},[B(tr('Refresh'),refreshFolderFiles)])]));
+/* ---------- Data chain ----------
+   steps/{id} records one computation: a script turned input files into output files. A file is known by its path
+   (relative to the folder of report.json) and its SHA-256; a file that no step produced is raw data. Following the
+   source file of a dataset back through the steps that made it gives the whole chain, down to the raw files.
+   A step needs recomputing when its script or an input changed, or an input comes from a step that needs recomputing.
+   The page checks the files itself: through the launcher, which keeps a fingerprint cache on disk, or directly in a
+   folder opened in the page. Size and modification time are compared first, so large raw files are only read when
+   they differ. In a Claude Artifact or a read-only copy nothing can be checked, and the chain is shown in grey. */
+const SLACK_MS=2000; // copies and sync clients may move the modification time a little
+function normPath(p){const out=[];String(p||'').replace(/\\/g,'/').split('/').forEach(s=>{if(!s||s==='.')return;
+  if(s==='..'&&out.length&&out[out.length-1]!=='..')out.pop();else out.push(s)});return out.join('/')}
+const isAbsPath=p=>/^([A-Za-z]:|[\\/])/.test(String(p||''));
+const baseName=p=>normPath(p).split('/').pop();
+const refKey=r=>normPath(r.path)+'|'+(r.sha256||'')+'|'+(r.size??'')+'|'+(r.modified||'');
+const fmtBytes=n=>n==null?'':n<1024?n+' B':n<1048576?(n/1024).toFixed(1)+' kB':(n/1048576).toFixed(1)+' MB';
+function stepFiles(s){const out=[];if(s.script&&s.script.path)out.push(['script',s.script]);
+  (s.inputs||[]).forEach(r=>{if(r&&r.path)out.push(['input',r])});(s.outputs||[]).forEach(r=>{if(r&&r.path)out.push(['output',r])});return out}
+const worst=list=>list.includes('stale')?'stale':list.every(x=>x==='ok')?'ok':'unchecked';
+const fileState=r=>{const f=r&&S.fstate&&S.fstate.get(refKey(r));return f?f.state:null}; // same, changed, missing, outside, unknown
+const stateOf=st=>st==='same'?'ok':st==='changed'||st==='missing'||st==='outside'?'stale':'unchecked';
+const rootName=()=>(S.folder&&S.folder.name)||'';
+function fileWhy(r,role){const st=fileState(r),f={file:r.path};
+  return st==='missing'?tr('{file} is missing',f):st==='outside'?tr('{file} is outside "{folder}"',{...f,folder:rootName()})
+    :st==='changed'?(role==='output'?tr('{file} changed after the step was recorded',f):role==='source'?tr('{file} changed since import',f):tr('{file} changed',f)):null}
+function chain(){ // the graph of steps, files, datasets and blocks; rebuilt on every render
+  if(S.chainMemo)return S.chainMemo;
+  const steps=[...S.steps.values()].filter(s=>s&&typeof s.id==='string'&&Array.isArray(s.outputs)).sort((a,b)=>(a.at||'')<(b.at||'')?-1:1);
+  const add=(m,k,v)=>{const l=m.get(k)||m.set(k,[]).get(k);if(!l.includes(v))l.push(v)};
+  const madeBy=new Map(),usedBy=new Map(),refOf=new Map(),inputs=new Set(),scripts=new Set(),blocksOf=new Map();
+  steps.forEach(s=>stepFiles(s).forEach(([role,r])=>{if(role==='output'){const p=normPath(r.path);madeBy.set(p,s);refOf.set(p,r)}})); // the latest step wins
+  steps.forEach(s=>stepFiles(s).forEach(([role,r])=>{if(role==='output')return;const p=normPath(r.path);add(usedBy,p,s);if(!refOf.has(p))refOf.set(p,r);(role==='script'?scripts:inputs).add(p)}));
+  orderedBlocks().forEach(b=>{const id=(b.type==='chart'||b.type==='table')&&(b.chart||b.table||{}).dataset;if(id)add(blocksOf,id,b)});
+  const memo=new Map();
+  function stepStatus(s,trail){
+    if(memo.has(s.id))return memo.get(s.id);
+    if(trail&&trail.has(s.id))return{state:'ok',why:[]}; // the records form a loop; stop here
+    const t=new Set(trail||[]).add(s.id),why=[],states=[];
+    stepFiles(s).forEach(([role,r])=>{const w=fileWhy(r,role);if(w)why.push(w);else states.push(stateOf(fileState(r)))});
+    (s.inputs||[]).forEach(r=>{const up=r&&r.path&&madeBy.get(normPath(r.path));if(!up||up===s)return;const u=stepStatus(up,t);
+      if(u.state==='stale')why.push(tr('{file} comes from a step that needs recomputing',{file:r.path}));else states.push(u.state)});
+    const res={state:why.length?'stale':worst(states),why};memo.set(s.id,res);return res}
+  function datasetStatus(d){
+    const src=d.source,up=madeBy.get(normPath(src.path)),u=up?stepStatus(up):null,w=fileWhy(src,'source'),why=w?[w]:[];
+    if(u&&u.state==='stale')why.push(...u.why);
+    return{state:why.length?'stale':worst([stateOf(fileState(src)),u?u.state:'ok']),why,step:up||null}}
+  function downstream(paths){ // everything computed from these files, step after step
+    const start=paths.map(normPath),files=new Set(),done=new Set(),queue=[...start];
+    while(queue.length)(usedBy.get(queue.shift())||[]).forEach(s=>{if(done.has(s))return;done.add(s);
+      s.outputs.forEach(r=>{if(!r||!r.path)return;const q=normPath(r.path);if(!files.has(q)){files.add(q);queue.push(q)}})});
+    const all=new Set([...start,...files]);
+    const datasets=[...S.datasets.values()].filter(d=>d.source&&d.source.path&&all.has(normPath(d.source.path)));
+    return{files:[...files],datasets,blocks:datasets.flatMap(d=>blocksOf.get(d.id)||[])}}
+  return S.chainMemo={steps,madeBy,refOf,stepStatus,datasetStatus,downstream,
+    derived:[...madeBy.keys()],raw:[...inputs].filter(p=>!madeBy.has(p)).sort(),scripts:[...scripts].sort()};
+}
+function blockDataset(b){const id=(b.type==='chart'||b.type==='table')&&(b.chart||b.table||{}).dataset,d=id&&S.datasets.get(id);return d&&d.source&&d.source.path?d:null}
+function blockChainState(b){const d=blockDataset(b);return d?chain().datasetStatus(d).state:null}
+const STATE_TEXT={ok:'Up to date',stale:'Needs recomputing',unchecked:'Not checked'};
+const dot=st=>h('span',{class:'dot '+(st||''),title:tr(STATE_TEXT[st]||'Not checked')});
+const scriptName=s=>s.script&&s.script.path?baseName(s.script.path):s.id;
+function inputCount(C,s){const ins=(s.inputs||[]).filter(r=>r&&r.path),d=ins.filter(r=>C.madeBy.has(normPath(r.path))).length;return{d,r:ins.length-d}}
+function sourceLine(b){ // under a chart or table: where its data comes from, with the state of the whole chain
+  const d=blockDataset(b);if(!d)return null;
+  const C=chain(),st=C.datasetStatus(d),s=st.step,parts=[tr('Source: {file}',{file:baseName(d.source.path)})];
+  if(s){parts.push(scriptName(s));const n=inputCount(C,s),ins=[];
+    if(n.d)ins.push(n.d===1?tr('1 derived file'):tr('{n} derived files',{n:n.d}));
+    if(n.r)ins.push(n.r===1?tr('1 raw file'):tr('{n} raw files',{n:n.r}));
+    if(ins.length)parts.push(ins.join(tr(', ')))}
+  return h('button',{type:'button',class:'srcl',title:tr(STATE_TEXT[st.state])+'. '+tr('Click to see the whole data chain.'),
+    onclick:e=>{e.stopPropagation();openChain(d,b)}},[dot(st.state),h('span',{class:'t',text:parts.join(' ← ')})]);
+}
+function fileRow(r){ // one file: state, path, fingerprint, size, date
+  const w=fileState(r),meta=[r.sha256?'sha256 '+String(r.sha256).slice(0,8):tr('no fingerprint'),fmtBytes(r.size),r.modified?shortTime(r.modified):''].filter(Boolean);
+  return h('div',{class:'fr'},[dot(stateOf(w)),h('span',{class:'mono',text:r.path}),h('span',{class:'meta',text:meta.join(' · ')}),
+    w==='changed'||w==='missing'||w==='outside'?h('span',{class:'bad',text:w==='outside'?tr('outside "{folder}"',{folder:rootName()}):tr({changed:'changed',missing:'missing'}[w])}):null]);
+}
+function groupByFolder(refs){const m=new Map();
+  refs.forEach(r=>{const p=normPath(r.path),i=p.lastIndexOf('/'),k=i<0?'./':p.slice(0,i+1);(m.get(k)||m.set(k,[]).get(k)).push(r)});
+  return[...m.entries()].sort((a,b)=>a[0]<b[0]?-1:1)}
+function lazyDetails(summary,fill,key){ // a <details> whose content is built when it is first opened (a folder may hold hundreds of files)
+  const det=h('details',{},[h('summary',{},summary)]);let filled=false;
+  const go=()=>{if(det.open&&!filled){filled=true;det.append(...fill())}};
+  det.addEventListener('toggle',()=>{go();if(key){S.openGroups=S.openGroups||new Set();det.open?S.openGroups.add(key):S.openGroups.delete(key)}});
+  if(key&&S.openGroups&&S.openGroups.has(key)){det.open=true;go()}
+  return det}
+function rawList(refs){
+  if(refs.length<=4)return refs.map(fileRow);
+  return groupByFolder(refs).map(([dir,list])=>lazyDetails([dot(worst(list.map(r=>stateOf(fileState(r))))),h('span',{class:'mono',text:dir}),
+    h('span',{class:'meta',text:tr('{n} files',{n:list.length})})],()=>list.map(fileRow)))}
+function whyList(why){return why.length?h('ul',{class:'why'},[...why.slice(0,8).map(w=>h('li',{text:w})),why.length>8?h('li',{text:tr('and {n} more',{n:why.length-8})}):null]):null}
+function stepNode(s,C,seen,open){ // a step: state, script, command, parameters, then its inputs (derived ones followed further up)
+  const st=C.stepStatus(s),det=h('details',{});det.open=!!open||st.state==='stale';
+  det.append(h('summary',{},[dot(st.state),h('span',{class:'st',text:tr('Made by step "{id}"',{id:s.id})}),h('span',{class:'meta',text:tr(STATE_TEXT[st.state])})]),whyList(st.why)||'');
+  const kv=h('div',{class:'kv'}),row=(k,v)=>{if(v)kv.append(h('span',{text:k}),typeof v==='string'?h('span',{class:'mono',text:v}):v)};
+  row(tr('Script'),s.script&&s.script.path?fileRow(s.script):h('span',{text:tr('none (done by hand, see the note)')}));
+  row(tr('Command'),s.command||'');
+  row(tr('Parameters'),s.params&&typeof s.params==='object'&&Object.keys(s.params).length?JSON.stringify(s.params):'');
+  row(tr('When'),h('span',{text:[shortTime(s.at),s.by==='claude'?tr('by the agent'):s.by==='user'?tr('by you'):''].filter(Boolean).join(' ')}));
+  row(tr('Note'),s.note?h('span',{text:s.note}):'');
+  det.append(kv);
+  const ins=(s.inputs||[]).filter(r=>r&&r.path),der=ins.filter(r=>C.madeBy.has(normPath(r.path))),raw=ins.filter(r=>!C.madeBy.has(normPath(r.path)));
+  if(der.length)det.append(h('h5',{text:tr('Derived inputs ({n})',{n:der.length})}),...der.map(r=>fileNode(r,C,seen,false)));
+  if(raw.length)det.append(h('h5',{text:tr('Raw inputs ({n})',{n:raw.length})}),...rawList(raw));
+  const outs=(s.outputs||[]).filter(r=>r&&r.path);
+  if(outs.length>1)det.append(h('h5',{text:tr('Everything this step wrote ({n})',{n:outs.length})}),...outs.map(fileRow));
+  return det;
+}
+function fileNode(r,C,seen,open){const s=C.madeBy.get(normPath(r.path));
+  if(!s)return fileRow(r);
+  if(seen.has(s.id))return h('div',{},[fileRow(r),h('p',{class:'meta',text:tr('Made by step "{id}", shown above.',{id:s.id})})]);
+  return h('div',{},[fileRow(r),stepNode(s,C,new Set(seen).add(s.id),open)])}
+function chainNote(){return h('p',{class:'cap',text:S.folder
+  ?tr('Green: as recorded. Red: changed or missing, so everything computed from it needs recomputing. Grey: not checked yet.')
+  :tr('Files can only be checked when the report is opened from its folder, so the chain is shown in grey here.')})}
+function usedIn(D){ // what was computed from some files: derived files, datasets, charts and tables
+  const C=chain(),out=[h('h5',{text:tr('What depends on it')})];
+  if(!D.files.length&&!D.datasets.length)return[...out,h('p',{class:'meta',text:tr('Nothing recorded uses it yet.')})];
+  if(D.files.length)out.push(h('p',{class:'meta',text:tr('Derived files ({n})',{n:D.files.length})}),
+    ...D.files.map(p=>h('div',{class:'fr'},[dot(C.stepStatus(C.madeBy.get(p)).state),h('button',{type:'button',class:'linkbtn mono',text:p,onclick:()=>openFile(p)})])));
+  if(D.datasets.length)out.push(h('p',{class:'meta',text:tr('Datasets ({n})',{n:D.datasets.length})}),
+    ...D.datasets.map(d=>h('div',{class:'fr'},[dot(C.datasetStatus(d).state),h('button',{type:'button',class:'linkbtn',text:d.title||d.id,onclick:()=>openChain(d)})])));
+  if(D.blocks.length)out.push(h('p',{class:'meta',text:tr('Charts and tables ({n})',{n:D.blocks.length})}),
+    ...D.blocks.map(b=>h('div',{class:'fr'},[dot(blockChainState(b)),h('button',{type:'button',class:'linkbtn',text:blockLabel(b)||typeName(b.type),onclick:()=>{closeModal();jumpTo(b.id)}})])));
+  return out;
+}
+function openChain(d,b){ // from a chart, table or dataset: all the way up to the raw files
+  const C=chain(),st=C.datasetStatus(d);
+  openModal(tr('Data chain: {name}',{name:(b&&b.title)||d.title||d.id}),[h('div',{class:'chain'},[
+    h('div',{class:'chsum'},[dot(st.state),h('span',{class:'st',text:tr(STATE_TEXT[st.state])})]),whyList(st.why),
+    h('h5',{text:tr('Dataset')}),h('div',{class:'fr'},[h('span',{text:d.title||d.id}),h('span',{class:'meta',text:tr('{n} rows, imported {t}',{n:(d.rows||[]).length,t:shortTime(d.source.importedAt)})})]),
+    h('h5',{text:tr('Imported from')}),fileNode(d.source,C,new Set(),true),chainNote()])]);
+}
+function openFile(path){ // from the overview: where a file comes from, and what depends on it
+  const C=chain(),p=normPath(path),r=C.refOf.get(p)||{path:p};
+  openModal(tr('Data chain: {name}',{name:baseName(p)}),[h('div',{class:'chain'},[
+    h('h5',{text:C.madeBy.has(p)?tr('Where it comes from'):C.scripts.includes(p)?tr('Script'):tr('Raw data file')}),fileNode(r,C,new Set(),true),
+    ...usedIn(C.downstream([p])),chainNote()])]);
+}
+function openFiles(paths,label){
+  openModal(tr('What depends on {name}',{name:label}),[h('div',{class:'chain'},[
+    h('p',{class:'meta',text:tr('{n} files in {dir}',{n:paths.length,dir:label})}),...usedIn(chain().downstream(paths)),chainNote()])]);
+}
+function chainSection(){ // Folder tab: every derived file, raw file and script, with what depends on it
+  const C=chain(),sec=h('div',{class:'stsec'});
+  sec.append(h('h4',{text:tr('Data chain')}),h('p',{class:'cap',text:S.folder.prefix==='../'
+    ?tr('Keep raw data inside "{folder}" but outside duetsheet/; Duetsheet only reads it. Put the files computed from it in duetsheet/derived_data/ and the scripts that compute them in duetsheet/scripts/.',{folder:rootName()})
+    :tr('Keep raw data in data/; Duetsheet only reads it. Put the files computed from it in derived_data/ and the scripts that compute them in scripts/.')}));
+  if(!C.steps.length){sec.append(h('p',{class:'cap',text:tr('No computation steps are recorded yet. Ask your agent to record each script it runs (see AGENTS.md); every chart can then be traced back to its raw files.')}));return sec}
+  const states=C.steps.map(s=>C.stepStatus(s).state),stale=states.filter(x=>x==='stale').length,all=S.checking?'unchecked':worst(states);
+  sec.append(h('div',{class:'chsum'},[dot(all),h('span',{text:tr('{s} steps, {d} derived files, {r} raw files.',{s:C.steps.length,d:C.derived.length,r:C.raw.length})+' '+
+      (S.checking?tr('Checking files…'):stale?tr('{n} steps need recomputing.',{n:stale}):all==='ok'?tr('All up to date.'):tr('Some files are not checked.'))}),
+    h('button',{type:'button',class:'btn small',style:'margin-left:auto',text:tr('Check again'),disabled:S.checking?'':null,onclick:()=>verifyChain()})]));
+  const link=(t,fn)=>h('button',{type:'button',class:'linkbtn fname',text:t,onclick:fn});
   const dl=h('ul',{class:'flist'});
-  if(!F.data.length)dl.append(h('li',{class:'empty',text:(S.folder.prefix==='../'?tr('No CSV, TSV or JSON files in this folder yet. Add some, then click Refresh.'):tr('No files yet. Put CSV, TSV or JSON files in the data/ folder, then click Refresh.'))}));
-  F.data.forEach(f=>{const ds=[...S.datasets.values()].find(d=>d.source&&d.source.path===f.path),stale=!!ds&&S.stale.has(ds.id);
+  C.steps.forEach(s=>{const st=C.stepStatus(s).state,n=inputCount(C,s);
+    s.outputs.filter(r=>r&&r.path&&C.madeBy.get(normPath(r.path))===s).forEach(r=>{const p=normPath(r.path),D=C.downstream([p]);
+      dl.append(h('li',{},[dot(st),link(p,()=>openFile(p)),h('span',{class:'fstat'+(st==='stale'?' stale':''),
+        text:'← '+scriptName(s)+' ← '+tr('{d} derived, {r} raw',{d:n.d,r:n.r})+(D.blocks.length?' · '+tr('used by {n} charts or tables',{n:D.blocks.length}):'')})]))})});
+  sec.append(h('h5',{text:tr('Derived files ← script ← inputs')}),dl);
+  const rl=h('ul',{class:'flist'});
+  groupByFolder(C.raw.map(p=>C.refOf.get(p))).forEach(([dir,list])=>rl.append(h('li',{},[lazyDetails(
+    [dot(worst(list.map(r=>stateOf(fileState(r))))),h('span',{class:'fname',text:dir}),h('span',{class:'fstat',text:tr('{n} files',{n:list.length})})],
+    ()=>[h('button',{type:'button',class:'linkbtn',text:tr('What depends on these {n} files?',{n:list.length}),onclick:()=>openFiles(list.map(r=>r.path),dir)}),
+      h('ul',{class:'chlinks'},list.map(r=>h('li',{class:'fr'},[dot(stateOf(fileState(r))),link(baseName(r.path),()=>openFile(r.path))])))],'raw:'+dir)])));
+  sec.append(h('h5',{text:tr('Raw data ({n} files): click a folder or file to see what depends on it',{n:C.raw.length})}),rl);
+  if(C.scripts.length)sec.append(h('h5',{text:tr('Scripts ({n})',{n:C.scripts.length})}),
+    h('ul',{class:'flist'},C.scripts.map(p=>h('li',{},[dot(stateOf(fileState(C.refOf.get(p)))),link(p,()=>openFile(p))]))));
+  return sec;
+}
+/* Checking the files: the launcher answers for all of them at once; in a folder opened in the page, the page reads them */
+let verifyT=null;
+function scheduleVerify(){clearTimeout(verifyT);verifyT=setTimeout(verifyChain,300)}
+const hashMemo=new Map(); // path|size|time -> sha256, for this page session
+async function localFingerprint(r){
+  const F=S.folder,out={path:r.path,state:'missing'};
+  if(isAbsPath(r.path))return{...out,state:'outside'};
+  const segs=normPath((F.dir!==F.root?F.dir.name+'/':'')+normPath(r.path)).split('/');
+  if(segs[0]==='..')return{...out,state:'outside'};
+  try{let d=F.root;for(const s of segs.slice(0,-1))d=await d.getDirectoryHandle(s);
+    const f=await(await d.getFileHandle(segs[segs.length-1])).getFile(),rec=r.modified?Date.parse(r.modified):NaN;
+    Object.assign(out,{size:f.size,modified:new Date(f.lastModified).toISOString()});
+    if(r.sha256&&r.size===f.size&&Math.abs(rec-f.lastModified)<=SLACK_MS)return{...out,state:'same',sha256:r.sha256};
+    const k=normPath(r.path)+'|'+f.size+'|'+f.lastModified;let sha=hashMemo.get(k);
+    if(!sha){sha=await sha256(await f.arrayBuffer());hashMemo.set(k,sha)}
+    return{...out,sha256:sha,state:!r.sha256?'unknown':sha===r.sha256?'same':'changed'}}
+  catch(e){return out}
+}
+async function serverFingerprints(list){
+  const r=await fetch('/api/fingerprints',{method:'POST',headers:{'X-Duetsheet-Token':S.server.token,'Content-Type':'application/json'},body:JSON.stringify({files:list})});
+  if(!r.ok)throw new Error(r.status+' '+await r.text());return r.json()}
+async function verifyChain(){
+  const seq=S.verifySeq=(S.verifySeq||0)+1;
+  if(!S.folder){if(S.fstate){S.fstate=null;S.stale=new Set();render()}return}
+  const refs=new Map();
+  S.steps.forEach(s=>{if(s&&typeof s==='object')stepFiles(s).forEach(([,r])=>refs.set(refKey(r),r))});
+  S.datasets.forEach(d=>{if(d.source&&d.source.path)refs.set(refKey(d.source),d.source)});
+  const list=[...refs.values()];let res=null;
+  S.checking=true;if(S.tab==='folder')renderPanel();
+  try{if(S.server)res=await serverFingerprints(list);else{res=[];for(const r of list)res.push(await localFingerprint(r))}} // one at a time: raw files can be large
+  catch(e){logIssue('warning',tr('Could not check the files of the data chain.'),errText(e))}
+  if(seq!==S.verifySeq)return;
+  S.checking=false;
+  const m=new Map();if(res)list.forEach((r,i)=>m.set(refKey(r),res[i]||{}));
+  const sig=x=>x?[...x].map(([k,v])=>k+'='+v.state).sort().join('\n'):'';
+  const changed=sig(m)!==sig(S.fstate);
+  S.fstate=m;S.stale=new Set([...S.datasets.values()].filter(d=>d.source&&d.source.path&&fileState(d.source)==='changed').map(d=>d.id));
+  if(changed)render();else renderPanel();
+}
+
+function fileList(files,empty){ // raw or derived data files that can be imported into datasets
+  const B=(t,fn,cls)=>h('button',{type:'button',class:'btn small'+(cls?' '+cls:''),text:t,onclick:fn}),dl=h('ul',{class:'flist'});
+  if(!files.length)dl.append(h('li',{class:'empty',text:empty}));
+  files.forEach(f=>{const ds=[...S.datasets.values()].find(d=>d.source&&normPath(d.source.path)===normPath(f.path)),stale=!!ds&&S.stale.has(ds.id);
     dl.append(h('li',{},[h('span',{class:'fname',text:f.name}),
       h('span',{class:'fstat'+(stale?' stale':''),text:!ds?tr('not imported'):stale?tr('changed since import'):tr('imported as "{t}", {n} rows',{t:ds.title||ds.id,n:ds.rows.length})}),
       B(ds?tr('Update'):tr('Import'),()=>importDataFile(f),stale?'primary':'')]))});
-  box.append(h('div',{class:'stsec'},[h('h4',{text:S.folder.prefix==='../'?tr('Raw data (this folder)'):tr('Raw data (data/)')}),dl,
+  return dl;
+}
+function renderFolder(){
+  const box=$('#tab-folder');box.replaceChildren();if(!S.folder)return;
+  const F=S.folderFiles||{data:[],derived:[],habits:[]},B=(t,fn,cls,dis)=>h('button',{type:'button',class:'btn small'+(cls?' '+cls:''),text:t,disabled:dis?'':null,onclick:fn});
+  box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Project folder')}),
+    h('p',{class:'cap',text:tr('"{name}". The report is saved to {file} automatically. An agent can read and edit the same folder (see AGENTS.md).',{name:S.folder.name,file:S.folder.file})}),
+    h('div',{class:'crow'},[B(tr('Refresh'),refreshFolderFiles)])]));
+  box.append(chainSection());
+  box.append(h('div',{class:'stsec'},[h('h4',{text:S.folder.prefix==='../'?tr('Raw data (this folder)'):tr('Raw data (data/)')}),
+    fileList(F.data,S.folder.prefix==='../'?tr('No CSV, TSV or JSON files in this folder yet. Add some, then click Refresh.'):tr('No files yet. Put CSV, TSV or JSON files in the data/ folder, then click Refresh.')),
     h('p',{class:'cap',text:tr('Each import records the file path and a fingerprint (SHA-256), so you can see when the file changes. Excel files: save them as CSV, or ask your agent.')})]));
+  if((F.derived||[]).length)box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Derived data (derived_data/)')}),fileList(F.derived,'')]));
   const cnt=re=>F.habits.filter(x=>re.test(x)).length,svg=cnt(/\.svg$/i),mpl=cnt(/\.mplstyle$/i),ras=cnt(/\.(png|jpe?g|webp|gif)$/i),prof=F.habits.includes('profile.json');
   box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Figure habits (habits/)')}),
     h('p',{class:'cap',text:tr('{svg} SVG, {mpl} matplotlib style and {ras} PNG/JPG files.',{svg,mpl,ras})+(prof?' '+tr('Your saved habits (profile.json) are there too.'):'')}),
     ras?h('p',{class:'cap',text:tr('PNG and JPG files cannot be measured here. Ask your agent to look at them, or export them as SVG.')}):null,
     h('div',{class:'crow'},[B(S.learning?tr('Analysing…'):tr('Learn my habits'),learnHabits,'primary',S.learning||!(svg+mpl+(prof?1:0))),B(tr('Save current style as my habits'),saveHabits)]),
     h('p',{class:'cap',text:tr('Saved habits go to habits/profile.json. Copy that file into the habits/ folder of your next project to start from the same style.')})]));
+}
+
+/* ---------- Ask the agent to revise ----------
+   The page never calls an AI model. With the launcher, a request is a notice stored by duetsheet.py; an agent waiting
+   with "duetsheet.py wait" picks it up, reads the annotations from report.json, and reports progress with
+   "duetsheet.py agent-status", which the page shows here. Without a listening agent, the page offers a prompt to paste. */
+const openCount=()=>S.annos.filter(a=>a.status!=='done').length;
+const ageS=iso=>iso?(Date.now()-Date.parse(iso))/1000:Infinity;
+function agentView(){ // what the bar shows: {state, text, cls}
+  const A=S.agent,req=A&&A.request,st=A&&A.status;
+  if(!req)return{state:A&&A.listening?'listening':'idle'};
+  if(!st){const waiting=ageS(req.at)<(A.listening?60:10);
+    return waiting?{state:'sent',text:tr('Request sent. Waiting for the agent…')}:{state:'unanswered',text:tr('No agent has answered yet.'),cls:'bad'}}
+  const note=st.note?' '+st.note:'';
+  if(st.state==='working')return{state:'working',text:tr('The agent is revising the report…')+note};
+  if(st.state==='failed')return{state:'failed',text:tr('The agent could not finish.')+note,cls:'bad'};
+  const n=S.annos.filter(a=>a.status==='done'&&a.resolvedAt&&a.resolvedAt>=req.at).length;
+  return ageS(st.at)<1800?{state:'done',text:tr('The agent handled {n} comments.',{n})+note,cls:'ok'}:{state:A.listening?'listening':'idle'};
+}
+function renderAgentBar(){
+  const box=$('#agentbar');if(!box)return;
+  const open=openCount(),cur=currentChanges().length,v=agentView(),busy=v.state==='sent'||v.state==='working';
+  const key=S.readonly||!S.meta?'':[open,cur,v.state,v.text,S.agent&&S.agent.listening].join('|');
+  if(key===box.dataset.key)return;box.dataset.key=key;box.replaceChildren();if(!key)return; // rebuilt only when it changes, so a click is never lost
+  const B=(t,fn,cls,title)=>h('button',{type:'button',class:'btn small'+(cls?' '+cls:''),text:t,title,onclick:fn});
+  if(cur)box.append(B(tr('Finish this round ({n})',{n:cur}),finishRound,'',tr('Move the current changes into the history as one round.')));
+  if(open&&!busy)box.append(B(tr('Ask the agent to revise ({n})',{n:open}),askAgent,'primary',
+    S.agent&&S.agent.listening?tr('An agent is listening and will revise the report now.'):tr('No agent is listening. You will get a prompt to paste into your agent.')));
+  if(v.text)box.append(h('span',{class:'ast'+(v.cls?' '+v.cls:''),text:v.text}));
+  if(v.state==='unanswered')box.append(h('button',{type:'button',class:'linkbtn',text:tr('Get a prompt to paste'),onclick:openAgentPrompt}));
+  if(v.state==='listening'&&!open)box.append(h('span',{class:'ast',text:tr('Agent listening')}));
+}
+async function askAgent(){
+  const open=openCount();
+  if(currentChanges().some(c=>c.by==='user'))await finishRound();
+  if(!S.server){openAgentPrompt();return}
+  try{const r=await fetch('/api/revise',{method:'POST',headers:{'X-Duetsheet-Token':S.server.token,'Content-Type':'application/json'},body:JSON.stringify({kind:'revise',open})});
+    if(!r.ok)throw new Error(r.status+' '+await r.text());S.agent=await r.json()}
+  catch(e){fail(tr('Could not send the request to the agent.'),e);return}
+  renderAgentBar();
+  if(S.agent.listening)toast(tr('Sent. The agent will revise the report; this page updates by itself.'));else openAgentPrompt();
+}
+async function pollAgent(){
+  if(!S.server)return;
+  try{const r=await fetch('/api/agent',{headers:{'X-Duetsheet-Token':S.server.token}});if(r.ok)S.agent=await r.json()}catch(e){}
+  renderAgentBar();
+}
+function agentPrompt(){
+  const i=S.server&&S.server.info,sep=i&&i.app&&i.app.includes('\\')?'\\':'/';
+  if(i&&i.root&&i.app)return tr('Handle the open comments of the Duetsheet report in "{folder}". First read {agents} and follow "Revise the report from the user\'s annotations"; list the comments with: python "{py}" annotations "{folder}". When you are done, keep listening: run python "{py}" wait "{folder}" in the background and handle each new request the same way.',
+    {folder:i.root,agents:i.app+sep+'AGENTS.md',py:i.app+sep+'duetsheet.py'});
+  if(S.cloud)return tr('Read the Duetsheet annotations in this Artifact and revise the report:')+' ';
+  if(S.folder)return tr('Handle the open comments of the Duetsheet report in the folder "{name}" ({file}): read AGENTS.md of Duetsheet and follow "Revise the report from the user\'s annotations".',{name:S.folder.name,file:S.folder.file});
+  return tr('Save the report file, give it to your agent, and ask it to handle the open comments following AGENTS.md of Duetsheet.');
+}
+function openAgentPrompt(){
+  const ta=h('textarea',{readonly:'',rows:'7',style:'width:100%;box-sizing:border-box;font:inherit;font-size:13px'});ta.value=agentPrompt();
+  const intro=S.server?tr('No agent is listening for this report right now. Your request is saved: paste this into your agent (Claude Code, Codex, Gemini CLI, ...). It picks up the request and then keeps listening for the next one.')
+    :S.cloud?tr('Go back to Claude, paste this, and add the link of this Artifact.'):tr('This page cannot reach an agent by itself. Paste this into your agent:');
+  openModal(tr('Ask the agent to revise'),[h('div',{class:'langbox'},[h('p',{text:intro}),ta,
+    h('div',{class:'crow'},[h('span',{class:'sp'}),
+      h('button',{type:'button',class:'btn small',text:tr('Copy'),onclick:async()=>{try{await navigator.clipboard.writeText(ta.value);toast(tr('Copied'))}catch(e){ta.focus();ta.select()}}}),
+      h('button',{type:'button',class:'btn small primary',text:tr('Close'),onclick:closeModal})])])]);
 }
 
 /* ---------- Welcome and help ---------- */
@@ -4276,10 +5023,11 @@ function subscribe(){
   const quiet=fn=>{if(editingNow()){renderPanel()}else fn()};
   db.doc('report/meta').onSnapshot(s=>{if(s.exists){S.meta=s.data();render()}},fail);
   db.collection('blocks').limit(500).onSnapshot(s=>{S.blocks=new Map(s.docs.map(d=>[d.id,d.data()]).filter(x=>x[1]));render()},fail);
-  db.collection('datasets').limit(50).onSnapshot(s=>{S.datasets=new Map(s.docs.map(d=>[d.id,d.data()]).filter(x=>x[1]));render()},fail);
+  db.collection('datasets').limit(50).onSnapshot(s=>{S.datasets=new Map(s.docs.map(d=>[d.id,d.data()]).filter(x=>x[1]));scheduleVerify();render()},fail);
   db.collection('annotations').limit(1000).onSnapshot(s=>{S.annos=s.docs.map(d=>d.data()).filter(a=>a&&a.id);quiet(()=>{renderPanel();paintAllOverlays()})},fail);
   db.collection('changes').limit(1000).onSnapshot(s=>{S.changes=s.docs.map(d=>d.data()).filter(c=>c&&c.id);renderPanel()},fail);
   db.collection('rounds').limit(500).onSnapshot(s=>{S.rounds=s.docs.map(d=>d.data()).filter(r=>r&&r.id);renderPanel()},fail);
+  db.collection('steps').limit(1000).onSnapshot(s=>{S.steps=new Map(s.docs.map(d=>[d.id,d.data()]).filter(x=>x[1]&&typeof x[1]==='object'));scheduleVerify();render()},fail);
   db.doc('style/profile').onSnapshot(s=>{S.style=s.exists?s.data():null;render()},fail);
   db.collection('examples').limit(200).onSnapshot(s=>{S.examples=s.docs.map(d=>d.data()).filter(x=>x&&x.id);renderPanel()},fail);
   db.doc('style/proposal').onSnapshot(s=>{const d=s.exists?s.data():null; // written by an agent, confirmed by the user in the Style tab

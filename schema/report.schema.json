@@ -6,7 +6,7 @@
   "type": "object",
   "required": ["schema", "report"],
   "properties": {
-    "schema": { "type": "string", "pattern": "^duetsheet/0\\.[0-9]+$", "description": "Format version, for example duetsheet/0.5." },
+    "schema": { "type": "string", "pattern": "^duetsheet/0\\.[0-9]+$", "description": "Format version, for example duetsheet/0.6." },
     "report": {
       "type": "object",
       "required": ["meta"],
@@ -24,10 +24,38 @@
         "proposal": { "$ref": "#/$defs/styleProposal" }
       }
     },
-    "examples": { "type": "object", "additionalProperties": { "$ref": "#/$defs/example" } }
+    "examples": { "type": "object", "additionalProperties": { "$ref": "#/$defs/example" } },
+    "steps": { "type": "object", "additionalProperties": { "$ref": "#/$defs/step" }, "description": "Computation steps (duetsheet/0.6): which script turned which files into which, so every dataset can be traced back to its raw files." }
   },
   "$defs": {
     "isoTime": { "type": "string", "format": "date-time" },
+    "fileRef": {
+      "type": "object",
+      "description": "A file, known by its path and the SHA-256 of its bytes. size and modified let a checker skip reading files that have not changed.",
+      "required": ["path"],
+      "properties": {
+        "path": { "type": "string", "description": "Relative to the folder that contains report.json, and inside the folder the user opens: ../Data/run1.xlsx (raw data, outside duetsheet/), derived_data/cells.csv, scripts/make_cells.py." },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "size": { "type": "integer" },
+        "modified": { "$ref": "#/$defs/isoTime" }
+      }
+    },
+    "step": {
+      "type": "object",
+      "description": "One run of a script. A file no step produced is raw data. python duetsheet.py step records one.",
+      "required": ["id", "outputs"],
+      "properties": {
+        "id": { "type": "string" },
+        "script": { "anyOf": [{ "$ref": "#/$defs/fileRef" }, { "type": "null" }], "description": "The script that was run; null for a step done by hand (describe it in note)." },
+        "command": { "type": "string", "description": "The command line that was run." },
+        "params": { "type": "object", "description": "Parameters of the run. The same script with other parameters is another step." },
+        "inputs": { "type": "array", "items": { "$ref": "#/$defs/fileRef" } },
+        "outputs": { "type": "array", "items": { "$ref": "#/$defs/fileRef" }, "minItems": 1 },
+        "at": { "$ref": "#/$defs/isoTime" },
+        "by": { "enum": ["user", "claude"], "description": "claude stands for any AI agent." },
+        "note": { "type": "string" }
+      }
+    },
     "assetId": { "type": "string", "pattern": "^[0-9a-f]{32}$", "description": "Artifact asset id, or in a project folder the name of assets/<id>.<ext> without the extension." },
     "meta": {
       "type": "object",

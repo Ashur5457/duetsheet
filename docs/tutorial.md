@@ -1,6 +1,6 @@
 # Duetsheet tutorial
 
-This tutorial walks through one full review cycle: open a report, bring in raw data, comment on a figure, let an AI agent revise the report, and check what it changed. It uses the demo project in [`examples/demo-project`](../examples/demo-project) (synthetic data, not experimental results).
+This tutorial walks through one full review cycle: open a report, bring in raw data, trace a figure back to it, comment on a figure, let an AI agent revise the report, and check what it changed. It uses the demo project in [`examples/demo-project`](../examples/demo-project) (synthetic data, not experimental results).
 
 You need a desktop computer. There are two ways to open a report:
 
@@ -50,7 +50,7 @@ These agents do not use Claude Code skills, but most of them read an `AGENTS.md`
 python path/to/duetsheet.py init-agent "path/to/data-folder"
 ```
 
-It adds a short section to `AGENTS.md` in the data folder (or creates the file) that tells any agent where the full rules are and how to check and start the report. Existing content in that file is kept; running it again only refreshes the section.
+It adds a short section to `AGENTS.md` and `CLAUDE.md` in the data folder (or creates the files) that tells any agent where the full rules are and how to check, start and listen to the report. Claude Code reads `CLAUDE.md` when you open it in that folder, so it knows the rules from the first message. Existing content in those files is kept: only the part between `<!-- duetsheet:start -->` and `<!-- duetsheet:end -->` belongs to Duetsheet, and running the command again only refreshes that part.
 
 Duetsheet itself never calls an AI model or needs an API key: your agent reads and writes `report.json`.
 
@@ -66,6 +66,20 @@ Open Claude Code in the folder that holds your raw data and type `/duetsheet`. C
 Without Claude Code you can start the launcher yourself: `python path/to/duetsheet.py "path/to/data-folder"`.
 
 Duetsheet keeps everything it writes in a `duetsheet/` subfolder of your data folder (`report.json`, uploaded images, exports, your figure habits). The raw data files stay where they are and are never modified.
+
+**One rule to know before you start: where files go.** Your raw data must be *inside* the folder you open, but *outside* `duetsheet/`; any subfolders are fine. What is computed from it goes *inside* `duetsheet/`: tables in `derived_data/`, the scripts that compute them in `scripts/`.
+
+```
+my-experiment/                the folder you open
+  Data_R1/run001.xlsx         raw data: stays where it is, only read
+  notes/instrument.csv
+  duetsheet/                  made by Duetsheet
+    report.json
+    derived_data/cells.csv    tables computed from the raw data
+    scripts/make_cells.py     the scripts that compute them
+```
+
+If some of your data is somewhere else (another drive, your Downloads folder), move or copy it into the folder first; Claude will ask you rather than do it. Only files inside the folder can be traced from a figure back to the raw data (section 3b).
 
 ## 1. Open Duetsheet
 
@@ -91,6 +105,8 @@ A project folder looks like this:
 demo-project/
   report.json      the report
   data/            raw data (CSV, TSV, JSON)
+  derived_data/    tables computed from the raw data
+  scripts/         the scripts that compute them
   habits/          your own example figures and .mplstyle files
   assets/          images uploaded in the page (created when needed)
   exports/         files the page exports (created when needed)
@@ -108,6 +124,22 @@ The file becomes a dataset. Duetsheet records where it came from: the path and a
 
 To plot the new data, switch to **Edit**, click **Add chart**, open **Chart settings** and pick the dataset.
 
+## 3b. Trace a figure back to its raw data
+
+Most report data is not a raw file: a script combines or summarises raw files into a table first. Duetsheet keeps that chain. Every time your agent runs a script, it records a **step** (`python duetsheet.py step`): the script, the command, the parameters, and every input and output file with its fingerprint.
+
+Under each chart and table, a small line shows where its data comes from, for example *Source: cycles1-3.csv ← combine_cycles.py ← 3 raw files*. Its dot shows the state of the whole chain:
+
+- **green**: every file is exactly as recorded;
+- **red**: something changed or is missing (a raw file, a script, a derived table), so the figure needs recomputing;
+- **grey**: not checked (for example in a read-only copy, where the files are not at hand).
+
+Click the line to see the whole chain: the dataset, the derived file, the step that made it, and its inputs, down to the raw files (grouped by folder).
+
+The **Folder** tab has the **Data chain** overview: every derived file with the script and inputs it comes from and how many charts use it, then the raw data grouped by folder, then the scripts. It works backwards too: open a raw data folder and click **What depends on these files?**, or click a single file, to see which derived files, datasets and charts would change if it did.
+
+Raw data can be large. Duetsheet compares size and modification date first and only reads a file again when they differ; the launcher keeps the fingerprints it computed in `duetsheet/cache/`. `python duetsheet.py check <folder>` reports the same states as warnings, and `check --deep` reads every file.
+
 ## 4. Review: edit and comment
 
 Switch to **Edit**. You can:
@@ -121,11 +153,15 @@ On a chart you can point at the exact data: click **Lasso on figure** (or **Box 
 
 ![A lasso and a single data point marked on a chart, with the comments in the panel](edit-annotate.png)
 
-When you have finished a batch of feedback, open the **Changes** tab and click **Finish this round**.
+When you have finished a batch of feedback, click **Finish this round** at the top of the page (it appears as soon as you change something), or in the **Changes** tab.
 
 ## 5. Let your agent revise the report
 
-Open your AI agent (Claude Code, Codex, Gemini CLI, Cursor, ...) in the same folder and ask:
+**With one button.** If Claude Code started the report (`/duetsheet`), it keeps listening in the background. Click **Ask the agent to revise** at the top: it finishes your round and hands your comments to the agent. Next to the button you see *Request sent*, then *The agent is revising the report…*, then *The agent handled N comments*; the report reloads by itself. Waiting costs the agent nothing; only the revision itself uses it.
+
+If no agent is listening (for example, you opened the report with a desktop shortcut), the button shows a prompt to copy and paste into your agent. Your request is kept, and the agent picks it up and then keeps listening for the next one.
+
+**By asking.** You can also open your AI agent (Claude Code, Codex, Gemini CLI, Cursor, ...) in the same folder and ask:
 
 > Read AGENTS.md from the Duetsheet repository, then read the open annotations in report.json and revise the report.
 

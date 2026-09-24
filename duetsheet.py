@@ -3,14 +3,23 @@
 
     python duetsheet.py [FOLDER]            start Duetsheet for FOLDER (default: the current folder)
     python duetsheet.py check [FOLDER]      check the report in FOLDER and exit (exit code 1 on errors)
+                                            (--deep: re-read every file instead of trusting size and date)
+    python duetsheet.py step FOLDER --script S --in PATTERN --out PATTERN
+                                            record a computation step: which script turned which files into which
+    python duetsheet.py annotations FOLDER  print the open annotations with what they point at (compact JSON for agents)
+    python duetsheet.py wait FOLDER         for an agent: wait until the user clicks "Ask the agent to revise", then exit
+    python duetsheet.py agent-status FOLDER working|done|failed [--note TEXT]
+                                            for an agent: tell the page what it is doing
     python duetsheet.py install-skill       install the /duetsheet skill for Claude Code
     python duetsheet.py shortcut [FOLDER]   put a shortcut on the desktop that starts Duetsheet for FOLDER
-    python duetsheet.py init-agent [FOLDER] add a short AGENTS.md to FOLDER that points any agent to Duetsheet
+    python duetsheet.py init-agent [FOLDER] add a marked section to AGENTS.md and CLAUDE.md in FOLDER that points any agent to Duetsheet
 
 Where the report lives:
   - If FOLDER contains report.json, FOLDER is the project folder (raw data in FOLDER/data/).
   - Otherwise the report goes into FOLDER/duetsheet/ and FOLDER itself is the raw data folder.
     Raw data files are only read, never written.
+  - Raw data stays outside duetsheet/ but inside FOLDER. Files computed from it (derived data, the scripts
+    that compute them) go into FOLDER/duetsheet/derived_data/ and FOLDER/duetsheet/scripts/.
 
 The launcher serves duetsheet.html on 127.0.0.1 and lets that page read and write the project
 folder. Every request needs a random token that is only given to the browser window it opens.
@@ -19,9 +28,10 @@ so an agent running this command sees them.
 
 Python 3.8 or later, standard library only.
 """
-import argparse, base64, hashlib, hmac, http.server, json, mimetypes, os, pathlib, re, secrets, shutil, subprocess, sys, tempfile, threading, time, urllib.parse, webbrowser
+import argparse, base64, datetime, glob, hashlib, hmac, http.server, json, mimetypes, os, pathlib, posixpath, re, secrets, shutil, subprocess, sys, tempfile, threading, time, urllib.parse, webbrowser
 
-VERSION = '0.5.0'
+VERSION = '0.6.0'
+SCHEMA = 'duetsheet/0.6'
 HERE = pathlib.Path(__file__).resolve().parent
 PAGE = HERE / 'duetsheet.html'
 SUBDIR = 'duetsheet'
@@ -46,46 +56,308 @@ def project_of(root):
     return root / SUBDIR, root
 
 
+def atomic_write(path, data):
+    """Write bytes through a temporary file and a rename, retrying while a sync client holds the file."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(path.name + '.' + secrets.token_hex(4) + '.duetsheet-tmp')
+    tmp.write_bytes(data)
+    for attempt in range(5):
+        try:
+            os.replace(tmp, path)
+            return
+        except PermissionError:
+            if attempt == 4:
+                tmp.unlink()
+                raise
+            time.sleep(0.2 * (attempt + 1))
+
+
+# ---------------------------------------------------------------- fingerprints
+# A file is known by its path (relative to the folder of report.json) and the SHA-256 of its bytes.
+# Raw data can be large (hundreds of files of tens of MB, often in a OneDrive folder, where reading a file
+# may download it), so a file is only read when its size or modification time differs from what was
+# recorded. Hashes computed that way are kept in cache/fingerprints.json; deleting it is harmless.
+
+CACHE_FILE = ('cache', 'fingerprints.json')
+MTIME_SLACK_MS = 2000   # copies and sync clients may move the modification time a little
+
+
+def iso_ms(ms):
+    return datetime.datetime.fromtimestamp(ms / 1000, datetime.timezone.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')
+
+
+def ms_of(iso):
+    try:
+        return datetime.datetime.fromisoformat(str(iso).replace('Z', '+00:00')).timestamp() * 1000
+    except ValueError:
+        return None
+
+
+def norm(rel):
+    return posixpath.normpath(str(rel).replace('\\', '/'))
+
+
+def inside(root, project, rel):
+    """True when rel (relative to the folder of report.json) stays inside the folder the user opened."""
+    if not isinstance(rel, str) or not rel or re.match(r'^([A-Za-z]:|[\\/])', rel):
+        return False
+    try:
+        (project / norm(rel)).resolve().relative_to(root.resolve())
+        return True
+    except (ValueError, OSError):
+        return False
+
+
+class Fingerprints:
+    def __init__(self, project):
+        self.project, self.file = project, project.joinpath(*CACHE_FILE)
+        self.lock, self.dirty, self.hashed = threading.Lock(), False, 0
+        try:
+            self.cache = json.loads(self.file.read_text(encoding='utf-8'))
+        except (OSError, ValueError):
+            self.cache = {}
+        if not isinstance(self.cache, dict):
+            self.cache = {}
+
+    def sha256(self, rel, st, force=False):
+        mtime = st.st_mtime_ns // 1_000_000
+        with self.lock:
+            c = self.cache.get(rel)
+        if not force and isinstance(c, dict) and c.get('size') == st.st_size and c.get('mtime') == mtime:
+            return c.get('sha256')
+        h = hashlib.sha256()
+        with open(self.project / rel, 'rb') as fh:
+            for b in iter(lambda: fh.read(1 << 20), b''):
+                h.update(b)
+        with self.lock:
+            self.cache[rel] = {'size': st.st_size, 'mtime': mtime, 'sha256': h.hexdigest()}
+            self.dirty = True
+            self.hashed += 1
+        return h.hexdigest()
+
+    def ref(self, rel):
+        """A file reference for a file that exists: {path, sha256, size, modified}."""
+        rel = norm(rel)
+        st = (self.project / rel).stat()
+        return {'path': rel, 'sha256': self.sha256(rel, st), 'size': st.st_size, 'modified': iso_ms(st.st_mtime_ns // 1_000_000)}
+
+    def status(self, ref, deep=False):
+        """Compare a file reference {path, sha256, size?, modified?} with the file on disk.
+        state: same | changed | missing | unknown (nothing recorded to compare with)."""
+        rel = norm(ref.get('path'))
+        out = {'path': ref.get('path'), 'state': 'missing'}
+        try:
+            st = (self.project / rel).stat()
+        except OSError:
+            return out
+        if not (self.project / rel).is_file():
+            return out
+        out.update(size=st.st_size, modified=iso_ms(st.st_mtime_ns // 1_000_000))
+        want, rec = ref.get('sha256'), ms_of(ref['modified']) if ref.get('modified') else None
+        if not deep and want and ref.get('size') == st.st_size and rec is not None and abs(rec - st.st_mtime_ns / 1e6) <= MTIME_SLACK_MS:
+            out.update(state='same', sha256=want)
+            return out
+        out['sha256'] = sha = self.sha256(rel, st, force=deep)
+        out['state'] = 'unknown' if not want else 'same' if sha == want else 'changed'
+        return out
+
+    def save(self):
+        with self.lock:
+            if not self.dirty:
+                return
+            data, self.dirty = json.dumps(self.cache, indent=0, sort_keys=True), False
+        try:
+            atomic_write(self.file, data.encode('utf-8'))
+        except OSError:
+            pass
+
+
+# ---------------------------------------------------------------- the data chain
+# steps/{id} records one computation: a script turned input files into output files. A dataset imported
+# from a step's output can be followed back, step by step, to the raw files no step produced.
+# A step needs rerunning when its script or an input changed, or when an input comes from a step that
+# needs rerunning; everything computed from it (outputs, datasets, charts and tables) is then out of date.
+
+def step_files(step):
+    """(role, ref) for every file a step names."""
+    if isinstance(step.get('script'), dict):
+        yield 'script', step['script']
+    for role in ('inputs', 'outputs'):
+        for r in step.get(role) or []:
+            yield role[:-1], r
+
+
+def check_chain(project, root, rep, deep):
+    """Return (errors, warnings, notes) about steps and dataset sources."""
+    errors, warnings, notes = [], [], []
+    steps = rep.get('steps') or {}
+    datasets = rep.get('datasets') if isinstance(rep.get('datasets'), dict) else {}
+    blocks = rep.get('blocks') if isinstance(rep.get('blocks'), dict) else {}
+    if not isinstance(steps, dict):
+        return ['"steps" must be an object keyed by step id'], [], []
+    fp, seen = Fingerprints(project), {}
+
+    def state(ref):
+        key = (norm(ref.get('path')), ref.get('sha256'), ref.get('size'), ref.get('modified'))
+        if key not in seen:
+            try:
+                seen[key] = fp.status(ref, deep)
+            except OSError as e:
+                seen[key] = {'state': 'missing', 'error': str(e)}
+        return seen[key]['state']
+
+    good = {}
+    for key, s in steps.items():
+        where = f'steps.{key}'
+        if not isinstance(s, dict):
+            errors.append(f'{where} must be an object')
+            continue
+        if s.get('id') != key:
+            errors.append(f'{where}.id must be "{key}"')
+        if not isinstance(s.get('outputs'), list) or not s['outputs']:
+            errors.append(f'{where}.outputs must list the files the step wrote')
+        if not isinstance(s.get('inputs', []), list):
+            errors.append(f'{where}.inputs must be a list')
+            continue
+        ok = True
+        for role, r in step_files(s):
+            if not isinstance(r, dict) or not isinstance(r.get('path'), str) or not r['path']:
+                errors.append(f'{where}: every {role} needs a "path"')
+                ok = False
+            elif not inside(root, project, r['path']):
+                errors.append(f'{where}: {role} "{r["path"]}" is outside the folder "{root.name}". Raw data must be inside "{root.name}" '
+                              f'(outside duetsheet/), and paths are relative to the folder of report.json')
+                ok = False
+            elif not re.fullmatch(r'[0-9a-f]{64}', str(r.get('sha256', ''))):
+                warnings.append(f'{where}: {role} "{r["path"]}" has no sha256, so changes to it cannot be seen')
+        if ok and isinstance(s.get('outputs'), list):
+            good[key] = s
+
+    # which step made each file: the latest one that lists it as an output
+    made_by = {}
+    for key, s in sorted(good.items(), key=lambda kv: str(kv[1].get('at', ''))):
+        for r in s.get('outputs') or []:
+            made_by[norm(r['path'])] = key
+
+    reasons, stale = {}, {}
+
+    def is_stale(key, trail=()):
+        if key in stale:
+            return stale[key]
+        if key in trail:   # a loop; reported once below
+            return False
+        s, why = good[key], []
+        for role, r in step_files(s):
+            st = state(r)
+            if st == 'missing':
+                why.append(f'{role} {r["path"]} is missing')
+            elif st == 'changed':
+                why.append(f'{role} {r["path"]} changed' + (' after the step was recorded' if role == 'output' else ''))
+        for r in s.get('inputs') or []:
+            up = made_by.get(norm(r['path']))
+            if up and up != key and is_stale(up, trail + (key,)):
+                why.append(f'input {r["path"]} comes from step "{up}", which needs rerunning')
+        reasons[key], stale[key] = why, bool(why)
+        return stale[key]
+
+    for key in good:
+        is_stale(key)
+
+    uses = {}   # dataset id -> block ids
+    for bid, b in blocks.items():
+        if isinstance(b, dict):
+            spec = b.get(b.get('type')) if b.get('type') in ('chart', 'table') else None
+            if isinstance(spec, dict) and spec.get('dataset'):
+                uses.setdefault(spec['dataset'], []).append(bid)
+
+    stale_ds = {}
+    for key, ds in datasets.items():
+        src = ds.get('source') if isinstance(ds, dict) else None
+        if not isinstance(src, dict) or not src.get('path'):
+            continue
+        where = f'datasets.{key}'
+        if not inside(root, project, src['path']):
+            errors.append(f'{where}.source.path "{src["path"]}" is outside the folder "{root.name}"; '
+                          f'put the file inside "{root.name}" (paths are relative to the folder of report.json)')
+            continue
+        st = state(src)
+        up = made_by.get(norm(src['path']))
+        if st == 'missing':
+            warnings.append(f'{where}.source.path "{src["path"]}" does not exist (paths are relative to the folder of report.json)')
+        elif st == 'changed':
+            stale_ds[key] = f'{src["path"]} changed since it was imported (sha256 differs); import it again'
+        elif up and stale.get(up):
+            stale_ds[key] = f'{src["path"]} comes from step "{up}", which needs rerunning'
+
+    def short(items, n=3):
+        items = list(items)
+        return ', '.join(items[:n]) + (f' and {len(items) - n} more' if len(items) > n else '')
+
+    for key in good:
+        if stale[key]:
+            outs = [r['path'] for r in good[key].get('outputs') or []]
+            ds = [d for d, x in datasets.items() if isinstance(x, dict) and isinstance(x.get('source'), dict)
+                  and norm(x['source'].get('path', '')) in {norm(o) for o in outs}]
+            warnings.append(f'step "{key}" needs rerunning: {short(reasons[key])}. It wrote {short(outs)}'
+                            + (f', imported as dataset {short(ds)}' if ds else ''))
+    for key, why in stale_ds.items():
+        warnings.append(f'datasets.{key}: {why}' + (f'. Used by {short(uses[key])}' if uses.get(key) else ''))
+
+    if good:
+        made = set(made_by)
+        raw = {norm(r['path']) for s in good.values() for r in s.get('inputs') or []} - made
+        scripts = {norm(s['script']['path']) for s in good.values() if isinstance(s.get('script'), dict)}
+        n_stale = sum(stale.values())
+        notes.append(f'Data chain: {len(good)} step(s), {len(made)} derived file(s), {len(raw)} raw file(s), {len(scripts)} script(s); '
+                     + (f'{n_stale} step(s) need rerunning' if n_stale else 'all up to date'))
+    if fp.hashed:
+        notes.append(f'Read {fp.hashed} file(s) to compute fingerprints (kept in {"/".join(CACHE_FILE)} for next time)')
+    fp.save()
+    return errors, warnings, notes
+
+
 # ---------------------------------------------------------------- checking a report
 
 STYLE_FIELDS = {'font.family', 'font.size', 'font.label', 'marker', 'line', 'ticks', 'frame', 'grid', 'palette',
                 'figure.preset', 'chartDefaults.kind', 'chartDefaults.logY'}
 
 
-def check_report(project):
-    """Return (errors, warnings) for project/report.json, as lists of strings."""
-    errors, warnings = [], []
+def check_report(project, root=None, deep=False):
+    """Return (errors, warnings, notes) for project/report.json, as lists of strings.
+    root is the folder the user opens (the parent of duetsheet/, or project itself)."""
+    errors, warnings, notes = [], [], []
+    root = root or project
     path = project / 'report.json'
     if not path.is_file():
-        return [f'{path} does not exist'], []
+        return [f'{path} does not exist'], [], []
     raw = path.read_bytes()
     if raw[:2] in (b'\xff\xfe', b'\xfe\xff'):
-        return ['report.json is UTF-16; save it as UTF-8'], []
+        return ['report.json is UTF-16; save it as UTF-8'], [], []
     if raw[:3] == b'\xef\xbb\xbf':
         warnings.append('report.json starts with a byte order mark (BOM); write plain UTF-8')
         raw = raw[3:]
     try:
         text = raw.decode('utf-8')
     except UnicodeDecodeError as e:
-        return [f'report.json is not UTF-8: {e}'], warnings
+        return [f'report.json is not UTF-8: {e}'], warnings, notes
 
     def no_constants(name):
         raise ValueError(f'{name} is not valid JSON; write null instead (Python: json.dump(..., allow_nan=False))')
     try:
         rep = json.loads(text, parse_constant=no_constants)
     except json.JSONDecodeError as e:
-        return [f'report.json line {e.lineno}, column {e.colno}: {e.msg}'], warnings
+        return [f'report.json line {e.lineno}, column {e.colno}: {e.msg}'], warnings, notes
     except ValueError as e:
         # find where the constant is, for the message
         for i, line in enumerate(text.splitlines(), 1):
             for tok in ('-Infinity', 'Infinity', 'NaN'):
                 col = line.find(tok)
                 if col >= 0 and line[:col].count('"') % 2 == 0:
-                    return [f'report.json line {i}, column {col + 1}: {e}'], warnings
-        return [f'report.json: {e}'], warnings
+                    return [f'report.json line {i}, column {col + 1}: {e}'], warnings, notes
+        return [f'report.json: {e}'], warnings, notes
 
     if not isinstance(rep, dict):
-        return ['report.json must be a JSON object'], warnings
+        return ['report.json must be a JSON object'], warnings, notes
     meta = (rep.get('report') or {}).get('meta') if isinstance(rep.get('report'), dict) else None
     if not isinstance(meta, dict):
         errors.append('report.meta is missing: report.json needs {"report": {"meta": {"title": ..., "order": [...]}}}')
@@ -126,13 +398,6 @@ def check_report(project):
             errors.append(f'{where}: every row needs a numeric "id"')
         elif len(set(ids)) != len(ids):
             errors.append(f'{where}: row ids must be unique')
-        src = ds.get('source')
-        if isinstance(src, dict) and src.get('path'):
-            f = (project / src['path']).resolve()
-            if not f.is_file():
-                warnings.append(f'{where}.source.path "{src["path"]}" does not exist (paths are relative to the folder of report.json)')
-            elif src.get('sha256') and hashlib.sha256(f.read_bytes()).hexdigest() != src['sha256']:
-                warnings.append(f'{where}: {src["path"]} changed since it was imported (sha256 differs)')
 
     colkeys = {k: {c.get('key') for c in (d.get('columns') or []) if isinstance(c, dict)} for k, d in datasets.items() if isinstance(d, dict)}
     for key, b in blocks.items():
@@ -187,12 +452,15 @@ def check_report(project):
         for i, r in enumerate(prop.get('rows') or []):
             if not isinstance(r, dict) or r.get('field') not in STYLE_FIELDS:
                 warnings.append(f'style.proposal.rows[{i}] has an unknown field and will be ignored')
-    return errors, warnings
+    e, w, n = check_chain(project, root, rep, deep)
+    return errors + e, warnings + w, notes + n
 
 
-def run_check(root):
+def run_check(root, deep=False):
     project, _ = project_of(root)
-    errors, warnings = check_report(project)
+    errors, warnings, notes = check_report(project, root, deep)
+    for n in notes:
+        say(n)
     for w in warnings:
         say('WARNING', w)
     for e in errors:
@@ -202,6 +470,146 @@ def run_check(root):
     return 1 if errors else 0
 
 
+# ---------------------------------------------------------------- the page asks the agent to act
+# The page's "Ask the agent to revise" button reaches an agent (Claude Code, Codex, ...) through small files in
+# ~/.duetsheet/run/<folder name>-<hash of the project path>/ (outside the project, so a sync client such as OneDrive
+# does not upload a file every few seconds), so any agent that can run a command in the background can answer:
+#   launcher.json  written every few seconds by the running launcher (so waiting agents notice when it stops)
+#   request.json   the latest request from the page: {id, kind, open, at}. It carries no text, only a kind from KINDS.
+#   listening.json written every few seconds while an agent runs "duetsheet.py wait"
+#   status.json    what the agent reported with "duetsheet.py agent-status": {request, state, at, note}
+# A request is only a notice; the agent reads the annotations from report.json and treats them as feedback.
+
+RUN_DIR = pathlib.Path(os.environ.get('DUETSHEET_RUN_DIR') or pathlib.Path.home() / '.duetsheet' / 'run')
+KINDS = ('revise',)
+STATES = ('working', 'done', 'failed')
+FRESH_S = 15          # an agent is listening when listening.json is younger than this
+LAUNCHER_STALE_S = 30
+
+
+def agent_file(project, name):
+    p = project.resolve()
+    key = hashlib.sha1(str(p).lower().encode('utf-8')).hexdigest()[:12]
+    label = re.sub(r'[^\w.-]+', '_', (p.parent.name if p.name == SUBDIR else p.name))[:40]
+    return RUN_DIR / f'{label}-{key}' / name
+
+
+def read_json(path):
+    try:
+        v = json.loads(path.read_text(encoding='utf-8'))
+        return v if isinstance(v, dict) else None
+    except (OSError, ValueError):
+        return None
+
+
+def write_json(path, obj):
+    atomic_write(path, (json.dumps(obj, ensure_ascii=False) + '\n').encode('utf-8'))
+
+
+def now_iso():
+    return iso_ms(time.time() * 1000)
+
+
+def age_s(obj):
+    t = ms_of(obj.get('at')) if obj else None
+    return (time.time() * 1000 - t) / 1000 if t is not None else float('inf')
+
+
+def agent_state(project):
+    """What the page shows next to the button."""
+    req, st = read_json(agent_file(project, 'request.json')), read_json(agent_file(project, 'status.json'))
+    return {'listening': age_s(read_json(agent_file(project, 'listening.json'))) < FRESH_S, 'request': req,
+            'status': st if st and req and st.get('request') == req.get('id') else None}
+
+
+def pending_request(project):
+    """The latest request, if no agent has started on it yet."""
+    req, st = read_json(agent_file(project, 'request.json')), read_json(agent_file(project, 'status.json'))
+    if req and not (st and st.get('request') == req.get('id') and st.get('state') in STATES):
+        return req
+    return None
+
+
+def wait_for_request(root):
+    """For an agent: return when the user asks for something (exit 0), or when the launcher stops (exit 3).
+    Meant to run in the background; each line it prints is something the agent should act on."""
+    project, _ = project_of(root)
+    if age_s(read_json(agent_file(project, 'launcher.json'))) > LAUNCHER_STALE_S:
+        say('LAUNCHER NOT RUNNING: start it first:', f'python "{HERE / "duetsheet.py"}" "{root}"')
+        return 3
+    beat = 0
+    try:
+        while True:
+            if time.time() - beat >= 5:
+                write_json(agent_file(project, 'listening.json'), {'at': now_iso(), 'pid': os.getpid()})
+                beat = time.time()
+            req = pending_request(project)
+            if req:
+                say(f'{req.get("kind", "revise").upper()} REQUESTED: {req.get("open", 0)} open annotation(s) (request {req.get("id")}).',
+                    'Report progress with agent-status, then run wait again.')
+                return 0
+            if age_s(read_json(agent_file(project, 'launcher.json'))) > LAUNCHER_STALE_S:
+                say('LAUNCHER STOPPED: Duetsheet is no longer running for', root)
+                return 3
+            time.sleep(1)
+    except KeyboardInterrupt:
+        return 130
+    finally:
+        try:
+            agent_file(project, 'listening.json').unlink()
+        except OSError:
+            pass
+
+
+def set_agent_status(root, state, note):
+    project, _ = project_of(root)
+    req = read_json(agent_file(project, 'request.json'))
+    write_json(agent_file(project, 'status.json'), {'request': req.get('id') if req else None, 'state': state, 'at': now_iso(), 'note': note})
+    say('Status:', state, f'({note})' if note else '')
+    return 0
+
+
+def open_annotations(root):
+    """The open annotations with the block, settings and data rows they point at, as compact JSON.
+    A report can be megabytes of data rows; this is what an agent needs to read to revise it."""
+    project, _ = project_of(root)
+    try:
+        rep = json.loads((project / 'report.json').read_text(encoding='utf-8-sig'))
+    except (OSError, ValueError) as err:
+        say('ERROR', 'cannot read report.json:', err)
+        return 1
+    blocks, datasets = rep.get('blocks') or {}, rep.get('datasets') or {}
+    rounds, changes = (rep.get('rounds') or {}).values(), (rep.get('changes') or {}).values()
+    last = max((r.get('at', '') for r in rounds if isinstance(r, dict)), default='')
+    out = []
+    for a in sorted((a for a in (rep.get('annotations') or {}).values() if isinstance(a, dict) and a.get('status') != 'done'),
+                    key=lambda a: a.get('no', 0)):
+        t = a.get('target') or {}
+        b = blocks.get(t.get('blockId')) or {}
+        blk = {k: v for k, v in b.items() if k not in ('createdAt', 'updatedAt')}
+        if isinstance(blk.get('image'), dict):   # no image data in the output
+            blk['image'] = {k: v for k, v in blk['image'].items() if k != 'src'}
+        spec = b.get(b.get('type')) if b.get('type') in ('chart', 'table') else None
+        ds = datasets.get(spec.get('dataset')) if isinstance(spec, dict) else None
+        item = {'annotation': a, 'block': blk}
+        if isinstance(ds, dict):
+            item['dataset'] = {'id': ds.get('id'), 'title': ds.get('title'), 'columns': ds.get('columns'),
+                               'rows': len(ds.get('rows') or []), 'source': (ds.get('source') or {}).get('path')}
+            ids = [t['rowId']] if 'rowId' in t else t.get('enclosed') or []
+            if ids:
+                want = set(ids)
+                rows = [r for r in ds.get('rows') or [] if isinstance(r, dict) and r.get('id') in want]
+                item['targetRows'] = rows[:30]
+                if len(rows) > 30:
+                    item['targetRowsNote'] = f'{len(rows) - 30} more rows not shown'
+        out.append(item)
+    print(json.dumps({'report': (rep.get('report') or {}).get('meta', {}).get('title'), 'file': str(project / 'report.json'),
+                      'open': len(out), 'lastRoundAt': last or None,
+                      'userChangesAfterLastRound': sum(1 for c in changes if isinstance(c, dict) and c.get('by') == 'user' and c.get('at', '') > last),
+                      'annotations': out}, ensure_ascii=False, indent=1))
+    return 0
+
+
 # ---------------------------------------------------------------- the server
 
 class Handler(http.server.BaseHTTPRequestHandler):
@@ -209,6 +617,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
     root = None       # the folder the user opened
     token = ''
     port = 0
+    prints = None     # Fingerprints of the project folder, shared by all requests
 
     def log_message(self, *a):
         pass
@@ -279,7 +688,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return
         if path == '/api/info':
             project, data = project_of(self.root)
-            return self.send(200, json.dumps({'name': self.root.name, 'version': VERSION, 'layout': 'data-folder' if project != self.root else 'project-folder'}), 'application/json')
+            return self.send(200, json.dumps({'name': self.root.name, 'version': VERSION, 'layout': 'data-folder' if project != self.root else 'project-folder',
+                                              'root': str(self.root), 'app': str(stable_app(False))}), 'application/json')
+        if path == '/api/agent':
+            project, _ = project_of(self.root)
+            return self.send(200, json.dumps(agent_state(project)), 'application/json')
         if path.startswith('/fs/'):
             t = self.target()
             if not t:
@@ -333,6 +746,39 @@ class Handler(http.server.BaseHTTPRequestHandler):
             except OSError:
                 pass
             return self.send(204)
+        if path == '/api/fingerprints':   # {files: [file reference]} -> the state of each file now (see Fingerprints.status)
+            try:
+                files = json.loads(body.decode('utf-8'))['files']
+                assert isinstance(files, list)
+            except Exception:
+                return self.send(400, 'expected {"files": [{"path": ...}]}')
+            project, _ = project_of(self.root)
+            if Handler.prints is None or Handler.prints.project != project:
+                Handler.prints = Fingerprints(project)
+            out = []
+            for ref in files[:20000]:
+                if not isinstance(ref, dict) or not isinstance(ref.get('path'), str):
+                    out.append({'state': 'missing'})
+                elif not inside(self.root, project, ref['path']):
+                    out.append({'path': ref['path'], 'state': 'outside'})
+                else:
+                    try:
+                        out.append(Handler.prints.status(ref))
+                    except OSError as err:
+                        out.append({'path': ref['path'], 'state': 'missing', 'error': str(err)})
+            Handler.prints.save()
+            return self.send(200, json.dumps(out), 'application/json')
+        if path == '/api/revise':   # the page's "Ask the agent to revise": only a kind and a count are taken from the page
+            try:
+                req = json.loads(body.decode('utf-8'))
+                kind, n = req.get('kind', 'revise'), int(req.get('open', 0))
+                assert kind in KINDS and 0 <= n < 100000
+            except Exception:
+                return self.send(400, 'expected {"kind": "revise", "open": <number>}')
+            project, _ = project_of(self.root)
+            write_json(agent_file(project, 'request.json'), {'id': 'q' + secrets.token_hex(6), 'kind': kind, 'open': n, 'at': now_iso()})
+            say(f'{kind.upper()} REQUESTED: {n} open annotation(s)')
+            return self.send(200, json.dumps(agent_state(project)), 'application/json')
         if path.startswith('/fs/'):   # create a folder
             t = self.target()
             if not t:
@@ -407,10 +853,90 @@ def serve(root, port, open_browser):
     say('Stop with Ctrl+C.')
     if open_browser:
         threading.Timer(0.5, webbrowser.open, [url]).start()
+
+    stop = threading.Event()
+
+    def heartbeat():   # lets "duetsheet.py wait" notice when the launcher stops
+        while not stop.is_set():
+            try:
+                write_json(agent_file(project, 'launcher.json'), {'at': now_iso(), 'pid': os.getpid(), 'port': Handler.port})
+            except OSError:
+                pass
+            stop.wait(5)
+    threading.Thread(target=heartbeat, daemon=True).start()
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         say('stopped')
+    finally:
+        stop.set()
+        try:
+            agent_file(project, 'launcher.json').unlink()
+        except OSError:
+            pass
+    return 0
+
+
+# ---------------------------------------------------------------- recording a computation step
+
+def record_step(root, a):
+    """Add (or replace) steps/<id> in report.json with fingerprints of the script, inputs and outputs.
+    Patterns are relative to the folder of report.json, for example ../Data/*.xlsx or derived_data/cells.csv."""
+    project, _ = project_of(root)
+    path = project / 'report.json'
+    if not path.is_file():
+        say('ERROR', f'{path} does not exist; write the report (or start Duetsheet once) before recording steps')
+        return 1
+    fp = Fingerprints(project)
+
+    def expand(patterns, what):
+        out = []
+        for pat in patterns:
+            hits = sorted(h for h in glob.glob(os.path.join(str(project), pat), recursive=True) if os.path.isfile(h))
+            if not hits:
+                raise ValueError(f'{what} "{pat}" matches no file (patterns are relative to {project})')
+            for h in hits:
+                rel = norm(os.path.relpath(h, project))
+                if not inside(root, project, rel):
+                    raise ValueError(f'{what} "{rel}" is outside the folder "{root.name}"; put it inside "{root.name}" first')
+                if rel not in [r['path'] for r in out]:
+                    out.append(fp.ref(rel))
+        return out
+
+    try:
+        script = expand([a.script], '--script')[0] if a.script else None
+        inputs, outputs = expand(a.inputs, '--in'), expand(a.outputs, '--out')
+    except (ValueError, OSError) as err:
+        say('ERROR', err)
+        return 1
+    if not outputs:
+        say('ERROR', 'name the files the step wrote with --out')
+        return 1
+    params = {}
+    for p in a.param:
+        k, _, v = p.partition('=')
+        try:
+            params[k] = json.loads(v)
+        except ValueError:
+            params[k] = v
+    stem = pathlib.PurePosixPath((script or outputs[0])['path']).stem
+    sid = a.id or 's-' + (re.sub(r'[^a-z0-9]+', '-', stem.lower()).strip('-') or 'step')
+    step = {'id': sid, 'script': script, 'command': a.command, 'params': params, 'inputs': inputs, 'outputs': outputs,
+            'at': iso_ms(time.time() * 1000), 'by': a.by, 'note': a.note}
+    try:
+        rep = json.loads(path.read_text(encoding='utf-8-sig'))   # read fresh: the page may have saved since
+        steps = rep.setdefault('steps', {})
+        replaced = sid in steps
+        steps[sid] = step
+        rep['schema'] = SCHEMA
+        atomic_write(path, (json.dumps(rep, ensure_ascii=False, indent=1, allow_nan=False) + '\n').encode('utf-8'))
+    except (OSError, ValueError) as err:
+        say('ERROR', 'could not update report.json:', err)
+        return 1
+    fp.save()
+    total = len(inputs) + len(outputs) + bool(script)
+    say('Replaced' if replaced else 'Recorded', f'step "{sid}":', f'{len(inputs)} input(s) -> {len(outputs)} output(s)',
+        '' if fp.hashed == total else f'({fp.hashed} of {total} file(s) read; the other fingerprints were already known)')
     return 0
 
 
@@ -469,19 +995,28 @@ def init_agent(root):
         '',
         f'- Read the full rules before you change anything: `{app / "AGENTS.md"}`',
         f'- The report: `{project / "report.json"}`. Raw data files are only read, never changed.',
+        f'- Raw data stays inside "{root.name}", outside `duetsheet/`. Files computed from it go into `duetsheet/derived_data/`,'
+        ' the scripts into `duetsheet/scripts/`; record every script run with `duetsheet.py step`.',
         f'- Check after every write: `{py} "{app / "duetsheet.py"}" check "{root}"`',
         f'- Start it for the user (keep it running in the background): `{py} "{app / "duetsheet.py"}" "{root}"`',
+        f'- Then listen for the page\'s "Ask the agent to revise" button (also in the background): `{py} "{app / "duetsheet.py"}" wait "{root}"`;'
+        ' see "Answer the Ask the agent to revise button" in AGENTS.md.',
         MARK_END, ''])
-    f = root / 'AGENTS.md'
-    old = f.read_text(encoding='utf-8-sig') if f.is_file() else ''
-    if MARK_START in old and MARK_END in old:
-        a, b = old.index(MARK_START), old.index(MARK_END) + len(MARK_END)
-        new = old[:a] + block.rstrip('\n') + old[b:]
-    else:
-        new = (old.rstrip('\n') + '\n\n' if old.strip() else '') + block
-    f.write_text(new, encoding='utf-8')
-    say('Updated' if old else 'Created', f)
-    say('Agents that read AGENTS.md (Codex, Copilot, Cursor and others) now know how to use Duetsheet here.')
+    # The same section in AGENTS.md (Codex, Copilot, Cursor and others) and CLAUDE.md (Claude Code). Only the part between
+    # the markers is Duetsheet's: running this again replaces it, and everything else in the files is kept as it is.
+    # A marker counts only on a line of its own, so text that merely mentions it is never replaced.
+    section = re.compile('^' + re.escape(MARK_START) + r'[ \t]*$.*?^' + re.escape(MARK_END) + r'[ \t]*$', re.M | re.S)
+    for name in ('AGENTS.md', 'CLAUDE.md'):
+        f = root / name
+        old = f.read_text(encoding='utf-8-sig') if f.is_file() else ''
+        m = section.search(old)
+        if m:
+            new = old[:m.start()] + block.rstrip('\n') + old[m.end():]
+        else:
+            new = (old.rstrip('\n') + '\n\n' if old.strip() else '') + block
+        f.write_text(new, encoding='utf-8')
+        say('Updated' if old else 'Created', f)
+    say('Agents that read AGENTS.md or CLAUDE.md (Claude Code, Codex, Copilot, Cursor and others) now know how to use Duetsheet here.')
     return 0
 
 
@@ -551,23 +1086,48 @@ def make_shortcut(root, target):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description='Duetsheet launcher', formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__)
-    ap.add_argument('args', nargs='*', help='[check | install-skill | shortcut | init-agent] [FOLDER]')
+    ap.add_argument('args', nargs='*', help='[check | step | annotations | wait | agent-status | install-skill | shortcut | init-agent] [FOLDER]')
+    ap.add_argument('--note', default='', help='step, agent-status: a short note')
     ap.add_argument('--port', type=int, default=0, help='port (default: first free port from 8765)')
     ap.add_argument('--no-browser', action='store_true', help='do not open a browser window')
+    ap.add_argument('--deep', action='store_true', help='check: re-read every file instead of trusting size and date')
     ap.add_argument('--skills-dir', default='~/.claude/skills', help='where install-skill puts the skill')
     ap.add_argument('--to', default='', help='where shortcut puts the shortcut (default: the desktop)')
+    st = ap.add_argument_group('step', 'record a computation step (paths and patterns relative to the folder of report.json)')
+    st.add_argument('--script', default='', help='the script that was run, for example scripts/make_cells.py')
+    st.add_argument('--in', dest='inputs', action='append', default=[], metavar='PATTERN', help='files it read (repeatable; * and ** allowed)')
+    st.add_argument('--out', dest='outputs', action='append', default=[], metavar='PATTERN', help='files it wrote (repeatable)')
+    st.add_argument('--command', default='', help='the command line that was run')
+    st.add_argument('--param', action='append', default=[], metavar='KEY=VALUE', help='a parameter of the run (repeatable)')
+    st.add_argument('--id', default='', help='step id (default: s-<script name>; an existing step with this id is replaced)')
+    st.add_argument('--by', default='claude', choices=('claude', 'user'), help='who ran it (claude stands for any agent)')
     ap.add_argument('--version', action='version', version=VERSION)
     a = ap.parse_args(argv)
-    cmd = a.args[0] if a.args and a.args[0] in ('check', 'install-skill', 'shortcut', 'init-agent', 'serve') else 'serve'
+    cmds = ('check', 'step', 'annotations', 'wait', 'agent-status', 'install-skill', 'shortcut', 'init-agent', 'serve')
+    cmd = a.args[0] if a.args and a.args[0] in cmds else 'serve'
     rest = a.args[1:] if a.args and a.args[0] == cmd else a.args
     if cmd == 'install-skill':
         return install_skill(a.skills_dir)
+    state = None
+    if cmd == 'agent-status':
+        if not rest or rest[-1] not in STATES:
+            say('ERROR', 'usage: duetsheet.py agent-status FOLDER working|done|failed [--note TEXT]')
+            return 1
+        rest, state = rest[:-1], rest[-1]
     root = pathlib.Path(rest[0] if rest else os.getcwd()).expanduser().resolve()
     if not root.is_dir():
         say('ERROR', f'{root} is not a folder')
         return 1
     if cmd == 'check':
-        return run_check(root)
+        return run_check(root, a.deep)
+    if cmd == 'step':
+        return record_step(root, a)
+    if cmd == 'annotations':
+        return open_annotations(root)
+    if cmd == 'wait':
+        return wait_for_request(root)
+    if cmd == 'agent-status':
+        return set_agent_status(root, state, a.note)
     if cmd == 'shortcut':
         return make_shortcut(root, a.to)
     if cmd == 'init-agent':

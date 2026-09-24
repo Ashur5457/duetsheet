@@ -5,7 +5,7 @@ type: software
 authors:
   - family-names: Wu
     given-names: Shu Chi
-version: 0.5.0
+version: 0.6.0
 date-released: 2026-09-24
 license: MIT
 repository-code: "https://github.com/Ashur5457/duetsheet"
@@ -17,8 +17,9 @@ abstract: >-
   points stored in data coordinates; every change is recorded with its author
   and grouped into review rounds. The report is plain JSON with a published
   JSON Schema, so any LLM agent can read the feedback and revise the report.
-  Raw data keeps its provenance (path and SHA-256), and the figure style can
-  be learned from the user's own figures.
+  Raw data keeps its provenance (path and SHA-256), every chart can be traced
+  through the recorded computation steps back to its raw files, and the
+  figure style can be learned from the user's own figures.
 keywords:
   - human-in-the-loop
   - AI agents

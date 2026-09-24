@@ -1,5 +1,5 @@
 {
- "schema": "duetsheet/0.4",
+ "schema": "duetsheet/0.6",
  "blocks": {
   "b-intro": {
    "id": "b-intro",
@@ -439,7 +439,15 @@
      "b": 1.69,
      "score": 0.814
     }
-   ]
+   ],
+   "source": {
+    "path": "derived_data/cycles1-3.csv",
+    "sha256": "1b89f96c8af97687633021a8ee8bbd0a5e77a6e9905dc23096266d718a2d3911",
+    "size": 955,
+    "modified": "2026-09-24T05:22:17.021Z",
+    "importedAt": "2026-09-24T05:22:17.537Z",
+    "parser": "delimited"
+   }
   }
  },
  "report": {
@@ -456,6 +464,50 @@
    ],
    "schema": "duetsheet/0.4",
    "createdAt": "2026-09-22T00:00:00.000Z"
+  }
+ },
+ "steps": {
+  "s-combine-cycles": {
+   "id": "s-combine-cycles",
+   "script": {
+    "path": "scripts/combine_cycles.py",
+    "sha256": "a7fdcb9373d74a453217daa19bc51f8c96f66450dc7c5587d8b092e73392ca3b",
+    "size": 1022,
+    "modified": "2026-09-24T05:22:05.732Z"
+   },
+   "command": "python scripts/combine_cycles.py",
+   "params": {},
+   "inputs": [
+    {
+     "path": "data/cycle1-runs.csv",
+     "sha256": "5d87791ad7a78658f84e5108039b57d0c6d6414d68340dd3fd6f02eb047ad2af",
+     "size": 356,
+     "modified": "2026-09-24T05:22:16.848Z"
+    },
+    {
+     "path": "data/cycle2-runs.csv",
+     "sha256": "0e532fdbefa0cf066fd58fe461f7cc5ecd7f103a7faf2570171f7bbc6345d8e0",
+     "size": 365,
+     "modified": "2026-09-24T05:22:16.854Z"
+    },
+    {
+     "path": "data/cycle3-runs.csv",
+     "sha256": "91ad19632d9a4b69ee60e91c403f6d5c5a674514f7d799395099d755df438423",
+     "size": 365,
+     "modified": "2026-09-24T05:22:16.861Z"
+    }
+   ],
+   "outputs": [
+    {
+     "path": "derived_data/cycles1-3.csv",
+     "sha256": "1b89f96c8af97687633021a8ee8bbd0a5e77a6e9905dc23096266d718a2d3911",
+     "size": 955,
+     "modified": "2026-09-24T05:22:17.021Z"
+    }
+   ],
+   "at": "2026-09-24T05:22:17.487Z",
+   "by": "claude",
+   "note": "Combines the run files of cycles 1 to 3 into one table."
   }
  }
 }
