@@ -5,6 +5,7 @@
     python duetsheet.py check [FOLDER]      check the report in FOLDER and exit (exit code 1 on errors)
     python duetsheet.py install-skill       install the /duetsheet skill for Claude Code
     python duetsheet.py shortcut [FOLDER]   put a shortcut on the desktop that starts Duetsheet for FOLDER
+    python duetsheet.py init-agent [FOLDER] add a short AGENTS.md to FOLDER that points any agent to Duetsheet
 
 Where the report lives:
   - If FOLDER contains report.json, FOLDER is the project folder (raw data in FOLDER/data/).
@@ -377,6 +378,10 @@ def serve(root, port, open_browser):
     if not PAGE.is_file():
         say('ERROR', f'{PAGE} not found; keep duetsheet.py next to duetsheet.html')
         return 1
+    try:
+        stable_app(False)  # keep ~/.duetsheet/app (used by shortcuts) as new as this plugin version
+    except OSError as err:
+        say('WARNING', 'could not update', STABLE, err)
     if (project / 'report.json').is_file():
         run_check(root)
     else:
@@ -418,10 +423,65 @@ def install_skill(target):
         return 1
     dest = pathlib.Path(target).expanduser() / 'duetsheet'
     dest.mkdir(parents=True, exist_ok=True)
-    text = src.read_text(encoding='utf-8').replace('{{DUETSHEET_DIR}}', str(HERE))
+    text = src.read_text(encoding='utf-8').replace('${CLAUDE_PLUGIN_ROOT}', str(HERE))
     (dest / 'SKILL.md').write_text(text, encoding='utf-8')
     say('Installed', dest / 'SKILL.md')
     say('In Claude Code, type /duetsheet (in a new session) to start.')
+    return 0
+
+
+# ---------------------------------------------------------------- a stable place for shortcuts and pointers
+
+APP_FILES = ('duetsheet.py', 'duetsheet.html', 'AGENTS.md', 'schema/report.schema.json')
+STABLE = pathlib.Path.home() / '.duetsheet' / 'app'
+
+
+def from_plugin_cache():
+    parts = [p.lower() for p in HERE.parts]
+    return 'plugins' in parts and 'cache' in parts
+
+
+def stable_app(create):
+    """The folder that shortcuts and AGENTS.md pointers should name. A Claude Code plugin lives in a cache folder
+    that changes with every update, so from there Duetsheet copies itself to ~/.duetsheet/app and names that."""
+    if not from_plugin_cache():
+        return HERE
+    if create or STABLE.is_dir():
+        for f in APP_FILES:
+            (STABLE / f).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(HERE / f, STABLE / f)
+    return STABLE
+
+
+# ---------------------------------------------------------------- a pointer for other agents
+
+MARK_START, MARK_END = '<!-- duetsheet:start -->', '<!-- duetsheet:end -->'
+
+
+def init_agent(root):
+    app, (project, _) = stable_app(True), project_of(root)
+    py = f'"{sys.executable}"' if ' ' in sys.executable else sys.executable
+    block = '\n'.join([
+        MARK_START,
+        '## Duetsheet report',
+        '',
+        'This folder is reviewed with Duetsheet: the user reads and annotates the report in the browser while you write and revise it.',
+        '',
+        f'- Read the full rules before you change anything: `{app / "AGENTS.md"}`',
+        f'- The report: `{project / "report.json"}`. Raw data files are only read, never changed.',
+        f'- Check after every write: `{py} "{app / "duetsheet.py"}" check "{root}"`',
+        f'- Start it for the user (keep it running in the background): `{py} "{app / "duetsheet.py"}" "{root}"`',
+        MARK_END, ''])
+    f = root / 'AGENTS.md'
+    old = f.read_text(encoding='utf-8-sig') if f.is_file() else ''
+    if MARK_START in old and MARK_END in old:
+        a, b = old.index(MARK_START), old.index(MARK_END) + len(MARK_END)
+        new = old[:a] + block.rstrip('\n') + old[b:]
+    else:
+        new = (old.rstrip('\n') + '\n\n' if old.strip() else '') + block
+    f.write_text(new, encoding='utf-8')
+    say('Updated' if old else 'Created', f)
+    say('Agents that read AGENTS.md (Codex, Copilot, Cursor and others) now know how to use Duetsheet here.')
     return 0
 
 
@@ -455,7 +515,7 @@ def shortcut_name(root):
 def make_shortcut(root, target):
     dest = pathlib.Path(target).expanduser() if target else desktop_dir()
     dest.mkdir(parents=True, exist_ok=True)
-    name, py, script = shortcut_name(root), sys.executable, HERE / 'duetsheet.py'
+    name, py, script = shortcut_name(root), sys.executable, stable_app(True) / 'duetsheet.py'
     if os.name == 'nt':
         # The .lnk is made in a temporary folder and then moved: Windows may keep PowerShell from writing to the
         # desktop (controlled folder access) while still letting Python do it. WScript.Shell only creates the file:
@@ -491,14 +551,14 @@ def make_shortcut(root, target):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description='Duetsheet launcher', formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__)
-    ap.add_argument('args', nargs='*', help='[check | install-skill | shortcut] [FOLDER]')
+    ap.add_argument('args', nargs='*', help='[check | install-skill | shortcut | init-agent] [FOLDER]')
     ap.add_argument('--port', type=int, default=0, help='port (default: first free port from 8765)')
     ap.add_argument('--no-browser', action='store_true', help='do not open a browser window')
     ap.add_argument('--skills-dir', default='~/.claude/skills', help='where install-skill puts the skill')
     ap.add_argument('--to', default='', help='where shortcut puts the shortcut (default: the desktop)')
     ap.add_argument('--version', action='version', version=VERSION)
     a = ap.parse_args(argv)
-    cmd = a.args[0] if a.args and a.args[0] in ('check', 'install-skill', 'shortcut', 'serve') else 'serve'
+    cmd = a.args[0] if a.args and a.args[0] in ('check', 'install-skill', 'shortcut', 'init-agent', 'serve') else 'serve'
     rest = a.args[1:] if a.args and a.args[0] == cmd else a.args
     if cmd == 'install-skill':
         return install_skill(a.skills_dir)
@@ -510,6 +570,8 @@ def main(argv=None):
         return run_check(root)
     if cmd == 'shortcut':
         return make_shortcut(root, a.to)
+    if cmd == 'init-agent':
+        return init_agent(root)
     return serve(root, a.port, not a.no_browser)
 
 

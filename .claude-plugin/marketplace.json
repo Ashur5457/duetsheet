@@ -1,0 +1,13 @@
+{
+  "name": "duetsheet",
+  "owner": {
+    "name": "Ashur5457"
+  },
+  "plugins": [
+    {
+      "name": "duetsheet",
+      "source": "./",
+      "description": "Interactive reports that you and Claude review and revise together. Adds the /duetsheet skill."
+    }
+  ]
+}

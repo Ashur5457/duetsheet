@@ -59,17 +59,20 @@ Describing "the cluster of points in the upper left of the second figure looks o
 
 ### With Claude Code (recommended)
 
-1. Clone this repository (or download it as a ZIP) anywhere on your computer. You need Python 3.8 or later; nothing else to install.
-2. Install the `/duetsheet` skill once:
-   ```bash
-   python duetsheet.py install-skill
+You need Python 3.8 or later (nothing else to install).
+
+1. In Claude Code (terminal, VS Code, JetBrains or desktop app), install once:
    ```
-3. Open Claude Code in the folder that holds your raw data (CSV, TSV, JSON; Excel is converted by Claude) and type `/duetsheet`, or just say:
+   /plugin marketplace add Ashur5457/duetsheet
+   /plugin install duetsheet@duetsheet
+   ```
+   Other ways to install (git, no plugin system) and how to update: [tutorial, section 0](docs/tutorial.md#0-install).
+2. Open Claude Code in the folder that holds your raw data (CSV, TSV, JSON; Excel is converted by Claude) and type `/duetsheet`, or just say:
    > Start Duetsheet and write a report from the data in this folder.
 
    Claude reads [`AGENTS.md`](AGENTS.md), proposes a report, writes it after you agree, checks it, and starts Duetsheet. The report opens in your browser, already connected to the folder. Duetsheet keeps its files in a `duetsheet/` subfolder; your raw data is never modified.
-4. Review in **Edit** mode: change things directly, comment, draw on figures. Click **Finish this round**.
-5. Tell Claude:
+3. Review in **Edit** mode: change things directly, comment, draw on figures. Click **Finish this round**.
+4. Tell Claude:
    > Read my annotations and revise the report.
 
    The page picks up Claude's changes within a few seconds. Everything it changed appears in the change log, marked as the agent's. If something goes wrong, the page reports it to Claude (and under **⚠** at the top), so Claude can fix it.
@@ -82,7 +85,7 @@ Start Duetsheet for your data folder yourself:
 python path/to/duetsheet.py "path/to/your/data-folder"
 ```
 
-It opens the report in your default browser (any modern browser). Your agent (Codex, Gemini CLI, Cursor, a script) edits `duetsheet/report.json` in that folder, following [`AGENTS.md`](AGENTS.md), and runs `python duetsheet.py check <folder>` to validate it.
+It opens the report in your default browser (any modern browser). Your agent (Codex, Copilot, Gemini CLI, Cursor, a script) edits `duetsheet/report.json` in that folder, following [`AGENTS.md`](AGENTS.md), and runs `python duetsheet.py check <folder>` to validate it. Run `python duetsheet.py init-agent <folder>` once and agents that read `AGENTS.md` find these instructions by themselves.
 
 Without Python: open [`duetsheet.html`](duetsheet.html) in **Chrome** or **Edge**, click **Open project folder** and choose your data folder. To try the demo, choose [`examples/demo-project`](examples/demo-project). Firefox and Safari cannot open folders from the page: use the launcher, or **Save report file** and **Open report file**.
 
@@ -104,8 +107,8 @@ The [tutorial](docs/tutorial.md) walks through it step by step with screenshots.
 Duetsheet does not call any AI model by itself (except the optional "estimate style from PNG" in a Claude Artifact). Your agent reads and writes the report as JSON:
 
 - [`AGENTS.md`](AGENTS.md): the data model, how to write `report.json` safely, and step-by-step tasks (revise from annotations, import data, learn figure habits, write a new report).
-- [`duetsheet.py`](duetsheet.py): the launcher (`python duetsheet.py <folder>`) and checker (`python duetsheet.py check <folder>`).
-- [`skills/duetsheet/SKILL.md`](skills/duetsheet/SKILL.md): the `/duetsheet` skill for Claude Code (`python duetsheet.py install-skill`).
+- [`duetsheet.py`](duetsheet.py): the launcher (`python duetsheet.py <folder>`), checker (`check <folder>`), desktop shortcut (`shortcut <folder>`) and pointer for other agents (`init-agent <folder>`).
+- [`skills/duetsheet/SKILL.md`](skills/duetsheet/SKILL.md): the `/duetsheet` skill for Claude Code, installed as a plugin (`/plugin marketplace add Ashur5457/duetsheet`) or with `python duetsheet.py install-skill`.
 - [`schema/report.schema.json`](schema/report.schema.json): the formal JSON Schema.
 - [`examples/demo-project/`](examples/demo-project/): a complete project folder.
 - [`llms.txt`](llms.txt): a short index for LLMs.

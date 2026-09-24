@@ -4,20 +4,59 @@ This tutorial walks through one full review cycle: open a report, bring in raw d
 
 You need a desktop computer. There are two ways to open a report:
 
-- **From Claude Code (fastest)**: see the next section. Claude starts Duetsheet for your data folder and the report opens by itself.
+- **From Claude Code (fastest)**: install once (section 0), then see section 0b. Claude starts Duetsheet for your data folder and the report opens by itself.
 - **By hand**: open `duetsheet.html` in Chrome or Edge and choose the folder (steps 1 and 2 below). No install is needed.
 
 A third path, Claude Artifacts on claude.ai, is at the end.
 
-## 0. Fastest: start from Claude Code
+## 0. Install
 
-Once, in the folder where you cloned or unzipped Duetsheet (Python 3.8 or later):
+Every way of using Duetsheet on your computer needs **Python 3.8 or later** (nothing else: no packages to install). Check with `python --version`.
 
-```bash
-python duetsheet.py install-skill
+### With Claude Code (recommended)
+
+In Claude Code (terminal, VS Code extension, JetBrains plugin or desktop app, with a subscription or an API key), type these two lines once:
+
+```
+/plugin marketplace add Ashur5457/duetsheet
+/plugin install duetsheet@duetsheet
 ```
 
-Then open Claude Code in the folder that holds your raw data and type `/duetsheet`. Claude reads `AGENTS.md`, proposes a report, writes it after you agree, checks it with `duetsheet.py check`, and starts the launcher. Your browser opens the report, already connected to the folder: skip to step 3.
+Start a new session and type `/`: **duetsheet** is in the list. That's it.
+
+- **Update**: `/plugin marketplace update duetsheet`, then start a new session.
+- **Remove**: `/plugin uninstall duetsheet@duetsheet`.
+
+### Without the plugin system
+
+If you prefer a copy of the repository on your computer (you need [git](https://git-scm.com/)):
+
+```bash
+git clone https://github.com/Ashur5457/duetsheet.git && python duetsheet/duetsheet.py install-skill
+```
+
+This installs the same `/duetsheet` skill into `~/.claude/skills/`, pointing to that copy. To update: `git pull` in that folder, then run `python duetsheet.py install-skill` again. If you move the folder, run `install-skill` again.
+
+### With other AI agents (Copilot, Cursor, Codex, Gemini CLI, Cline and others)
+
+These agents do not use Claude Code skills, but most of them read an `AGENTS.md` file in the folder they work in. Get Duetsheet (clone or [download the ZIP](https://github.com/Ashur5457/duetsheet/archive/refs/heads/main.zip)), then, once per data folder:
+
+```bash
+python path/to/duetsheet.py init-agent "path/to/data-folder"
+```
+
+It adds a short section to `AGENTS.md` in the data folder (or creates the file) that tells any agent where the full rules are and how to check and start the report. Existing content in that file is kept; running it again only refreshes the section.
+
+Duetsheet itself never calls an AI model or needs an API key: your agent reads and writes `report.json`.
+
+### Opening a report later without an agent
+
+- `python path/to/duetsheet.py shortcut "path/to/data-folder"` puts a shortcut on your desktop. Double-click it to open the report; keep the window that opens while you use it.
+- To show the report to someone who has nothing installed, click **Export read-only copy** at the top of the page and send them the HTML file from `exports/`. It opens in any browser.
+
+## 0b. Start from Claude Code
+
+Open Claude Code in the folder that holds your raw data and type `/duetsheet`. Claude reads `AGENTS.md`, proposes a report, writes it after you agree, checks it with `duetsheet.py check`, and starts the launcher. Your browser opens the report, already connected to the folder: skip to step 3.
 
 Without Claude Code you can start the launcher yourself: `python path/to/duetsheet.py "path/to/data-folder"`.
 

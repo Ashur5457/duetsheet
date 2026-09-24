@@ -47,12 +47,13 @@ battery-test-0924/            the raw data folder the user works in
 python duetsheet.py "<folder>"          # start (keep it running, for example as a background process)
 python duetsheet.py check "<folder>"    # check report.json; exit code 1 on errors
 python duetsheet.py shortcut "<folder>" # put a desktop shortcut that starts Duetsheet for the folder
+python duetsheet.py init-agent "<folder>" # add a short AGENTS.md to the folder that points agents here
 ```
 
 - It serves the page on `127.0.0.1` with a random token, and lets the page write only Duetsheet's own files (`report.json`, `assets/`, `exports/`, `habits/`, `lang/`, `errors.log`). Raw data is read only.
 - Every problem the page reports (a `report.json` it cannot read, a failed save, a failed import) is printed as `[duetsheet] ERROR ...` or `[duetsheet] WARNING ...` and appended to `errors.log` next to `report.json`. Watch this output after you write.
 - Without the launcher, the user can open `duetsheet.html` in Chrome or Edge and choose the folder; the same layout rule applies.
-- For Claude Code there is a `/duetsheet` skill: `python duetsheet.py install-skill` installs it (see `skills/duetsheet/SKILL.md`).
+- For Claude Code there is a `/duetsheet` skill, installed as a plugin (`/plugin marketplace add Ashur5457/duetsheet`, then `/plugin install duetsheet@duetsheet`) or with `python duetsheet.py install-skill` (see `skills/duetsheet/SKILL.md`).
 
 ### `report.json`
 
