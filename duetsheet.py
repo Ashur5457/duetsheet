@@ -458,13 +458,16 @@ def make_shortcut(root, target):
     name, py, script = shortcut_name(root), sys.executable, HERE / 'duetsheet.py'
     if os.name == 'nt':
         # The .lnk is made in a temporary folder and then moved: Windows may keep PowerShell from writing to the
-        # desktop (controlled folder access) while still letting Python do it.
+        # desktop (controlled folder access) while still letting Python do it. WScript.Shell only creates the file:
+        # it stores paths in the ANSI code page, so the paths are set through Shell.Application, which keeps Unicode.
         link = dest / (name + '.lnk')
         tmp = pathlib.Path(tempfile.mkdtemp(prefix='duetsheet-')) / 'shortcut.lnk'
         q = lambda v: "'" + str(v).replace("'", "''") + "'"
-        ps = (f'$s=(New-Object -ComObject WScript.Shell).CreateShortcut({q(tmp)});$s.TargetPath={q(py)};'
-              f'$s.Arguments={q(chr(34) + str(script) + chr(34) + " " + chr(34) + str(root) + chr(34))};'
-              f'$s.WorkingDirectory={q(root)};$s.Description={q("Start Duetsheet for " + str(root))};$s.Save()')
+        args = f'"{script}" "{root}"'
+        ps = (f'$w=(New-Object -ComObject WScript.Shell).CreateShortcut({q(tmp)});$w.TargetPath={q(os.environ.get("COMSPEC", "cmd.exe"))};$w.Save();'
+              f'$s=(New-Object -ComObject Shell.Application).NameSpace({q(tmp.parent)}).ParseName({q(tmp.name)}).GetLink;'
+              f'$s.Path={q(py)};$s.Arguments={q(args)};$s.WorkingDirectory={q(root)};'
+              f'$s.Description={q("Start Duetsheet for " + root.name)};$s.Save()')
         enc = base64.b64encode(ps.encode('utf-16-le')).decode('ascii')
         r = subprocess.run(['powershell', '-NoProfile', '-NonInteractive', '-EncodedCommand', enc], capture_output=True, text=True, errors='replace')
         try:
