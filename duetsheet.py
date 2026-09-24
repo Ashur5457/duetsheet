@@ -472,6 +472,9 @@ def check_report(project, root=None, deep=False):
             continue
         if a.get('status') not in ('open', 'done'):
             errors.append(f'annotations.{key}.status must be open or done')
+        th = a.get('thread', [])
+        if not isinstance(th, list) or not all(isinstance(m, dict) and m.get('by') in ('user', 'claude') and isinstance(m.get('text'), str) for m in th):
+            errors.append(f'annotations.{key}.thread must be a list of {{"by": "user" | "claude", "text", "at"}}')
         bid = (a.get('target') or {}).get('blockId')
         if bid and bid not in blocks:
             warnings.append(f'annotations.{key} points at block "{bid}", which no longer exists')
@@ -483,6 +486,14 @@ def check_report(project, root=None, deep=False):
         for i, r in enumerate(prop.get('rows') or []):
             if not isinstance(r, dict) or r.get('field') not in STYLE_FIELDS:
                 warnings.append(f'style.proposal.rows[{i}] has an unknown field and will be ignored')
+    for doc in ('writing', 'writingProposal'):
+        w = (rep.get('style') or {}).get(doc) if isinstance(rep.get('style'), dict) else None
+        if w is not None and (not isinstance(w, dict) or not isinstance(w.get('rules'), list)):
+            errors.append(f'style.{doc} must be {{"rules": [{{"text": ...}}]}}')
+        elif w:
+            for i, r in enumerate(w['rules']):
+                if not isinstance(r, dict) or not isinstance(r.get('text'), str) or not r['text'].strip():
+                    warnings.append(f'style.{doc}.rules[{i}] needs a "text" and will be ignored')
     e, w, n = check_chain(project, root, rep, deep)
     return errors + e, warnings + w, notes + n
 
@@ -512,6 +523,7 @@ def run_check(root, deep=False):
 # A request is only a notice; the agent reads the annotations from report.json and treats them as feedback.
 
 RUN_DIR = pathlib.Path(os.environ.get('DUETSHEET_RUN_DIR') or pathlib.Path.home() / '.duetsheet' / 'run')
+PERSONAL_DIR = pathlib.Path(os.environ.get('DUETSHEET_HABITS_DIR') or pathlib.Path.home() / '.duetsheet' / 'habits')   # habits for all projects
 KINDS = ('revise',)
 STATES = ('working', 'done', 'failed')
 FRESH_S = 15          # an agent is listening when listening.json is younger than this
@@ -634,8 +646,10 @@ def open_annotations(root):
                 if len(rows) > 30:
                     item['targetRowsNote'] = f'{len(rows) - 30} more rows not shown'
         out.append(item)
+    style = rep.get('style') if isinstance(rep.get('style'), dict) else {}
+    rules = [r.get('text') for r in ((style.get('writing') or {}).get('rules') or []) if isinstance(r, dict) and r.get('text')]
     print(json.dumps({'report': (rep.get('report') or {}).get('meta', {}).get('title'), 'file': str(project / 'report.json'),
-                      'open': len(out), 'lastRoundAt': last or None,
+                      'writingRules': rules, 'open': len(out), 'lastRoundAt': last or None,
                       'userChangesAfterLastRound': sum(1 for c in changes if isinstance(c, dict) and c.get('by') == 'user' and c.get('at', '') > last),
                       'annotations': out}, ensure_ascii=False, indent=1))
     return 0
@@ -724,6 +738,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if path == '/api/agent':
             project, _ = project_of(self.root)
             return self.send(200, json.dumps(agent_state(project)), 'application/json')
+        if path == '/api/personal':   # the user's habits shared by all projects
+            return self.send(200, json.dumps({k: read_json(PERSONAL_DIR / f'{k}.json') for k in ('profile', 'writing')}), 'application/json')
         if path.startswith('/fs/'):
             t = self.target()
             if not t:
@@ -799,6 +815,28 @@ class Handler(http.server.BaseHTTPRequestHandler):
                         out.append({'path': ref['path'], 'state': 'missing', 'error': str(err)})
             Handler.prints.save()
             return self.send(200, json.dumps(out), 'application/json')
+        if path == '/api/reveal':   # open the folder of a file in Explorer / Finder, with the file selected
+            try:
+                rel = json.loads(body.decode('utf-8'))['path']
+                assert isinstance(rel, str) and rel
+            except Exception:
+                return self.send(400, 'expected {"path": ...}')
+            project, _ = project_of(self.root)
+            if not inside(self.root, project, rel):
+                return self.send(403, 'outside the folder')
+            p = (project / norm(rel)).resolve()
+            if not p.exists():
+                return self.send(404, 'not found')
+            try:
+                if os.name == 'nt':
+                    subprocess.Popen(f'explorer /select,"{p}"')   # a Windows path cannot contain a double quote
+                elif sys.platform == 'darwin':
+                    subprocess.Popen(['open', '-R', str(p)])
+                else:
+                    subprocess.Popen(['xdg-open', str(p.parent if p.is_file() else p)])
+            except OSError as err:
+                return self.send(500, f'could not open the folder: {err}')
+            return self.send(204)
         if path == '/api/revise':   # the page's "Ask the agent to revise": only a kind and a count are taken from the page
             try:
                 req = json.loads(body.decode('utf-8'))
@@ -824,6 +862,16 @@ class Handler(http.server.BaseHTTPRequestHandler):
     def do_PUT(self):
         if not self.allowed() or not self.authorised():
             return
+        if urllib.parse.urlsplit(self.path).path == '/api/personal':   # {profile?, writing?} -> ~/.duetsheet/habits/
+            try:
+                new = json.loads(self.rfile.read(min(int(self.headers.get('Content-Length', 0) or 0), 2_000_000)).decode('utf-8'))
+                assert isinstance(new, dict)
+            except Exception:
+                return self.send(400, 'expected {"profile": {...}, "writing": {"rules": [...]}}')
+            for k in ('profile', 'writing'):
+                if isinstance(new.get(k), dict):
+                    write_json(PERSONAL_DIR / f'{k}.json', {**new[k], 'savedAt': now_iso()})
+            return self.send(204)
         if not urllib.parse.urlsplit(self.path).path.startswith('/fs/'):
             return self.send(404)
         t = self.target()

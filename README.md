@@ -25,6 +25,7 @@ Describing "the cluster of points in the upper left of the second figure looks o
 - **Edit mode**: edit titles, text and captions in place; change chart type, dataset, axes, ranges and log scale; crop and resize images; drag blocks to reorder, or switch to **Reorder (titles only)** to see every block as one line, page by page, and drag a figure together with its discussion; add or delete blocks.
 - **Visual annotation on figures**: box-select or free-hand lasso on charts and images, or click a single data point in Edit mode (in View mode, pointing at a point shows its values). A small dialog opens right there to say what should change. On charts the annotation stores the **data-space range and the enclosed data points**, not pixels, so the agent knows exactly which measurements you mean.
 - **Ask the agent to revise**: one button at the top sends your comments to the agent that started the report (it waits in the background with `duetsheet.py wait`, at no cost). The page shows when the request is sent, when the agent is working and how many comments it handled, and reloads the revised report by itself. The page never calls a model: the request is only a notice, and the agent reads your comments from the report.
+- **Conversations on comments**: the agent answers under each comment, and you can answer back; your answer reopens the comment for the next round.
 - **Per-block comments** with preset tags ("more concise", "add data", "use log scale", "add trend line", ...) and quotes of selected text.
 
 **History**
@@ -40,7 +41,8 @@ Describing "the cluster of points in the upper left of the second figure looks o
 
 **Your style**
 - **Style profile**: fonts, tick and axis-title sizes in points, marker size, line width, tick direction, frame, grid, colour palette, figure width presets (free, ACS single column, ACS double column), and defaults for new charts. Exportable as a matplotlib `.mplstyle` file or JSON.
-- **Learn your habits**: put your own figures and `.mplstyle` files in `habits/` and click **Learn my habits**. SVG files are measured exactly; each suggestion shows which files it comes from, and nothing changes until you tick it. Save the result as `habits/profile.json` and reuse it in your next project. Agents can add suggestions from PNG figures or plotting scripts, which you confirm the same way.
+- **Learn your habits**: put your own figures and `.mplstyle` files in `habits/figures/` and click **Learn my habits** (Folder > Habits). SVG files are measured exactly; each suggestion shows which files it comes from, and nothing changes until you tick it. Save the result as `habits/profile.json` and reuse it in your next project. Agents can add suggestions from PNG figures or plotting scripts, which you confirm the same way.
+- **Learn how you write**: put articles and reports you wrote in `habits/writing/` (.md, .txt, .docx, .pdf). The page measures sentence and paragraph lengths; your agent reads the texts and suggests writing rules (tone, paragraph rhythm, numbers and units, wording) with the files each one comes from. You tick the rules to keep, and agents follow them whenever they write. Figure and writing habits can be saved once as personal habits and loaded in every new project.
 - **Habit suggestions**: when you make the same chart change on three charts (for example switching to a log axis), Duetsheet offers to make it the default.
 
 **For everyone**

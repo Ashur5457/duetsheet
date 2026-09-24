@@ -122,6 +122,8 @@ Open the **Folder** tab in the panel. Files in `data/` are listed with their sta
 
 The file becomes a dataset. Duetsheet records where it came from: the path and a SHA-256 fingerprint of the file. If the file changes later, the Folder tab says "changed since import", charts that use it show a warning in Edit mode, and **Update** imports the new version (the change log keeps both).
 
+Files are grouped by folder: **Import all** imports every file of one folder at once. **Show in folder** opens the file's folder in File Explorer or Finder (with the launcher; otherwise it copies the path).
+
 To plot the new data, switch to **Edit**, click **Add chart**, open **Chart settings** and pick the dataset.
 
 ## 3b. Trace a figure back to its raw data
@@ -171,7 +173,7 @@ If no agent is listening (for example, you opened the report with a desktop shor
 
 ![The agent's replies under each comment, and Figure 1 now on a log axis](agent-reply.png)
 
-Comments the agent handled are marked **Done** with its reply. A comment it could not settle stays **Open**, with a question for you.
+Comments the agent handled are marked **Done** with its reply. A comment it could not settle stays **Open**, with a question for you. To answer the agent, write under its reply and click **Reply**: the comment opens again, and the next **Ask the agent to revise** sends your answer. The agent bar above the report shows whether an agent is listening and what it is doing.
 
 ## 6. Check what changed
 
@@ -181,9 +183,11 @@ The timeline has one row per block and one column per round. Filled markers are 
 
 ![The change history and the timeline](change-log.png)
 
-## 7. Teach it your figure style
+## 7. Teach it your figure style and your writing
 
-Put figures you like in `habits/`: SVG exports from Origin, matplotlib, R or other tools, and `.mplstyle` files. In the **Folder** tab, click **Learn my habits**.
+The **Folder** tab has two parts: **Data** (the data chain and your data files) and **Habits**.
+
+Put figures you like in `habits/figures/`: SVG exports from Origin, matplotlib, R or other tools, and `.mplstyle` files. In Folder > Habits, click **Learn my habits**.
 
 Duetsheet measures the SVG files exactly (font, sizes, line width, colours, figure width), reads the `.mplstyle` files, and lists what it found. Each suggestion shows which files it is based on; suggestions that most files agree on are ticked. Nothing changes until you click **Apply selected**.
 
@@ -192,6 +196,10 @@ Duetsheet measures the SVG files exactly (font, sizes, line width, colours, figu
 - **Save current style as my habits** writes `habits/profile.json`. Copy it into the `habits/` folder of your next project to start from the same style.
 - PNG and JPG figures cannot be measured by the page. Ask your agent to look at them: it writes its suggestions to `style/proposal`, and they appear in the Style tab for you to confirm in the same way.
 - **Export** in the Style tab saves the style as a matplotlib `.mplstyle` file (`exports/duetsheet-style.mplstyle`), so your plotting scripts can use it too.
+
+**Your writing.** Put articles or reports you wrote in `habits/writing/` (.md, .txt, .docx, .pdf). **Measure my texts** shows plain numbers (sentence and paragraph length, lists, bold). For the rest, ask your agent: *Learn my writing style from habits/writing/.* Its suggestions (for example *Give the conclusion first, then the numbers*) appear in Folder > Habits with the files each one comes from; tick the ones to keep and click **Apply selected**. You can also add or remove rules yourself. Agents follow these rules whenever they write or revise text.
+
+**Personal habits.** With the launcher, **Save as my personal habits** keeps your figure style and writing rules in `~/.duetsheet/habits/`, and **Load my personal habits** brings them into any new project.
 
 ## 8. Other languages
 

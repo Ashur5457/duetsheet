@@ -56,9 +56,21 @@ button,input,select,textarea{font:inherit;color:inherit}
 .seg button+button{border-left:1px solid var(--line)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .hint{color:var(--muted);font-size:13px;flex:1 1 220px}
-#agentbar{display:inline-flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
-#agentbar:empty{display:none}
-#agentbar .ast{font-size:12.5px;color:var(--muted);max-width:360px}
+#agentbar{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin:0 0 12px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);font-size:13px}
+#agentbar[hidden]{display:none}
+.reply.me{border-left-color:var(--c2)}
+.linkbtn.rv{font-size:12px;color:var(--muted)}
+.flist li.grp{background:var(--soft);font-weight:500;padding:5px 6px}
+.flist li.sub{padding-left:14px}
+.ftop{margin:0 0 6px}
+.wstats{margin:6px 0;font-size:13px;border-collapse:collapse}.wstats th{text-align:left;font-weight:400;color:var(--muted);padding:2px 14px 2px 0}
+.wadd input{flex:1;min-width:0;font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:5px;background:var(--paper);color:var(--ink)}
+.wrules .chk{display:flex;gap:6px;align-items:baseline;flex:1 1 60%}
+.areply{display:flex;gap:6px;align-items:flex-end;margin:6px 0}
+.areply textarea{flex:1;min-width:0;box-sizing:border-box;font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:5px;background:var(--paper);color:var(--ink)}
+#agentbar .conn{display:inline-flex;gap:6px;align-items:center;font-weight:500}
+#agentbar .sp{flex:1}
+#agentbar .ast{font-size:13px;color:var(--muted)}
 #agentbar .ast.bad{color:var(--c5)}
 #agentbar .ast.ok{color:var(--ok)}
 #lang{border:1px solid var(--line);border-radius:7px;padding:5px 8px;background:var(--paper)}
@@ -101,7 +113,7 @@ main{min-width:0}
 /* data chain */
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c0);flex:0 0 auto}
 .dot.ok{background:var(--ok)}.dot.stale{background:var(--c5)}
-.srcl{display:flex;align-items:center;gap:6px;margin:3px 0 0;padding:0;border:0;background:none;color:var(--muted);font:inherit;font-size:12px;line-height:1.4;cursor:pointer;text-align:left;max-width:100%}
+.srcl{display:flex;align-items:center;gap:7px;margin:5px 0 0;padding:0;border:0;background:none;color:var(--ink);font:inherit;font-size:13.5px;font-weight:600;line-height:1.45;cursor:pointer;text-align:left;max-width:100%}
 .srcl .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .srcl:hover .t{text-decoration:underline}
 .chain{font-size:13px;width:min(760px,86vw);line-height:1.45}
@@ -349,7 +361,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
     <button type="button" data-mode="edit" aria-pressed="false">Edit</button>
   </div>
   <span class="hint" id="hint"></span>
-  <span id="agentbar"></span>
   <button type="button" class="btn issues" id="issuesBtn" hidden aria-label="Problems"></button>
   <select id="lang" aria-label="Language"></select>
   <button type="button" class="btn" id="helpBtn" aria-label="Help">?</button>
@@ -359,6 +370,7 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
 <div class="wrap">
 <main>
   <div id="note-db" hidden><span id="note-text"></span><span id="note-acts"></span></div>
+  <div id="agentbar" hidden></div>
   <section id="view" aria-label="View">
     <div id="pagehost"></div>
     <div class="pager">
@@ -550,7 +562,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Comments": "註記",
  "Done": "已改",
  "Open": "待處理",
- "Claude: ": "Claude：",
  "Jump to": "跳到位置",
  "Reopen": "重新開啟",
  "Mark done": "標為已改",
@@ -784,13 +795,11 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Data": "數據",
  "{n} rows, {c} columns": "{n} 列、{c} 欄",
  "To attach data files, open a project folder or use the claude.ai link.": "要附上數據檔，請開啟專案資料夾，或用 claude.ai 上的連結開啟。",
- "Figure habits (habits/)": "作圖習慣（habits/）",
  "{svg} SVG, {mpl} matplotlib style and {ras} PNG/JPG files.": "{svg} 個 SVG、{mpl} 個 matplotlib 樣式檔、{ras} 個 PNG/JPG 檔。",
  "Your saved habits (profile.json) are there too.": "也有你存下的習慣檔（profile.json）。",
  "PNG and JPG files cannot be measured here. Ask your agent to look at them, or export them as SVG.": "PNG、JPG 檔無法在這裡測量。請 agent 看圖，或改存成 SVG。",
  "Learn my habits": "學習我的習慣",
  "Save current style as my habits": "把目前樣式存成我的習慣",
- "Saved habits go to habits/profile.json. Copy that file into the habits/ folder of your next project to start from the same style.": "習慣會存到 habits/profile.json。把這個檔案複製到下一個專案的 habits/ 資料夾，就能從同樣的樣式開始。",
  "{k} of {n} files: {files}": "{n} 個檔案中有 {k} 個：{files}",
  "Your habits already match the current style. Nothing to change.": "你的習慣和目前樣式一致，沒有需要修改的項目。",
  "No SVG, .mplstyle or profile.json files in habits/.": "habits/ 裡沒有 SVG、.mplstyle 或 profile.json 檔。",
@@ -947,7 +956,58 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "New files not used yet ({n})": "尚未用到的新檔案（{n}）",
  "Input patterns": "輸入規則",
  "{n} new raw files not used yet.": "有 {n} 個新的原始檔尚未用到。",
- "{n} new": "{n} 個新檔"
+ "{n} new": "{n} 個新檔",
+ "Add": "加入",
+ "Add a rule of your own, for example: Give the conclusion first, then the numbers.": "自己加一條規則，例如：先講結論，再給數字。",
+ "Agent: ": "agent：",
+ "You: ": "你：",
+ "Answer the agent…": "回覆 agent…",
+ "Reply": "回覆",
+ "Reply added. Click \"Ask the agent to revise\" when you are ready.": "已加入回覆。準備好後按「請 agent 修改」。",
+ "Available when the report is opened with the launcher (duetsheet.py). Meanwhile, copy habits/profile.json and habits/writing.json between projects.": "用啟動程式（duetsheet.py）打開報告時才能用。在那之前，可以在專案之間複製 habits/profile.json 和 habits/writing.json。",
+ "Average paragraph (sentences)": "平均段落長（句）",
+ "Average sentence (characters)": "平均句長（字元）",
+ "Bold phrases": "粗體片語數",
+ "Copy path": "複製路徑",
+ "Could not load your personal habits.": "無法載入你的個人習慣。",
+ "Could not open the folder.": "無法打開資料夾。",
+ "Figure habits (habits/figures/)": "作圖習慣（habits/figures/）",
+ "Figure suggestions are in the Style tab.": "作圖建議在「樣式」分頁。",
+ "Files": "檔案數",
+ "From {src}": "來自{src}",
+ "your personal habits": "你的個人習慣",
+ "Habits": "習慣",
+ "Import all {n}": "全部匯入（{n}）",
+ "Import {n} files from {dir}? Each one becomes a dataset in the report.": "要從 {dir} 匯入 {n} 個檔案嗎？每個檔案都會變成報告裡的一個資料集。",
+ "Imported {n} files from {dir}.": "已從 {dir} 匯入 {n} 個檔案。",
+ "all imported": "都已匯入",
+ "Lines that are list items": "清單行的比例",
+ "Load habits/writing.json": "載入 habits/writing.json",
+ "Load my personal habits": "載入我的個人習慣",
+ "Measure my texts": "計算我的文字統計",
+ "No agent connected": "目前沒有 agent 連線",
+ "None yet. Agents follow these rules whenever they write or revise text in this report.": "還沒有。agent 在這份報告裡寫或改文字時，都會照這些規則。",
+ "Nothing new: these habits are already applied.": "沒有新的：這些習慣已經套用了。",
+ "Personal habits (all projects)": "個人習慣（所有專案共用）",
+ "Put articles or reports you wrote in habits/writing/ (.md, .txt, .docx, .pdf). Your agent learns your writing style from them, and you confirm each rule here.": "把你寫過的文章或報告放進 habits/writing/（.md、.txt、.docx、.pdf）。agent 會從中學你的寫作風格，每條規則都由你在這裡確認。",
+ "Put figures you like in habits/figures/ (SVG, PNG, .mplstyle, plotting scripts). Suggestions appear in the Style tab. Saved habits go to habits/profile.json.": "把你喜歡的圖放進 habits/figures/（SVG、PNG、.mplstyle、作圖程式）。建議會出現在「樣式」分頁。存下的習慣放在 habits/profile.json。",
+ "Save as my personal habits": "存成我的個人習慣",
+ "Save as my writing habits": "存成我的寫作習慣",
+ "Save this report's figure style and writing habits once, and load them in every new project.": "把這份報告的作圖樣式和寫作習慣存一次，之後每個新專案都能載入。",
+ "Saved as your personal habits. New projects can load them.": "已存成你的個人習慣，新專案可以載入。",
+ "Saved habits go to habits/writing.json. Copy that file into the habits/ folder of your next project to start from the same habits.": "存下的習慣放在 habits/writing.json。把它複製到下一個專案的 habits/ 資料夾，就能從同樣的習慣開始。",
+ "Sentences": "句數",
+ "Show in folder": "在資料夾中顯示",
+ "Suggested by the agent": "agent 的建議",
+ "Tone, paragraph rhythm and wording need reading. Ask your agent: \"Learn my writing style from habits/writing/\". Its suggestions appear here for you to tick.": "語氣、段落節奏和用詞需要靠閱讀判斷。請跟 agent 說：「從 habits/writing/ 學我的寫作風格」。它的建議會出現在這裡讓你勾選。",
+ "Writing habits": "寫作習慣",
+ "field|Writing habits": "寫作習慣",
+ "Writing habits (habits/writing/)": "寫作習慣（habits/writing/）",
+ "Writing habits updated.": "寫作習慣已更新。",
+ "You have personal habits: a figure style and {n} writing rules. Load them to use them in this report.": "你有個人習慣：一套作圖樣式和 {n} 條寫作規則。載入後就能用在這份報告。",
+ "Your writing habits ({n})": "你的寫作習慣（{n}）",
+ "added by you": "你自己加的",
+ "{t} Markdown or text, {d} Word and {p} PDF files.": "{t} 個 Markdown 或文字檔、{d} 個 Word、{p} 個 PDF。"
 },
 "zh-Hans": {
  "_name": "简体中文",
@@ -1072,7 +1132,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Comments": "批注",
  "Done": "已改",
  "Open": "待处理",
- "Claude: ": "Claude：",
  "Jump to": "跳转到位置",
  "Reopen": "重新打开",
  "Mark done": "标为已改",
@@ -1306,13 +1365,11 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Data": "数据",
  "{n} rows, {c} columns": "{n} 行、{c} 列",
  "To attach data files, open a project folder or use the claude.ai link.": "要附上数据文件，请打开项目文件夹，或通过 claude.ai 上的链接打开。",
- "Figure habits (habits/)": "作图习惯（habits/）",
  "{svg} SVG, {mpl} matplotlib style and {ras} PNG/JPG files.": "{svg} 个 SVG、{mpl} 个 matplotlib 样式文件、{ras} 个 PNG/JPG 文件。",
  "Your saved habits (profile.json) are there too.": "还有你保存的习惯文件（profile.json）。",
  "PNG and JPG files cannot be measured here. Ask your agent to look at them, or export them as SVG.": "PNG、JPG 文件无法在这里测量。请让 agent 看图，或改存为 SVG。",
  "Learn my habits": "学习我的习惯",
  "Save current style as my habits": "把当前样式保存为我的习惯",
- "Saved habits go to habits/profile.json. Copy that file into the habits/ folder of your next project to start from the same style.": "习惯会保存到 habits/profile.json。把这个文件复制到下一个项目的 habits/ 文件夹，就能从同样的样式开始。",
  "{k} of {n} files: {files}": "{n} 个文件中有 {k} 个：{files}",
  "Your habits already match the current style. Nothing to change.": "你的习惯与当前样式一致，没有需要修改的项目。",
  "No SVG, .mplstyle or profile.json files in habits/.": "habits/ 中没有 SVG、.mplstyle 或 profile.json 文件。",
@@ -1469,7 +1526,58 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "New files not used yet ({n})": "尚未用到的新文件（{n}）",
  "Input patterns": "输入规则",
  "{n} new raw files not used yet.": "有 {n} 个新的原始文件尚未用到。",
- "{n} new": "{n} 个新文件"
+ "{n} new": "{n} 个新文件",
+ "Add": "添加",
+ "Add a rule of your own, for example: Give the conclusion first, then the numbers.": "自己加一条规则，例如：先讲结论，再给数字。",
+ "Agent: ": "agent：",
+ "You: ": "你：",
+ "Answer the agent…": "回复 agent…",
+ "Reply": "回复",
+ "Reply added. Click \"Ask the agent to revise\" when you are ready.": "已添加回复。准备好后按“请 agent 修改”。",
+ "Available when the report is opened with the launcher (duetsheet.py). Meanwhile, copy habits/profile.json and habits/writing.json between projects.": "用启动程序（duetsheet.py）打开报告时才能用。在那之前，可以在项目之间复制 habits/profile.json 和 habits/writing.json。",
+ "Average paragraph (sentences)": "平均段落长（句）",
+ "Average sentence (characters)": "平均句长（字符）",
+ "Bold phrases": "粗体短语数",
+ "Copy path": "复制路径",
+ "Could not load your personal habits.": "无法加载你的个人习惯。",
+ "Could not open the folder.": "无法打开文件夹。",
+ "Figure habits (habits/figures/)": "作图习惯（habits/figures/）",
+ "Figure suggestions are in the Style tab.": "作图建议在“样式”分页。",
+ "Files": "文件数",
+ "From {src}": "来自{src}",
+ "your personal habits": "你的个人习惯",
+ "Habits": "习惯",
+ "Import all {n}": "全部导入（{n}）",
+ "Import {n} files from {dir}? Each one becomes a dataset in the report.": "要从 {dir} 导入 {n} 个文件吗？每个文件都会变成报告里的一个数据集。",
+ "Imported {n} files from {dir}.": "已从 {dir} 导入 {n} 个文件。",
+ "all imported": "都已导入",
+ "Lines that are list items": "列表行的比例",
+ "Load habits/writing.json": "加载 habits/writing.json",
+ "Load my personal habits": "加载我的个人习惯",
+ "Measure my texts": "计算我的文字统计",
+ "No agent connected": "目前没有 agent 连接",
+ "None yet. Agents follow these rules whenever they write or revise text in this report.": "还没有。agent 在这份报告里写或改文字时，都会照这些规则。",
+ "Nothing new: these habits are already applied.": "没有新的：这些习惯已经应用了。",
+ "Personal habits (all projects)": "个人习惯（所有项目共用）",
+ "Put articles or reports you wrote in habits/writing/ (.md, .txt, .docx, .pdf). Your agent learns your writing style from them, and you confirm each rule here.": "把你写过的文章或报告放进 habits/writing/（.md、.txt、.docx、.pdf）。agent 会从中学你的写作风格，每条规则都由你在这里确认。",
+ "Put figures you like in habits/figures/ (SVG, PNG, .mplstyle, plotting scripts). Suggestions appear in the Style tab. Saved habits go to habits/profile.json.": "把你喜欢的图放进 habits/figures/（SVG、PNG、.mplstyle、作图程序）。建议会出现在“样式”分页。保存的习惯放在 habits/profile.json。",
+ "Save as my personal habits": "保存为我的个人习惯",
+ "Save as my writing habits": "保存为我的写作习惯",
+ "Save this report's figure style and writing habits once, and load them in every new project.": "把这份报告的作图样式和写作习惯存一次，之后每个新项目都能加载。",
+ "Saved as your personal habits. New projects can load them.": "已保存为你的个人习惯，新项目可以加载。",
+ "Saved habits go to habits/writing.json. Copy that file into the habits/ folder of your next project to start from the same habits.": "保存的习惯放在 habits/writing.json。把它复制到下一个项目的 habits/ 文件夹，就能从同样的习惯开始。",
+ "Sentences": "句数",
+ "Show in folder": "在文件夹中显示",
+ "Suggested by the agent": "agent 的建议",
+ "Tone, paragraph rhythm and wording need reading. Ask your agent: \"Learn my writing style from habits/writing/\". Its suggestions appear here for you to tick.": "语气、段落节奏和用词需要靠阅读判断。请跟 agent 说：“从 habits/writing/ 学我的写作风格”。它的建议会出现在这里让你勾选。",
+ "Writing habits": "写作习惯",
+ "field|Writing habits": "写作习惯",
+ "Writing habits (habits/writing/)": "写作习惯（habits/writing/）",
+ "Writing habits updated.": "写作习惯已更新。",
+ "You have personal habits: a figure style and {n} writing rules. Load them to use them in this report.": "你有个人习惯：一套作图样式和 {n} 条写作规则。加载后就能用在这份报告。",
+ "Your writing habits ({n})": "你的写作习惯（{n}）",
+ "added by you": "你自己加的",
+ "{t} Markdown or text, {d} Word and {p} PDF files.": "{t} 个 Markdown 或文本文件、{d} 个 Word、{p} 个 PDF。"
 },
 "ja": {
  "_name": "日本語",
@@ -1594,7 +1702,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Comments": "コメント",
  "Done": "対応済み",
  "Open": "未対応",
- "Claude: ": "Claude：",
  "Jump to": "移動",
  "Reopen": "再オープン",
  "Mark done": "対応済みにする",
@@ -1828,13 +1935,11 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Data": "データ",
  "{n} rows, {c} columns": "{n} 行、{c} 列",
  "To attach data files, open a project folder or use the claude.ai link.": "データファイルを添付するには、プロジェクトフォルダを開くか、claude.ai のリンクから開いてください。",
- "Figure habits (habits/)": "作図の習慣（habits/）",
  "{svg} SVG, {mpl} matplotlib style and {ras} PNG/JPG files.": "SVG {svg} 件、matplotlib スタイル {mpl} 件、PNG/JPG {ras} 件。",
  "Your saved habits (profile.json) are there too.": "保存した習慣（profile.json）もあります。",
  "PNG and JPG files cannot be measured here. Ask your agent to look at them, or export them as SVG.": "PNG・JPG ファイルはここでは測定できません。agent に見てもらうか、SVG で書き出してください。",
  "Learn my habits": "習慣を学習",
  "Save current style as my habits": "現在のスタイルを習慣として保存",
- "Saved habits go to habits/profile.json. Copy that file into the habits/ folder of your next project to start from the same style.": "習慣は habits/profile.json に保存されます。次のプロジェクトの habits/ フォルダにこのファイルをコピーすれば、同じスタイルから始められます。",
  "{k} of {n} files: {files}": "{n} ファイル中 {k} ファイル：{files}",
  "Your habits already match the current style. Nothing to change.": "習慣は現在のスタイルと一致しています。変更する項目はありません。",
  "No SVG, .mplstyle or profile.json files in habits/.": "habits/ に SVG、.mplstyle、profile.json のファイルがありません。",
@@ -1991,7 +2096,58 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "New files not used yet ({n})": "まだ使われていない新しいファイル（{n}）",
  "Input patterns": "入力パターン",
  "{n} new raw files not used yet.": "まだ使われていない新しい元データが {n} 件あります。",
- "{n} new": "新規 {n}"
+ "{n} new": "新規 {n}",
+ "Add": "追加",
+ "Add a rule of your own, for example: Give the conclusion first, then the numbers.": "自分でルールを追加（例：結論を先に、数値はその後に）",
+ "Agent: ": "エージェント：",
+ "You: ": "あなた：",
+ "Answer the agent…": "エージェントに返信…",
+ "Reply": "返信",
+ "Reply added. Click \"Ask the agent to revise\" when you are ready.": "返信を追加しました。準備ができたら「エージェントに修正を依頼」を押してください。",
+ "Available when the report is opened with the launcher (duetsheet.py). Meanwhile, copy habits/profile.json and habits/writing.json between projects.": "ランチャー（duetsheet.py）でレポートを開いたときに使えます。それまでは habits/profile.json と habits/writing.json をプロジェクト間でコピーしてください。",
+ "Average paragraph (sentences)": "段落の平均の長さ（文）",
+ "Average sentence (characters)": "文の平均の長さ（文字）",
+ "Bold phrases": "太字の語句",
+ "Copy path": "パスをコピー",
+ "Could not load your personal habits.": "個人の習慣を読み込めませんでした。",
+ "Could not open the folder.": "フォルダを開けませんでした。",
+ "Figure habits (habits/figures/)": "作図の習慣（habits/figures/）",
+ "Figure suggestions are in the Style tab.": "作図の提案は「スタイル」タブにあります。",
+ "Files": "ファイル数",
+ "From {src}": "{src}から",
+ "your personal habits": "あなたの個人の習慣",
+ "Habits": "習慣",
+ "Import all {n}": "すべて取り込む（{n}）",
+ "Import {n} files from {dir}? Each one becomes a dataset in the report.": "{dir} から {n} 個のファイルを取り込みますか？それぞれがレポートのデータセットになります。",
+ "Imported {n} files from {dir}.": "{dir} から {n} 個のファイルを取り込みました。",
+ "all imported": "すべて取り込み済み",
+ "Lines that are list items": "箇条書きの行の割合",
+ "Load habits/writing.json": "habits/writing.json を読み込む",
+ "Load my personal habits": "個人の習慣を読み込む",
+ "Measure my texts": "文章を数値で測る",
+ "No agent connected": "エージェント未接続",
+ "None yet. Agents follow these rules whenever they write or revise text in this report.": "まだありません。エージェントはこのレポートの文章を書いたり直したりするとき、これらのルールに従います。",
+ "Nothing new: these habits are already applied.": "新しいものはありません。これらの習慣はすでに適用されています。",
+ "Personal habits (all projects)": "個人の習慣（すべてのプロジェクト共通）",
+ "Put articles or reports you wrote in habits/writing/ (.md, .txt, .docx, .pdf). Your agent learns your writing style from them, and you confirm each rule here.": "あなたが書いた記事やレポートを habits/writing/ に置いてください（.md、.txt、.docx、.pdf）。エージェントがそこから文章のスタイルを学び、各ルールはここであなたが確認します。",
+ "Put figures you like in habits/figures/ (SVG, PNG, .mplstyle, plotting scripts). Suggestions appear in the Style tab. Saved habits go to habits/profile.json.": "好きな図を habits/figures/ に置いてください（SVG、PNG、.mplstyle、作図スクリプト）。提案は「スタイル」タブに出ます。保存した習慣は habits/profile.json に入ります。",
+ "Save as my personal habits": "個人の習慣として保存",
+ "Save as my writing habits": "自分の文章の習慣として保存",
+ "Save this report's figure style and writing habits once, and load them in every new project.": "このレポートの作図スタイルと文章の習慣を一度保存すれば、新しいプロジェクトごとに読み込めます。",
+ "Saved as your personal habits. New projects can load them.": "個人の習慣として保存しました。新しいプロジェクトで読み込めます。",
+ "Saved habits go to habits/writing.json. Copy that file into the habits/ folder of your next project to start from the same habits.": "保存した習慣は habits/writing.json に入ります。次のプロジェクトの habits/ にコピーすれば同じ習慣から始められます。",
+ "Sentences": "文の数",
+ "Show in folder": "フォルダで表示",
+ "Suggested by the agent": "エージェントの提案",
+ "Tone, paragraph rhythm and wording need reading. Ask your agent: \"Learn my writing style from habits/writing/\". Its suggestions appear here for you to tick.": "語調、段落のリズム、言葉づかいは読んで判断する必要があります。エージェントに「habits/writing/ から私の文章スタイルを学んで」と頼んでください。提案がここに表示され、選んで適用できます。",
+ "Writing habits": "文章の習慣",
+ "field|Writing habits": "文章の習慣",
+ "Writing habits (habits/writing/)": "文章の習慣（habits/writing/）",
+ "Writing habits updated.": "文章の習慣を更新しました。",
+ "You have personal habits: a figure style and {n} writing rules. Load them to use them in this report.": "個人の習慣があります：作図スタイルと {n} 件の文章ルール。読み込むとこのレポートで使えます。",
+ "Your writing habits ({n})": "あなたの文章の習慣（{n}）",
+ "added by you": "あなたが追加",
+ "{t} Markdown or text, {d} Word and {p} PDF files.": "Markdown・テキスト {t}、Word {d}、PDF {p} ファイル。"
 },
 "ko": {
  "_name": "한국어",
@@ -2116,7 +2272,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Comments": "주석",
  "Done": "반영됨",
  "Open": "대기 중",
- "Claude: ": "Claude: ",
  "Jump to": "위치로 이동",
  "Reopen": "다시 열기",
  "Mark done": "반영됨으로 표시",
@@ -2350,13 +2505,11 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Data": "데이터",
  "{n} rows, {c} columns": "{n}행, {c}열",
  "To attach data files, open a project folder or use the claude.ai link.": "데이터 파일을 첨부하려면 프로젝트 폴더를 열거나 claude.ai 링크로 여세요.",
- "Figure habits (habits/)": "그래프 습관 (habits/)",
  "{svg} SVG, {mpl} matplotlib style and {ras} PNG/JPG files.": "SVG {svg}개, matplotlib 스타일 {mpl}개, PNG/JPG {ras}개 파일.",
  "Your saved habits (profile.json) are there too.": "저장해 둔 습관(profile.json)도 있습니다.",
  "PNG and JPG files cannot be measured here. Ask your agent to look at them, or export them as SVG.": "PNG와 JPG 파일은 여기서 측정할 수 없습니다. agent에게 보여 주거나 SVG로 내보내세요.",
  "Learn my habits": "내 습관 배우기",
  "Save current style as my habits": "현재 스타일을 내 습관으로 저장",
- "Saved habits go to habits/profile.json. Copy that file into the habits/ folder of your next project to start from the same style.": "습관은 habits/profile.json에 저장됩니다. 다음 프로젝트의 habits/ 폴더에 이 파일을 복사하면 같은 스타일로 시작할 수 있습니다.",
  "{k} of {n} files: {files}": "{n}개 파일 중 {k}개: {files}",
  "Your habits already match the current style. Nothing to change.": "습관이 이미 현재 스타일과 같습니다. 바꿀 항목이 없습니다.",
  "No SVG, .mplstyle or profile.json files in habits/.": "habits/에 SVG, .mplstyle, profile.json 파일이 없습니다.",
@@ -2513,7 +2666,58 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "New files not used yet ({n})": "아직 사용하지 않은 새 파일 ({n})",
  "Input patterns": "입력 패턴",
  "{n} new raw files not used yet.": "아직 사용하지 않은 새 원본 파일이 {n}개 있습니다.",
- "{n} new": "새 파일 {n}개"
+ "{n} new": "새 파일 {n}개",
+ "Add": "추가",
+ "Add a rule of your own, for example: Give the conclusion first, then the numbers.": "직접 규칙 추가 (예: 결론을 먼저, 숫자는 그다음에)",
+ "Agent: ": "에이전트: ",
+ "You: ": "나: ",
+ "Answer the agent…": "에이전트에게 답하기…",
+ "Reply": "답장",
+ "Reply added. Click \"Ask the agent to revise\" when you are ready.": "답장을 추가했습니다. 준비되면 \"에이전트에게 수정 요청\"을 누르세요.",
+ "Available when the report is opened with the launcher (duetsheet.py). Meanwhile, copy habits/profile.json and habits/writing.json between projects.": "런처(duetsheet.py)로 보고서를 열었을 때 사용할 수 있습니다. 그 전에는 habits/profile.json과 habits/writing.json을 프로젝트 간에 복사하세요.",
+ "Average paragraph (sentences)": "평균 문단 길이 (문장)",
+ "Average sentence (characters)": "평균 문장 길이 (글자)",
+ "Bold phrases": "굵은 글씨 구절",
+ "Copy path": "경로 복사",
+ "Could not load your personal habits.": "개인 습관을 불러오지 못했습니다.",
+ "Could not open the folder.": "폴더를 열지 못했습니다.",
+ "Figure habits (habits/figures/)": "그래프 습관 (habits/figures/)",
+ "Figure suggestions are in the Style tab.": "그래프 제안은 스타일 탭에 있습니다.",
+ "Files": "파일 수",
+ "From {src}": "{src}에서",
+ "your personal habits": "나의 개인 습관",
+ "Habits": "습관",
+ "Import all {n}": "모두 가져오기 ({n})",
+ "Import {n} files from {dir}? Each one becomes a dataset in the report.": "{dir}에서 파일 {n}개를 가져올까요? 각각 보고서의 데이터셋이 됩니다.",
+ "Imported {n} files from {dir}.": "{dir}에서 파일 {n}개를 가져왔습니다.",
+ "all imported": "모두 가져옴",
+ "Lines that are list items": "목록 항목 줄 비율",
+ "Load habits/writing.json": "habits/writing.json 불러오기",
+ "Load my personal habits": "내 개인 습관 불러오기",
+ "Measure my texts": "내 글 측정하기",
+ "No agent connected": "연결된 에이전트 없음",
+ "None yet. Agents follow these rules whenever they write or revise text in this report.": "아직 없습니다. 에이전트는 이 보고서의 글을 쓰거나 고칠 때 이 규칙을 따릅니다.",
+ "Nothing new: these habits are already applied.": "새로운 것이 없습니다. 이미 적용된 습관입니다.",
+ "Personal habits (all projects)": "개인 습관 (모든 프로젝트 공통)",
+ "Put articles or reports you wrote in habits/writing/ (.md, .txt, .docx, .pdf). Your agent learns your writing style from them, and you confirm each rule here.": "직접 쓴 글이나 보고서를 habits/writing/에 넣으세요 (.md, .txt, .docx, .pdf). 에이전트가 글쓰기 스타일을 배우고, 각 규칙은 여기서 확인합니다.",
+ "Put figures you like in habits/figures/ (SVG, PNG, .mplstyle, plotting scripts). Suggestions appear in the Style tab. Saved habits go to habits/profile.json.": "마음에 드는 그래프를 habits/figures/에 넣으세요 (SVG, PNG, .mplstyle, 그래프 스크립트). 제안은 스타일 탭에 나옵니다. 저장한 습관은 habits/profile.json에 들어갑니다.",
+ "Save as my personal habits": "내 개인 습관으로 저장",
+ "Save as my writing habits": "내 글쓰기 습관으로 저장",
+ "Save this report's figure style and writing habits once, and load them in every new project.": "이 보고서의 그래프 스타일과 글쓰기 습관을 한 번 저장하면 새 프로젝트마다 불러올 수 있습니다.",
+ "Saved as your personal habits. New projects can load them.": "개인 습관으로 저장했습니다. 새 프로젝트에서 불러올 수 있습니다.",
+ "Saved habits go to habits/writing.json. Copy that file into the habits/ folder of your next project to start from the same habits.": "저장한 습관은 habits/writing.json에 들어갑니다. 다음 프로젝트의 habits/ 폴더에 복사하면 같은 습관으로 시작할 수 있습니다.",
+ "Sentences": "문장 수",
+ "Show in folder": "폴더에서 보기",
+ "Suggested by the agent": "에이전트의 제안",
+ "Tone, paragraph rhythm and wording need reading. Ask your agent: \"Learn my writing style from habits/writing/\". Its suggestions appear here for you to tick.": "어조, 문단 리듬, 단어 선택은 읽어야 알 수 있습니다. 에이전트에게 \"habits/writing/에서 내 글쓰기 스타일을 배워 줘\"라고 하세요. 제안이 여기에 나타나면 체크하세요.",
+ "Writing habits": "글쓰기 습관",
+ "field|Writing habits": "글쓰기 습관",
+ "Writing habits (habits/writing/)": "글쓰기 습관 (habits/writing/)",
+ "Writing habits updated.": "글쓰기 습관을 업데이트했습니다.",
+ "You have personal habits: a figure style and {n} writing rules. Load them to use them in this report.": "개인 습관이 있습니다: 그래프 스타일과 글쓰기 규칙 {n}개. 불러오면 이 보고서에 쓸 수 있습니다.",
+ "Your writing habits ({n})": "나의 글쓰기 습관 ({n})",
+ "added by you": "직접 추가함",
+ "{t} Markdown or text, {d} Word and {p} PDF files.": "Markdown·텍스트 {t}개, Word {d}개, PDF {p}개 파일."
 },
 "es": {
  "_name": "Español",
@@ -2638,7 +2842,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Comments": "Comentarios",
  "Done": "Resuelto",
  "Open": "Pendiente",
- "Claude: ": "Claude: ",
  "Jump to": "Ir a",
  "Reopen": "Reabrir",
  "Mark done": "Marcar como resuelto",
@@ -2872,13 +3075,11 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Data": "Datos",
  "{n} rows, {c} columns": "{n} filas, {c} columnas",
  "To attach data files, open a project folder or use the claude.ai link.": "Para adjuntar archivos de datos, abre una carpeta de proyecto o usa el enlace de claude.ai.",
- "Figure habits (habits/)": "Hábitos de figuras (habits/)",
  "{svg} SVG, {mpl} matplotlib style and {ras} PNG/JPG files.": "{svg} SVG, {mpl} estilos de matplotlib y {ras} archivos PNG/JPG.",
  "Your saved habits (profile.json) are there too.": "También están tus hábitos guardados (profile.json).",
  "PNG and JPG files cannot be measured here. Ask your agent to look at them, or export them as SVG.": "Los archivos PNG y JPG no se pueden medir aquí. Pide a tu agente que los mire o expórtalos como SVG.",
  "Learn my habits": "Aprender mis hábitos",
  "Save current style as my habits": "Guardar el estilo actual como mis hábitos",
- "Saved habits go to habits/profile.json. Copy that file into the habits/ folder of your next project to start from the same style.": "Los hábitos se guardan en habits/profile.json. Copia ese archivo en la carpeta habits/ de tu próximo proyecto para empezar con el mismo estilo.",
  "{k} of {n} files: {files}": "{k} de {n} archivos: {files}",
  "Your habits already match the current style. Nothing to change.": "Tus hábitos ya coinciden con el estilo actual. No hay nada que cambiar.",
  "No SVG, .mplstyle or profile.json files in habits/.": "No hay archivos SVG, .mplstyle ni profile.json en habits/.",
@@ -3035,7 +3236,58 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "New files not used yet ({n})": "Archivos nuevos aún sin usar ({n})",
  "Input patterns": "Patrones de entrada",
  "{n} new raw files not used yet.": "{n} archivos originales nuevos aún sin usar.",
- "{n} new": "{n} nuevos"
+ "{n} new": "{n} nuevos",
+ "Add": "Añadir",
+ "Add a rule of your own, for example: Give the conclusion first, then the numbers.": "Añade una regla propia, por ejemplo: primero la conclusión, luego los números.",
+ "Agent: ": "Agente: ",
+ "You: ": "Tú: ",
+ "Answer the agent…": "Responde al agente…",
+ "Reply": "Responder",
+ "Reply added. Click \"Ask the agent to revise\" when you are ready.": "Respuesta añadida. Pulsa \"Pedir al agente que revise\" cuando estés listo.",
+ "Available when the report is opened with the launcher (duetsheet.py). Meanwhile, copy habits/profile.json and habits/writing.json between projects.": "Disponible cuando el informe se abre con el lanzador (duetsheet.py). Mientras tanto, copia habits/profile.json y habits/writing.json entre proyectos.",
+ "Average paragraph (sentences)": "Párrafo medio (oraciones)",
+ "Average sentence (characters)": "Oración media (caracteres)",
+ "Bold phrases": "Frases en negrita",
+ "Copy path": "Copiar ruta",
+ "Could not load your personal habits.": "No se pudieron cargar tus hábitos personales.",
+ "Could not open the folder.": "No se pudo abrir la carpeta.",
+ "Figure habits (habits/figures/)": "Hábitos de figuras (habits/figures/)",
+ "Figure suggestions are in the Style tab.": "Las sugerencias de figuras están en la pestaña Estilo.",
+ "Files": "Archivos",
+ "From {src}": "De {src}",
+ "your personal habits": "tus hábitos personales",
+ "Habits": "Hábitos",
+ "Import all {n}": "Importar todos ({n})",
+ "Import {n} files from {dir}? Each one becomes a dataset in the report.": "¿Importar {n} archivos de {dir}? Cada uno será un conjunto de datos del informe.",
+ "Imported {n} files from {dir}.": "Se importaron {n} archivos de {dir}.",
+ "all imported": "todos importados",
+ "Lines that are list items": "Líneas que son elementos de lista",
+ "Load habits/writing.json": "Cargar habits/writing.json",
+ "Load my personal habits": "Cargar mis hábitos personales",
+ "Measure my texts": "Medir mis textos",
+ "No agent connected": "Ningún agente conectado",
+ "None yet. Agents follow these rules whenever they write or revise text in this report.": "Aún ninguna. Los agentes siguen estas reglas cuando escriben o revisan texto en este informe.",
+ "Nothing new: these habits are already applied.": "Nada nuevo: estos hábitos ya están aplicados.",
+ "Personal habits (all projects)": "Hábitos personales (todos los proyectos)",
+ "Put articles or reports you wrote in habits/writing/ (.md, .txt, .docx, .pdf). Your agent learns your writing style from them, and you confirm each rule here.": "Pon artículos o informes que hayas escrito en habits/writing/ (.md, .txt, .docx, .pdf). Tu agente aprende de ellos tu estilo de escritura y tú confirmas cada regla aquí.",
+ "Put figures you like in habits/figures/ (SVG, PNG, .mplstyle, plotting scripts). Suggestions appear in the Style tab. Saved habits go to habits/profile.json.": "Pon las figuras que te gustan en habits/figures/ (SVG, PNG, .mplstyle, scripts de gráficos). Las sugerencias aparecen en la pestaña Estilo. Los hábitos guardados van a habits/profile.json.",
+ "Save as my personal habits": "Guardar como mis hábitos personales",
+ "Save as my writing habits": "Guardar como mis hábitos de escritura",
+ "Save this report's figure style and writing habits once, and load them in every new project.": "Guarda una vez el estilo de figuras y los hábitos de escritura de este informe y cárgalos en cada proyecto nuevo.",
+ "Saved as your personal habits. New projects can load them.": "Guardado como tus hábitos personales. Los proyectos nuevos pueden cargarlos.",
+ "Saved habits go to habits/writing.json. Copy that file into the habits/ folder of your next project to start from the same habits.": "Los hábitos guardados van a habits/writing.json. Copia ese archivo en la carpeta habits/ de tu próximo proyecto para empezar con los mismos hábitos.",
+ "Sentences": "Oraciones",
+ "Show in folder": "Mostrar en la carpeta",
+ "Suggested by the agent": "Sugerido por el agente",
+ "Tone, paragraph rhythm and wording need reading. Ask your agent: \"Learn my writing style from habits/writing/\". Its suggestions appear here for you to tick.": "El tono, el ritmo de los párrafos y la redacción necesitan lectura. Pide a tu agente: \"Aprende mi estilo de escritura de habits/writing/\". Sus sugerencias aparecen aquí para que las marques.",
+ "Writing habits": "Hábitos de escritura",
+ "field|Writing habits": "Hábitos de escritura",
+ "Writing habits (habits/writing/)": "Hábitos de escritura (habits/writing/)",
+ "Writing habits updated.": "Hábitos de escritura actualizados.",
+ "You have personal habits: a figure style and {n} writing rules. Load them to use them in this report.": "Tienes hábitos personales: un estilo de figuras y {n} reglas de escritura. Cárgalos para usarlos en este informe.",
+ "Your writing habits ({n})": "Tus hábitos de escritura ({n})",
+ "added by you": "añadida por ti",
+ "{t} Markdown or text, {d} Word and {p} PDF files.": "{t} archivos Markdown o de texto, {d} de Word y {p} PDF."
 }
 }
 </script>
@@ -3544,7 +3796,7 @@ const FIELDS=['title','text','caption','breakBefore',
   'table.dataset','table.sortBy','table.desc','table.limit','image.width','image.crop','image.src','image.asset',
   'image.source.tool','image.source.file','image.source.note','image.source.script','image.source.data'];
 const STYLE_FIELDS=['font.family','font.size','font.label','marker','line','ticks','frame','grid','palette','figure.preset','chartDefaults.kind','chartDefaults.logY'];
-const FIELD_LABEL={title:'Title',text:'Text',caption:'Caption',breakBefore:'Page break',
+const FIELD_LABEL={title:'Title',text:'Text',caption:'Caption',breakBefore:'Page break','style.writing':'Writing habits',
   'chart.dataset':'Dataset','table.dataset':'Dataset',dataset:'Imported data',
   'chart.kind':'Chart type','chart.x':'X column','chart.y':'Y column','chart.color':'Colour by','chart.xLabel':'X axis label','chart.yLabel':'Y axis label',
   'chart.yMin':'Y min','chart.yMax':'Y max','chart.logY':'Y scale',
@@ -3854,7 +4106,21 @@ function describe(t){
 /* ---------- Panel: comments ---------- */
 async function setStatus(a,status){const m={...a,status,resolvedAt:status==='done'?now():null};S.annos=S.annos.map(x=>x.id===a.id?m:x);renderPanel();paintAllOverlays();await put('annotations/'+a.id,m)}
 async function removeAnno(a){S.annos=S.annos.filter(x=>x.id!==a.id);renderPanel();paintAllOverlays();await drop('annotations/'+a.id)}
+// The conversation after a comment: thread = [{by: "user"|"claude", text, at}]. Older reports only have reply.
+const threadOf=a=>Array.isArray(a.thread)&&a.thread.length?a.thread.filter(m=>m&&m.text):a.reply?[{by:'claude',text:a.reply,at:a.resolvedAt||''}]:[];
+async function replyAnno(a,text){text=String(text||'').trim();if(!text)return;
+  const m={...a,thread:[...threadOf(a),{by:'user',text,at:now()}],status:'open',resolvedAt:null}; // answering reopens the comment for the agent
+  S.replyDrafts&&S.replyDrafts.delete(a.id);S.annos=S.annos.map(x=>x.id===a.id?m:x);renderPanel();paintAllOverlays();await put('annotations/'+a.id,m);
+  toast(tr('Reply added. Click "Ask the agent to revise" when you are ready.'))}
+function replyBox(a){
+  S.replyDrafts=S.replyDrafts||new Map();
+  const ta=h('textarea',{rows:'2',placeholder:tr('Answer the agent…'),'data-fid':'reply:'+a.id});ta.value=S.replyDrafts.get(a.id)||'';
+  ta.addEventListener('input',()=>S.replyDrafts.set(a.id,ta.value));
+  ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();replyAnno(a,ta.value)}});
+  return h('div',{class:'areply'},[ta,h('button',{type:'button',class:'btn small',text:tr('Reply'),onclick:()=>replyAnno(a,ta.value)})]);
+}
 function renderAnnos(){
+  const ae=document.activeElement;if(ae&&ae.dataset&&String(ae.dataset.fid||'').startsWith('reply:')&&$('#list').contains(ae)){S.deferred=true;return} // typing a reply: refresh on leaving the box
   $$('#filters button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.f===S.filter)));
   const list=$('#list');list.replaceChildren();
   const shown=S.annos.filter(a=>S.filter==='all'||(S.filter==='done'?a.status==='done':a.status!=='done')).sort((p,q)=>(q.no||0)-(p.no||0));
@@ -3865,7 +4131,8 @@ function renderAnnos(){
       h('p',{class:'where',text:describe(t)}),
       a.tags&&a.tags.length?h('p',{class:'tags'},a.tags.map(x=>h('span',{class:'tag',text:tagText(x)}))):null,
       a.text?h('p',{class:'txt',text:a.text}):null,
-      a.reply?h('p',{class:'reply',text:tr('Claude: ')+a.reply}):null,
+      ...threadOf(a).map(m=>h('p',{class:'reply'+(m.by==='user'?' me':'')},[h('strong',{text:m.by==='user'?tr('You: '):tr('Agent: ')}),m.text])),
+      !S.readonly&&threadOf(a).some(m=>m.by!=='user')?replyBox(a):null,
       h('div',{class:'acts'},[
         h('button',{type:'button',text:tr('Jump to'),onclick:()=>jumpTo(t.blockId,a.id)}),
         h('button',{type:'button',text:done?tr('Reopen'):tr('Mark done'),onclick:()=>setStatus(a,done?'open':'done')}),
@@ -4429,7 +4696,7 @@ async function connectServer(){
 // An agent can edit report.json while the page is open: the page reloads it, and merges by document when both wrote.
 const FS_OK=typeof window.showDirectoryPicker==='function';
 const REPORT_FILE='report.json',SCHEMA='duetsheet/0.6';
-const DATA_EXT=/\.(csv|tsv|txt|json)$/i,HABIT_EXT=/\.(svg|mplstyle|png|jpe?g|webp|gif|json)$/i;
+const DATA_EXT=/\.(csv|tsv|txt|json)$/i,HABIT_EXT=/\.(svg|mplstyle|png|jpe?g|webp|gif|json)$/i,WRITE_EXT=/\.(md|txt|docx|pdf)$/i;
 const ASSET_EXT={'image/svg+xml':'svg','image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/gif':'gif','text/csv':'csv','text/plain':'txt','application/json':'json'};
 function docsFromReport(j){
   if(!j||typeof j!=='object'||Array.isArray(j))throw{code:'bad_report'};
@@ -4445,7 +4712,7 @@ function reportFromState(){ // the report as shown now, in report.json form (sam
   const d={'report/meta':S.meta};
   S.blocks.forEach((b,id)=>{d['blocks/'+id]=b});S.datasets.forEach((x,id)=>{d['datasets/'+id]=x});
   S.annos.forEach(a=>{d['annotations/'+a.id]=a});S.changes.forEach(c=>{d['changes/'+c.id]=c});S.rounds.forEach(r=>{d['rounds/'+r.id]=r});
-  S.examples.forEach(x=>{d['examples/'+x.id]=x});S.steps.forEach((x,id)=>{d['steps/'+id]=x});if(S.style)d['style/profile']=S.style;
+  S.examples.forEach(x=>{d['examples/'+x.id]=x});S.steps.forEach((x,id)=>{d['steps/'+id]=x});if(S.style)d['style/profile']=S.style;if(S.writing)d['style/writing']=S.writing;
   return reportFromDocs(d);
 }
 const hex=buf=>[...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
@@ -4519,7 +4786,7 @@ function starterDocs(name){const t=now(),id='b-start';
     ['blocks/'+id]:{id,type:'text',title:'',caption:'',breakBefore:'auto',createdAt:t,
       text:tr('Raw data files in this folder are listed in the Folder tab. Ask your agent to write the report (see AGENTS.md), or add blocks yourself in Edit mode.')}}}
 function useDB(next){db=next;
-  Object.assign(S,{meta:null,blocks:new Map(),datasets:new Map(),annos:[],changes:[],rounds:[],steps:new Map(),fstate:null,newInputs:null,style:null,examples:[],agentProposal:null,proposal:null,drafts:new Map(),page:0,stale:new Set(),folderFiles:null});
+  Object.assign(S,{meta:null,blocks:new Map(),datasets:new Map(),annos:[],changes:[],rounds:[],steps:new Map(),fstate:null,newInputs:null,writing:null,writingProposal:null,writingStats:null,style:null,examples:[],agentProposal:null,proposal:null,drafts:new Map(),page:0,stale:new Set(),folderFiles:null});
   subscribe()}
 async function pickFolder(){let dir;try{dir=await window.showDirectoryPicker({mode:'readwrite',id:'duetsheet'})}catch(e){return}await openFolder(dir,true)}
 async function openFolder(root,ask){
@@ -4607,11 +4874,13 @@ async function refreshFolderFiles(){
   const found=(await listDeep(F.dataDir,DATA_EXT)).sort((a,b)=>a.rel<b.rel?-1:1);
   const data=await Promise.all(found.map(async({fh,rel})=>{const f=fh.meta||await fh.getFile();
     return{name:rel,path:F.prefix+rel,fh,size:f.size,modified:new Date(f.lastModified).toISOString()}}));
-  const habits=(await listFiles(await subdir(dir,'habits'),HABIT_EXT)).map(fh=>fh.name);
+  const hd=await subdir(dir,'habits'); // figure examples in habits/ (older projects) and habits/figures/; the user's own texts in habits/writing/
+  const habits=[...(await listFiles(hd,HABIT_EXT)).map(fh=>fh.name),...(await listFiles(await subdir(hd,'figures'),HABIT_EXT)).map(fh=>'figures/'+fh.name)];
+  const writing=await listFiles(await subdir(hd,'writing'),WRITE_EXT);
   const der=(await listDeep(await subdir(dir,'derived_data'),DATA_EXT,'derived_data/')).sort((a,b)=>a.rel<b.rel?-1:1);
   const derived=await Promise.all(der.map(async({fh,rel})=>{const f=fh.meta||await fh.getFile();
     return{name:rel,path:rel,fh,size:f.size,modified:new Date(f.lastModified).toISOString()}}));
-  S.folderFiles={data,derived,habits};renderPanel();
+  S.folderFiles={data,derived,habits,writing};renderPanel();
   scheduleVerify(); // whether imported files changed: see verifyChain()
 }
 function parseDelimited(txt){
@@ -4650,7 +4919,7 @@ function parseDataFile(name,text){
   return tableFromObjects(grid.slice(1).map(r=>Object.fromEntries(head.map((k,i)=>[k,r[i]]))),head.map(k=>({key:k,label:k})),'delimited');
 }
 function uniqueDatasetId(fname){let k=fname.replace(/\.[^.]+$/,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'data';let x=k,i=2;while(S.datasets.has(x))x=k+'-'+i++;return x}
-async function importDataFile(f){
+async function importDataFile(f,quiet){
   try{const file=await f.fh.getFile(),buf=await file.arrayBuffer();const table=parseDataFile(f.name,new TextDecoder('utf-8').decode(buf));
     const old=[...S.datasets.values()].find(d=>d.source&&d.source.path===f.path);const id=old?old.id:uniqueDatasetId(f.name);
     const ds={id,title:old?old.title:f.name.replace(/\.[^.]+$/,''),columns:table.columns,rows:table.rows,
@@ -4659,7 +4928,8 @@ async function importDataFile(f){
     const sum=d=>d?{rows:d.rows.length,columns:d.columns.length,sha256:(d.source&&d.source.sha256)||null}:null;
     const c={id:uid('c'),by:'user',at:now(),blockId:null,datasetId:id,field:'dataset',before:sum(old),after:sum(ds),name:ds.title,revertible:false};
     S.changes=[...S.changes,c];renderPanel();await put('changes/'+c.id,c);
-    toast(tr('Imported {file}: {n} rows, {c} columns.',{file:f.name,n:ds.rows.length,c:ds.columns.length}));refreshFolderFiles()}
+    if(!quiet){toast(tr('Imported {file}: {n} rows, {c} columns.',{file:f.name,n:ds.rows.length,c:ds.columns.length}));refreshFolderFiles()}
+    return true}
   catch(e){fail(e&&e.msg?e.msg:tr('Could not read {file}.',{file:f.name}),e)}
 }
 
@@ -4694,7 +4964,7 @@ function validStyleValue(f,v){
 const effective=(st,f)=>f==='palette'?[...Array(6)].map((_,i)=>st.palette[i]||DEFAULT_PALETTE[i]):getPath(st,f);
 async function learnHabits(){
   if(!S.folder||S.learning)return;S.learning=true;renderPanel();
-  try{const files=await listFiles(await subdir(S.folder.dir,'habits'),HABIT_EXT);
+  try{const hd=await subdir(S.folder.dir,'habits'),files=[...await listFiles(hd,HABIT_EXT),...await listFiles(await subdir(hd,'figures'),HABIT_EXT)];
     const votes=new Map();let n=0,profile=null;
     const vote=(field,value,file,source)=>{if(value==null||value===''||!validStyleValue(field,value))return;
       const m=votes.get(field)||votes.set(field,new Map()).get(field),k=JSON.stringify(value);const e=m.get(k)||m.set(k,{value,source,files:[]}).get(k);e.files.push(file);if(e.source!==source)e.source='files'};
@@ -4704,8 +4974,7 @@ async function learnHabits(){
         if(a.widthPt){const p=Math.abs(a.widthPt-234)<25?'acs1':Math.abs(a.widthPt-504)<40?'acs2':null;if(p)vote('figure.preset',p,name,'svg')}}
       else if(/\.mplstyle$/i.test(name)){n++;Object.entries(parseMplstyle(await text())).forEach(([f,v])=>vote(f,v,name,'mplstyle'))}
       else if(name==='profile.json'){try{profile=JSON.parse(await text())}catch(e){}}}
-    const st=styleNow(),rows=[];
-    if(profile&&typeof profile==='object')STYLE_FIELDS.forEach(f=>{const v=getPath(profile,f);if(v!==undefined&&validStyleValue(f,v)&&!same(v,effective(st,f)))rows.push({field:f,value:v,source:'profile',on:true})});
+    const st=styleNow(),rows=profileRows(profile);
     votes.forEach((m,field)=>{if(rows.some(r=>r.field===field))return;const best=[...m.values()].sort((a,b)=>b.files.length-a.files.length)[0];
       if(same(best.value,effective(st,field)))return;
       rows.push({field,value:best.value,source:best.source,on:best.files.length*2>=n,
@@ -4714,6 +4983,11 @@ async function learnHabits(){
     if(!rows.length)toast(n||profile?tr('Your habits already match the current style. Nothing to change.'):tr('No SVG, .mplstyle or profile.json files in habits/.'))}
   catch(e){fail(tr('Analysis failed. Please try again.'),e)}
   finally{S.learning=false;renderPanel()}
+}
+function profileRows(profile){ // style suggestions from saved habits (habits/profile.json or the personal copy)
+  const st=styleNow(),rows=[];
+  if(profile&&typeof profile==='object')STYLE_FIELDS.forEach(f=>{const v=getPath(profile,f);if(v!==undefined&&validStyleValue(f,v)&&!same(v,effective(st,f)))rows.push({field:f,value:v,source:'profile',on:true})});
+  return rows;
 }
 async function saveHabits(){
   if(!S.folder)return;
@@ -4798,10 +5072,12 @@ function sourceLine(b){ // under a chart or table: where its data comes from, wi
 }
 const fileDot=r=>chain().isNew(r.path)?'stale':stateOf(fileState(r));
 function fileRow(r){ // one file: state, path, fingerprint, size, date
-  if(chain().isNew(r.path))return h('div',{class:'fr'},[dot('stale'),h('span',{class:'mono',text:r.path}),h('span',{class:'bad',text:tr('new, not used yet')})]);
+  const rv=S.folder?revealBtn(r.path):null;
+  if(chain().isNew(r.path))return h('div',{class:'fr'},[dot('stale'),h('span',{class:'mono',text:r.path}),h('span',{class:'bad',text:tr('new, not used yet')}),rv]);
   const w=fileState(r),meta=[r.sha256?'sha256 '+String(r.sha256).slice(0,8):tr('no fingerprint'),fmtBytes(r.size),r.modified?shortTime(r.modified):''].filter(Boolean);
   return h('div',{class:'fr'},[dot(stateOf(w)),h('span',{class:'mono',text:r.path}),h('span',{class:'meta',text:meta.join(' · ')}),
-    w==='changed'||w==='missing'||w==='outside'?h('span',{class:'bad',text:w==='outside'?tr('outside "{folder}"',{folder:rootName()}):tr({changed:'changed',missing:'missing'}[w])}):null]);
+    w==='changed'||w==='missing'||w==='outside'?h('span',{class:'bad',text:w==='outside'?tr('outside "{folder}"',{folder:rootName()}):tr({changed:'changed',missing:'missing'}[w])}):null,
+    w==='missing'||w==='outside'?null:rv]);
 }
 function groupByFolder(refs){const m=new Map();
   refs.forEach(r=>{const p=normPath(r.path),i=p.lastIndexOf('/'),k=i<0?'./':p.slice(0,i+1);(m.get(k)||m.set(k,[]).get(k)).push(r)});
@@ -4895,7 +5171,7 @@ function chainSection(){ // Folder tab: every derived file, raw file and script,
     [dot(worst(list.map(fileDot))),h('span',{class:'fname',text:dir}),h('span',{class:'fstat'+(k?' stale':''),text:tr('{n} files',{n:list.length})+(k?' · '+tr('{n} new',{n:k}):'')})],
     ()=>[h('button',{type:'button',class:'linkbtn',text:tr('What depends on these {n} files?',{n:list.length}),onclick:()=>openFiles(list.map(r=>r.path),dir)}),
       h('ul',{class:'chlinks'},list.map(r=>h('li',{class:'fr'},[dot(fileDot(r)),link(baseName(r.path),()=>openFile(r.path)),
-        C.isNew(r.path)?h('span',{class:'fstat stale',text:tr('new, not used yet')}):null])))],'raw:'+dir)]))});
+        C.isNew(r.path)?h('span',{class:'fstat stale',text:tr('new, not used yet')}):null,revealBtn(r.path)])))],'raw:'+dir)]))});
   sec.append(h('h5',{text:tr('Raw data ({n} files): click a folder or file to see what depends on it',{n:C.raw.length})}),rl);
   if(C.scripts.length)sec.append(h('h5',{text:tr('Scripts ({n})',{n:C.scripts.length})}),
     h('ul',{class:'flist'},C.scripts.map(p=>h('li',{},[dot(stateOf(fileState(C.refOf.get(p)))),link(p,()=>openFile(p))]))));
@@ -4975,32 +5251,154 @@ async function verifyChain(){
   if(changed)render();else renderPanel();
 }
 
-function fileList(files,empty){ // raw or derived data files that can be imported into datasets
+/* Show a file in Explorer or Finder: the launcher opens its folder. Without the launcher, the path can be copied. */
+function revealBtn(path){
+  return h('button',{type:'button',class:'linkbtn rv',text:S.server?tr('Show in folder'):tr('Copy path'),title:path,onclick:async e=>{e.stopPropagation();
+    if(!S.server){try{await navigator.clipboard.writeText(path);toast(tr('Copied'))}catch(x){}return}
+    try{const r=await fetch('/api/reveal',{method:'POST',headers:{'X-Duetsheet-Token':S.server.token,'Content-Type':'application/json'},body:JSON.stringify({path})});
+      if(!r.ok)throw new Error(r.status+' '+await r.text())}catch(x){fail(tr('Could not open the folder.'),x)}}});
+}
+const datasetOf=f=>[...S.datasets.values()].find(d=>d.source&&normPath(d.source.path)===normPath(f.path));
+async function importAll(list,dir){ // every file of one folder that is not imported yet or changed since
+  if(list.length>20&&!confirm(tr('Import {n} files from {dir}? Each one becomes a dataset in the report.',{n:list.length,dir})))return;
+  let n=0;for(const f of list)if(await importDataFile(f,true))n++;
+  toast(tr('Imported {n} files from {dir}.',{n,dir}));refreshFolderFiles();
+}
+function fileList(files,empty){ // raw or derived data files that can be imported into datasets, grouped by folder
   const B=(t,fn,cls)=>h('button',{type:'button',class:'btn small'+(cls?' '+cls:''),text:t,onclick:fn}),dl=h('ul',{class:'flist'});
-  if(!files.length)dl.append(h('li',{class:'empty',text:empty}));
-  files.forEach(f=>{const ds=[...S.datasets.values()].find(d=>d.source&&normPath(d.source.path)===normPath(f.path)),stale=!!ds&&S.stale.has(ds.id);
-    dl.append(h('li',{},[h('span',{class:'fname',text:f.name}),
-      h('span',{class:'fstat'+(stale?' stale':''),text:!ds?tr('not imported'):stale?tr('changed since import'):tr('imported as "{t}", {n} rows',{t:ds.title||ds.id,n:ds.rows.length})}),
-      B(ds?tr('Update'):tr('Import'),()=>importDataFile(f),stale?'primary':'')]))});
+  if(!files.length){if(empty)dl.append(h('li',{class:'empty',text:empty}));return dl}
+  const groups=new Map();files.forEach(f=>{const i=f.name.lastIndexOf('/'),k=i<0?'':f.name.slice(0,i+1);(groups.get(k)||groups.set(k,[]).get(k)).push(f)});
+  groups.forEach((list,dir)=>{
+    const todo=list.filter(f=>{const ds=datasetOf(f);return!ds||S.stale.has(ds.id)});
+    if(groups.size>1||list.length>1)dl.append(h('li',{class:'grp'},[h('span',{class:'fname',text:dir||'./'}),h('span',{class:'fstat',text:tr('{n} files',{n:list.length})}),
+      todo.length>1?B(tr('Import all {n}',{n:todo.length}),()=>importAll(todo,dir||'./'),'primary'):todo.length?null:h('span',{class:'fstat',text:tr('all imported')})]));
+    list.forEach(f=>{const ds=datasetOf(f),stale=!!ds&&S.stale.has(ds.id);
+      dl.append(h('li',{class:dir?'sub':''},[h('span',{class:'fname',text:dir?f.name.slice(dir.length):f.name}),
+        h('span',{class:'fstat'+(stale?' stale':''),text:!ds?tr('not imported'):stale?tr('changed since import'):tr('imported as "{t}", {n} rows',{t:ds.title||ds.id,n:ds.rows.length})}),
+        revealBtn(f.path),B(ds?tr('Update'):tr('Import'),()=>importDataFile(f),stale?'primary':'')]))})});
   return dl;
 }
 function renderFolder(){
   const box=$('#tab-folder');box.replaceChildren();if(!S.folder)return;
-  const F=S.folderFiles||{data:[],derived:[],habits:[]},B=(t,fn,cls,dis)=>h('button',{type:'button',class:'btn small'+(cls?' '+cls:''),text:t,disabled:dis?'':null,onclick:fn});
+  const F=S.folderFiles||{data:[],derived:[],habits:[],writing:[]},B=(t,fn,cls,dis)=>h('button',{type:'button',class:'btn small'+(cls?' '+cls:''),text:t,disabled:dis?'':null,onclick:fn});
+  const tab=S.folderTab||'data';
+  box.append(h('div',{class:'crow ftop'},[h('div',{class:'seg'},[['data',tr('Data')],['habits',tr('Habits')]].map(([k,t])=>
+      h('button',{type:'button','aria-pressed':String(tab===k),text:t,onclick:()=>{S.folderTab=k;renderPanel()}}))),
+    h('span',{class:'sp'}),B(tr('Refresh'),refreshFolderFiles)]));
+  if(tab==='habits'){box.append(figureHabitsSection(F,B),writingSection(F,B),personalSection(B));return}
   box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Project folder')}),
-    h('p',{class:'cap',text:tr('"{name}". The report is saved to {file} automatically. An agent can read and edit the same folder (see AGENTS.md).',{name:S.folder.name,file:S.folder.file})}),
-    h('div',{class:'crow'},[B(tr('Refresh'),refreshFolderFiles)])]));
+    h('p',{class:'cap',text:tr('"{name}". The report is saved to {file} automatically. An agent can read and edit the same folder (see AGENTS.md).',{name:S.folder.name,file:S.folder.file})})]));
   box.append(chainSection());
   box.append(h('div',{class:'stsec'},[h('h4',{text:S.folder.prefix==='../'?tr('Raw data (this folder)'):tr('Raw data (data/)')}),
     fileList(F.data,S.folder.prefix==='../'?tr('No CSV, TSV or JSON files in this folder yet. Add some, then click Refresh.'):tr('No files yet. Put CSV, TSV or JSON files in the data/ folder, then click Refresh.')),
     h('p',{class:'cap',text:tr('Each import records the file path and a fingerprint (SHA-256), so you can see when the file changes. Excel files: save them as CSV, or ask your agent.')})]));
   if((F.derived||[]).length)box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Derived data (derived_data/)')}),fileList(F.derived,'')]));
+}
+function figureHabitsSection(F,B){
   const cnt=re=>F.habits.filter(x=>re.test(x)).length,svg=cnt(/\.svg$/i),mpl=cnt(/\.mplstyle$/i),ras=cnt(/\.(png|jpe?g|webp|gif)$/i),prof=F.habits.includes('profile.json');
-  box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Figure habits (habits/)')}),
+  return h('div',{class:'stsec'},[h('h4',{text:tr('Figure habits (habits/figures/)')}),
     h('p',{class:'cap',text:tr('{svg} SVG, {mpl} matplotlib style and {ras} PNG/JPG files.',{svg,mpl,ras})+(prof?' '+tr('Your saved habits (profile.json) are there too.'):'')}),
     ras?h('p',{class:'cap',text:tr('PNG and JPG files cannot be measured here. Ask your agent to look at them, or export them as SVG.')}):null,
     h('div',{class:'crow'},[B(S.learning?tr('Analysing…'):tr('Learn my habits'),learnHabits,'primary',S.learning||!(svg+mpl+(prof?1:0))),B(tr('Save current style as my habits'),saveHabits)]),
-    h('p',{class:'cap',text:tr('Saved habits go to habits/profile.json. Copy that file into the habits/ folder of your next project to start from the same style.')})]));
+    h('p',{class:'cap',text:tr('Put figures you like in habits/figures/ (SVG, PNG, .mplstyle, plotting scripts). Suggestions appear in the Style tab. Saved habits go to habits/profile.json.')})]);
+}
+
+/* ---------- Writing habits ----------
+   The user's own articles and reports go in habits/writing/. The page measures plain numbers in .md and .txt files;
+   an agent reads all of them (also .docx and .pdf) and suggests rules in style/writingProposal. The user ticks the rules
+   to keep; they are stored in style/writing, and agents follow them when they write or revise text. */
+function textStats(texts){ // sentence and paragraph lengths, lists and bold, in any language
+  let sents=0,chars=0,paras=0,paraSents=0,items=0,lines=0,bold=0;
+  for(const t of texts){const body=String(t).replace(/\r/g,'');bold+=(body.match(/\*\*[^*\n]+\*\*/g)||[]).length;
+    body.split(/\n\s*\n/).map(p=>p.trim()).filter(Boolean).forEach(p=>{
+      const ls=p.split('\n');lines+=ls.length;items+=ls.filter(l=>/^\s*([-*+]|\d+[.)])\s/.test(l)).length;
+      const ss=p.replace(/^\s*([-*+]|\d+[.)]|#+)\s+/gm,'').split(/(?<=[.!?\u3002\uff01\uff1f])\s*/).map(s=>s.trim()).filter(s=>s.length>1);
+      if(!/^#/.test(p)){paras++;paraSents+=ss.length}
+      ss.forEach(s=>{sents++;chars+=[...s].length})})}
+  return{files:texts.length,sentences:sents,avgSentence:sents?Math.round(chars/sents):0,avgParagraph:paras?Math.round(10*paraSents/paras)/10:0,listShare:lines?Math.round(100*items/lines):0,bold};
+}
+async function measureWriting(){
+  const F=S.folderFiles||{},plain=(F.writing||[]).filter(fh=>/\.(md|txt)$/i.test(fh.name));
+  try{S.writingStats=textStats(await Promise.all(plain.map(async fh=>(await fh.getFile()).text())));renderPanel()}
+  catch(e){fail(tr('Analysis failed. Please try again.'),e)}
+}
+const writingRules=()=>(S.writing&&Array.isArray(S.writing.rules)?S.writing.rules:[]).filter(r=>r&&r.text);
+async function setWriting(rules){
+  const before=writingRules().map(r=>r.text),doc={rules,updatedAt:now()};S.writing=doc;renderPanel();await put('style/writing',doc);
+  await recordChange({blockId:null,field:'style.writing',before,after:rules.map(r=>r.text),name:tr('Writing habits'),revertible:false});
+}
+async function applyWriting(){
+  const P=S.writingProposal;if(!P)return;const have=new Set(writingRules().map(r=>r.text));
+  await setWriting([...writingRules(),...P.rules.filter(r=>r.on&&!have.has(r.text)).map(r=>({text:r.text,from:r.from||''}))]);
+  await dismissWriting();toast(tr('Writing habits updated.'));
+}
+async function dismissWriting(){const agent=S.writingProposal&&S.writingProposal.source==='agent';S.writingProposal=null;renderPanel();if(agent)await drop('style/writingProposal')}
+async function saveWritingFile(){
+  try{await writeFile(await subdir(S.folder.dir,'habits',true),'writing.json',JSON.stringify({rules:writingRules(),savedAt:now()},null,1)+'\n');
+    toast(tr('Saved to {p}',{p:'habits/writing.json'}));refreshFolderFiles()}catch(e){fail(tr('Save failed. Please try again.'),e)}
+}
+function proposeWriting(rules,source,note){ // rules from habits/writing.json or the personal copy, shown for the user to tick
+  const have=new Set(writingRules().map(r=>r.text)),list=(Array.isArray(rules)?rules:[]).filter(r=>r&&typeof r.text==='string'&&r.text.trim()&&!have.has(r.text));
+  if(!list.length){toast(tr('Nothing new: these habits are already applied.'));return}
+  S.writingProposal={rules:list.map(r=>({text:r.text,from:r.from||'',conf:null,on:true})),note:note||'',source};S.folderTab='habits';renderPanel();
+}
+async function loadWritingFile(){
+  try{const fh=await(await subdir(S.folder.dir,'habits')).getFileHandle('writing.json');proposeWriting(JSON.parse(await(await fh.getFile()).text()).rules,'file','habits/writing.json')}
+  catch(e){fail(tr('Could not read {file}.',{file:'habits/writing.json'}),e)}
+}
+function writingSection(F,B){
+  const w=F.writing||[],cnt=re=>w.filter(f=>re.test(f.name)).length,plain=cnt(/\.(md|txt)$/i);
+  const sec=h('div',{class:'stsec'},[h('h4',{text:tr('Writing habits (habits/writing/)')}),
+    h('p',{class:'cap',text:w.length?tr('{t} Markdown or text, {d} Word and {p} PDF files.',{t:plain,d:cnt(/\.docx$/i),p:cnt(/\.pdf$/i)})
+      :tr('Put articles or reports you wrote in habits/writing/ (.md, .txt, .docx, .pdf). Your agent learns your writing style from them, and you confirm each rule here.')}),
+    h('div',{class:'crow'},[B(tr('Measure my texts'),measureWriting,'',!plain),F.habits.includes('writing.json')?B(tr('Load habits/writing.json'),loadWritingFile):null])]);
+  const s=S.writingStats;
+  if(s)sec.append(h('table',{class:'wstats'},[[tr('Files'),s.files],[tr('Sentences'),s.sentences],[tr('Average sentence (characters)'),s.avgSentence],
+    [tr('Average paragraph (sentences)'),s.avgParagraph],[tr('Lines that are list items'),s.listShare+'%'],[tr('Bold phrases'),s.bold]].map(([k,v])=>h('tr',{},[h('th',{text:k}),h('td',{text:String(v)})]))));
+  sec.append(h('p',{class:'cap',text:tr('Tone, paragraph rhythm and wording need reading. Ask your agent: "Learn my writing style from habits/writing/". Its suggestions appear here for you to tick.')}));
+  const P=S.writingProposal;
+  if(P){const ul=h('ul',{class:'flist wrules'});
+    P.rules.forEach(r=>{const cb=h('input',{type:'checkbox'});cb.checked=r.on;cb.onchange=()=>{r.on=cb.checked};
+      ul.append(h('li',{},[h('label',{class:'chk'},[cb,h('span',{text:r.text})]),r.from?h('span',{class:'fstat',text:r.from}):null,r.conf!=null?h('span',{class:'conf',text:Math.round(r.conf*100)+'%'}):null]))});
+    sec.append(h('h5',{text:P.source==='agent'?tr('Suggested by the agent'):tr('From {src}',{src:P.source==='personal'?tr('your personal habits'):P.note})}),
+      P.source==='agent'&&P.note?h('p',{class:'cap',text:P.note}):null,ul,
+      h('div',{class:'crow'},[B(tr('Apply selected'),applyWriting,'primary'),B(tr('Dismiss'),dismissWriting)]))}
+  const R=writingRules(),ul=h('ul',{class:'flist wrules'});
+  R.forEach(r=>ul.append(h('li',{},[h('span',{text:r.text}),r.from?h('span',{class:'fstat',text:r.from}):null,
+    h('button',{type:'button',class:'linkbtn',text:tr('Remove'),onclick:()=>setWriting(R.filter(x=>x!==r))})])));
+  const add=h('input',{type:'text',placeholder:tr('Add a rule of your own, for example: Give the conclusion first, then the numbers.')});
+  const addRule=()=>{const t=add.value.trim();if(t)setWriting([...R,{text:t,from:tr('added by you')}])};
+  add.addEventListener('keydown',e=>{if(e.key==='Enter')addRule()});
+  sec.append(h('h5',{text:tr('Your writing habits ({n})',{n:R.length})}),R.length?ul:h('p',{class:'cap',text:tr('None yet. Agents follow these rules whenever they write or revise text in this report.')}),
+    h('div',{class:'crow wadd'},[add,B(tr('Add'),addRule)]),h('div',{class:'crow'},[B(tr('Save as my writing habits'),saveWritingFile,'',!R.length)]),
+    h('p',{class:'cap',text:tr('Saved habits go to habits/writing.json. Copy that file into the habits/ folder of your next project to start from the same habits.')}));
+  return sec;
+}
+
+/* Personal habits: one copy in ~/.duetsheet/habits/ shared by all projects (through the launcher) */
+async function personalCall(method,body){
+  const r=await fetch('/api/personal',{method,headers:{'X-Duetsheet-Token':S.server.token,'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
+  if(!r.ok)throw new Error(r.status+' '+await r.text());return method==='GET'?r.json():null;
+}
+async function savePersonal(){
+  try{await personalCall('PUT',{profile:styleExport(styleNow()),writing:{rules:writingRules()}});S.personal=null;toast(tr('Saved as your personal habits. New projects can load them.'));loadPersonalInfo()}
+  catch(e){fail(tr('Save failed. Please try again.'),e)}
+}
+async function loadPersonal(){
+  try{const p=await personalCall('GET');const rows=profileRows(p.profile);
+    if(rows.length){S.proposal=rows}
+    if(p.writing&&Array.isArray(p.writing.rules)&&p.writing.rules.length)proposeWriting(p.writing.rules,'personal');
+    else if(!rows.length)toast(tr('Nothing new: these habits are already applied.'));
+    if(rows.length)toast(tr('Figure suggestions are in the Style tab.'))}
+  catch(e){fail(tr('Could not load your personal habits.'),e)}
+}
+async function loadPersonalInfo(){if(!S.server||S.personal)return;S.personal={};try{S.personal=await personalCall('GET');renderPanel()}catch(e){}}
+function personalSection(B){
+  if(!S.server)return h('div',{class:'stsec'},[h('h4',{text:tr('Personal habits (all projects)')}),h('p',{class:'cap',text:tr('Available when the report is opened with the launcher (duetsheet.py). Meanwhile, copy habits/profile.json and habits/writing.json between projects.')})]);
+  loadPersonalInfo();const p=S.personal,nw=p&&p.writing&&Array.isArray(p.writing.rules)?p.writing.rules.length:0,has=!!(p&&(p.profile||nw));
+  return h('div',{class:'stsec'},[h('h4',{text:tr('Personal habits (all projects)')}),
+    h('p',{class:'cap',text:has?tr('You have personal habits: a figure style and {n} writing rules. Load them to use them in this report.',{n:nw}):tr('Save this report\'s figure style and writing habits once, and load them in every new project.')}),
+    h('div',{class:'crow'},[B(tr('Load my personal habits'),loadPersonal,has&&!writingRules().length?'primary':'',!has),B(tr('Save as my personal habits'),savePersonal)])]);
 }
 
 /* ---------- Ask the agent to revise ----------
@@ -5011,27 +5409,29 @@ const openCount=()=>S.annos.filter(a=>a.status!=='done').length;
 const ageS=iso=>iso?(Date.now()-Date.parse(iso))/1000:Infinity;
 function agentView(){ // what the bar shows: {state, text, cls}
   const A=S.agent,req=A&&A.request,st=A&&A.status;
-  if(!req)return{state:A&&A.listening?'listening':'idle'};
+  if(!req)return{state:'idle'};
   if(!st){const waiting=ageS(req.at)<(A.listening?60:10);
     return waiting?{state:'sent',text:tr('Request sent. Waiting for the agent…')}:{state:'unanswered',text:tr('No agent has answered yet.'),cls:'bad'}}
   const note=st.note?' '+st.note:'';
   if(st.state==='working')return{state:'working',text:tr('The agent is revising the report…')+note};
   if(st.state==='failed')return{state:'failed',text:tr('The agent could not finish.')+note,cls:'bad'};
   const n=S.annos.filter(a=>a.status==='done'&&a.resolvedAt&&a.resolvedAt>=req.at).length;
-  return ageS(st.at)<1800?{state:'done',text:tr('The agent handled {n} comments.',{n})+note,cls:'ok'}:{state:A.listening?'listening':'idle'};
+  return ageS(st.at)<1800?{state:'done',text:tr('The agent handled {n} comments.',{n})+note,cls:'ok'}:{state:'idle'};
 }
-function renderAgentBar(){
+function renderAgentBar(){ // the agent strip above the report: connection, progress, and the two round buttons
   const box=$('#agentbar');if(!box)return;
-  const open=openCount(),cur=currentChanges().length,v=agentView(),busy=v.state==='sent'||v.state==='working';
-  const key=S.readonly||!S.meta?'':[open,cur,v.state,v.text,S.agent&&S.agent.listening].join('|');
-  if(key===box.dataset.key)return;box.dataset.key=key;box.replaceChildren();if(!key)return; // rebuilt only when it changes, so a click is never lost
+  const open=openCount(),cur=currentChanges().length,v=agentView(),busy=v.state==='sent'||v.state==='working',listening=!!(S.agent&&S.agent.listening);
+  const show=!S.readonly&&!!S.meta&&!!(S.server||open||cur);
+  const key=show?[open,cur,v.state,v.text,listening,!!S.server].join('|'):'';
+  if(key===box.dataset.key)return;box.dataset.key=key;box.replaceChildren();box.hidden=!show;if(!show)return; // rebuilt only when it changes, so a click is never lost
   const B=(t,fn,cls,title)=>h('button',{type:'button',class:'btn small'+(cls?' '+cls:''),text:t,title,onclick:fn});
+  box.append(h('span',{class:'conn'},[h('span',{class:'dot'+(listening?' ok':'')}),h('span',{text:listening?tr('Agent listening'):tr('No agent connected')})]));
+  if(!listening||v.state==='unanswered')box.append(h('button',{type:'button',class:'linkbtn',text:tr('Get a prompt to paste'),onclick:openAgentPrompt}));
+  if(v.text)box.append(h('span',{class:'ast'+(v.cls?' '+v.cls:''),text:v.text}));
+  box.append(h('span',{class:'sp'}));
   if(cur)box.append(B(tr('Finish this round ({n})',{n:cur}),finishRound,'',tr('Move the current changes into the history as one round.')));
   if(open&&!busy)box.append(B(tr('Ask the agent to revise ({n})',{n:open}),askAgent,'primary',
-    S.agent&&S.agent.listening?tr('An agent is listening and will revise the report now.'):tr('No agent is listening. You will get a prompt to paste into your agent.')));
-  if(v.text)box.append(h('span',{class:'ast'+(v.cls?' '+v.cls:''),text:v.text}));
-  if(v.state==='unanswered')box.append(h('button',{type:'button',class:'linkbtn',text:tr('Get a prompt to paste'),onclick:openAgentPrompt}));
-  if(v.state==='listening'&&!open)box.append(h('span',{class:'ast',text:tr('Agent listening')}));
+    listening?tr('An agent is listening and will revise the report now.'):tr('No agent is listening. You will get a prompt to paste into your agent.')));
 }
 async function askAgent(){
   const open=openCount();
@@ -5098,13 +5498,18 @@ function subscribe(){
   const quiet=fn=>{if(editingNow()){renderPanel()}else fn()};
   db.doc('report/meta').onSnapshot(s=>{if(s.exists){S.meta=s.data();render()}},fail);
   db.collection('blocks').limit(500).onSnapshot(s=>{S.blocks=new Map(s.docs.map(d=>[d.id,d.data()]).filter(x=>x[1]));render()},fail);
-  db.collection('datasets').limit(50).onSnapshot(s=>{S.datasets=new Map(s.docs.map(d=>[d.id,d.data()]).filter(x=>x[1]));scheduleVerify();render()},fail);
+  db.collection('datasets').limit(500).onSnapshot(s=>{S.datasets=new Map(s.docs.map(d=>[d.id,d.data()]).filter(x=>x[1]));scheduleVerify();render()},fail);
   db.collection('annotations').limit(1000).onSnapshot(s=>{S.annos=s.docs.map(d=>d.data()).filter(a=>a&&a.id);quiet(()=>{renderPanel();paintAllOverlays()})},fail);
   db.collection('changes').limit(1000).onSnapshot(s=>{S.changes=s.docs.map(d=>d.data()).filter(c=>c&&c.id);renderPanel()},fail);
   db.collection('rounds').limit(500).onSnapshot(s=>{S.rounds=s.docs.map(d=>d.data()).filter(r=>r&&r.id);renderPanel()},fail);
   db.collection('steps').limit(1000).onSnapshot(s=>{S.steps=new Map(s.docs.map(d=>[d.id,d.data()]).filter(x=>x[1]&&typeof x[1]==='object'));scheduleVerify();render()},fail);
   db.doc('style/profile').onSnapshot(s=>{S.style=s.exists?s.data():null;render()},fail);
   db.collection('examples').limit(200).onSnapshot(s=>{S.examples=s.docs.map(d=>d.data()).filter(x=>x&&x.id);renderPanel()},fail);
+  db.doc('style/writing').onSnapshot(s=>{S.writing=s.exists?s.data():null;renderPanel()},fail); // the writing habits the user confirmed
+  db.doc('style/writingProposal').onSnapshot(s=>{const d=s.exists?s.data():null; // written by an agent, confirmed by the user in Folder > Habits
+    const rules=d&&Array.isArray(d.rules)?d.rules.filter(r=>r&&typeof r.text==='string'&&r.text.trim()&&r.text.length<600)
+      .map(r=>({text:r.text.trim(),from:r.from?String(r.from):'',conf:typeof r.conf==='number'?r.conf:null,on:(r.conf??1)>=0.6})):[];
+    S.writingProposal=rules.length?{rules,note:d.note?String(d.note):'',source:'agent'}:(S.writingProposal&&S.writingProposal.source!=='agent'?S.writingProposal:null);renderPanel()},fail);
   db.doc('style/proposal').onSnapshot(s=>{const d=s.exists?s.data():null; // written by an agent, confirmed by the user in the Style tab
     const rows=d&&Array.isArray(d.rows)?d.rows.filter(r=>r&&STYLE_FIELDS.includes(r.field)&&validStyleValue(r.field,r.value)).map(r=>({field:r.field,value:r.value,conf:r.conf,from:r.from?String(r.from):'',source:'agent',on:(r.conf??1)>=0.6})):[];
     S.agentProposal=rows.length?{rows,note:d.note?String(d.note):''}:null;renderPanel()},fail);

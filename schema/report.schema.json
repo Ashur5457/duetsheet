@@ -21,7 +21,9 @@
       "type": "object",
       "properties": {
         "profile": { "$ref": "#/$defs/styleProfile" },
-        "proposal": { "$ref": "#/$defs/styleProposal" }
+        "proposal": { "$ref": "#/$defs/styleProposal" },
+        "writing": { "$ref": "#/$defs/writingRules", "description": "The writing habits the user confirmed; agents follow them when they write." },
+        "writingProposal": { "$ref": "#/$defs/writingRules", "description": "Writing habits suggested by an agent from habits/writing/; the user ticks the ones to keep." }
       }
     },
     "examples": { "type": "object", "additionalProperties": { "$ref": "#/$defs/example" } },
@@ -29,6 +31,17 @@
   },
   "$defs": {
     "isoTime": { "type": "string", "format": "date-time" },
+    "writingRules": {
+      "type": "object",
+      "required": ["rules"],
+      "properties": {
+        "by": { "type": "string" }, "at": { "type": "string" }, "note": { "type": "string" }, "updatedAt": { "type": "string" },
+        "rules": { "type": "array", "items": { "type": "object", "required": ["text"], "properties": {
+          "text": { "type": "string", "description": "One habit, for example: Give the conclusion first, then the numbers." },
+          "from": { "type": "string", "description": "Which texts it comes from." },
+          "conf": { "type": "number", "minimum": 0, "maximum": 1 } } } }
+      }
+    },
     "fileRef": {
       "type": "object",
       "description": "A file, known by its path and the SHA-256 of its bytes. size and modified let a checker skip reading files that have not changed.",
@@ -206,7 +219,12 @@
         },
         "text": { "type": "string" },
         "status": { "enum": ["open", "done"] },
-        "reply": { "type": "string", "description": "The agent's answer." },
+        "reply": { "type": "string", "description": "The agent's latest answer (the same text as its last thread message)." },
+        "thread": {
+          "type": "array",
+          "description": "The conversation after the comment, oldest first. A user message sets status back to open.",
+          "items": { "type": "object", "required": ["by", "text"], "properties": { "by": { "enum": ["user", "claude"] }, "text": { "type": "string" }, "at": { "type": "string" } } }
+        },
         "createdAt": { "$ref": "#/$defs/isoTime" },
         "resolvedAt": { "anyOf": [{ "$ref": "#/$defs/isoTime" }, { "type": "null" }] }
       }
