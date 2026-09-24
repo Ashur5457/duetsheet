@@ -2,7 +2,7 @@
 
 This file is for AI agents (Claude Code, Claude on claude.ai, Codex, Gemini CLI, Cursor, or any LLM that can read and write files). It explains how a Duetsheet report is stored, how to read the human's feedback, and how to write or revise the report so that every change stays visible, attributable and reversible.
 
-- Format version: `duetsheet/0.4`. Reports from `duetsheet/0.2` and `0.3` are read as they are; nothing needs to be migrated.
+- Format version: `duetsheet/0.5`. Reports from `duetsheet/0.2` to `0.4` are read as they are; nothing needs to be migrated. (0.5 added the `outline` block type and the `beside` value of `breakBefore`.)
 - Formal definition: [`schema/report.schema.json`](schema/report.schema.json) (JSON Schema 2020-12).
 - Complete example: [`examples/demo-project/`](examples/demo-project/).
 - The interface can be shown in several languages, but the data never changes with it: field names, tag ids and enum values are always English. Write report content (titles, text, captions, replies) in the language the user works in, and reply to an annotation in its language.
@@ -57,8 +57,8 @@ python duetsheet.py check "<folder>"    # check report.json; exit code 1 on erro
 
 ```json
 {
- "schema": "duetsheet/0.4",
- "report":      { "meta": { "title": "...", "order": ["b-intro", "b-fig1"], "schema": "duetsheet/0.4", "createdAt": "ISO-8601" } },
+ "schema": "duetsheet/0.5",
+ "report":      { "meta": { "title": "...", "order": ["b-intro", "b-fig1"], "schema": "duetsheet/0.5", "createdAt": "ISO-8601" } },
  "blocks":      { "b-intro": { ... }, "b-fig1": { ... } },
  "datasets":    { "exp": { ... } },
  "annotations": { "a...": { ... } },
@@ -92,10 +92,10 @@ Common fields:
 | Field | Type | Notes |
 |---|---|---|
 | `id` | string | Same as the document id |
-| `type` | `text` \| `chart` \| `table` \| `image` | |
+| `type` | `text` \| `chart` \| `table` \| `image` \| `outline` | |
 | `title` | string | May be empty |
 | `caption` | string | Shown under charts, tables, images |
-| `breakBefore` | `auto` \| `page` \| `avoid` | Pagination: automatic, force a new page, keep with previous block |
+| `breakBefore` | `auto` \| `page` \| `avoid` \| `beside` | Pagination: automatic, force a new page, keep with the previous block (below it), or keep with the previous blocks in a right-hand column next to them |
 | `createdAt`, `updatedAt` | ISO-8601 | |
 
 Type-specific fields:
@@ -108,8 +108,18 @@ Type-specific fields:
   - `w`, `h` are the image's natural size (only the aspect ratio matters). `crop` values are percentages (0 to 45). `width` is a percentage of the page width (20 to 100).
   - `source` = `{ tool, file, note, script, data }` describes how the figure was made: `tool` (for example `Origin`, `Python (matplotlib)`), the original `file` name, a free-text `note`, the plotting `script`, and `data` = `{ asset, name, type }` for an attached raw data file. Read the script and data before proposing changes to a figure.
   - `calibration` is reserved for a future version (mapping image pixels to data coordinates).
+- `outline`: no content fields. The page lists the titled blocks that come after it, with their page numbers, as links: titled `text` blocks are headings, titled charts, tables and images are listed under them. Put one right after the summary; give it a `title` such as "Contents" in the report's language.
 
 Write a block as a whole document, not as a partial merge, so nested objects never keep stale keys.
+
+### Layout: keep a figure and its discussion together
+
+Pages are 16:9 and computed by the page; you only say which blocks belong together:
+
+- `breakBefore: "avoid"` puts a block under the previous one, on the same page.
+- `breakBefore: "beside"` puts a block in a right-hand column next to the blocks before it (left about 60 %, right about 40 %), on the same page. Blocks after it with `avoid` continue in the right column.
+
+Both attach to the block right before in `order`, so put a discussion right after the figure or table it discusses and give it `beside`. Add a table under a figure with `avoid` (before the discussion) only when both fit on one page together; a table of more than about 10 rows is better on its own page after the figure. Keep a discussion short enough to fit next to its figure; a long one reads better as its own block.
 
 ### `datasets/{id}`
 
@@ -242,6 +252,7 @@ The page imports CSV, TSV and JSON files itself (Folder tab). Do it yourself whe
 ### Write a new report
 
 1. Create `report.json` with `report/meta`, the `datasets` (with `source` when they come from files) and the `blocks`. Charts and tables reference datasets by id and columns by key; every number in the text should come from a dataset.
+   Start with a one-page summary, then an `outline` block, then the sections. Give every section and figure a title (the outline is built from them) and put each discussion next to its figure with `beside`.
 2. Put figures made in other tools in `assets/<id>.<ext>` (32-hex id) and reference them from image blocks, with `source` telling how they were made.
 3. Close a first round with `by: "claude"` so the user's review starts a new round.
 4. Run `python duetsheet.py check "<folder>"`, fix every ERROR, then start `python duetsheet.py "<folder>"` in the background (or tell the user to open the folder in Duetsheet). Watch its output for problems the page reports.

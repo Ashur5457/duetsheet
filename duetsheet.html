@@ -108,6 +108,17 @@ main{min-width:0}
 
 /* block content (shared) */
 .blk{position:relative;flex:0 0 auto}
+.duo{display:flex;gap:calc(var(--gap) * 2);align-items:flex-start;flex:0 0 auto}
+.duo>.col{display:flex;flex-direction:column;gap:var(--gap);min-width:0}
+.duo>.col.main{flex:3 1 0}.duo>.col.side{flex:2 1 0}
+.toc{list-style:none;margin:0;padding:0}
+.toc li{display:flex;align-items:baseline;gap:8px;padding:2px 0}
+.toc li.l1{font-weight:500}
+.toc li.l2{padding-left:1.5em;font-size:.93em}
+.toc .tocl{border:0;background:none;padding:0;font:inherit;color:var(--accent);cursor:pointer;text-align:left}
+.toc .tocl:hover{text-decoration:underline}
+.toc .lead{flex:1 1 20px;border-bottom:1px dotted var(--line)}
+.toc .pg{color:var(--muted);font-variant-numeric:tabular-nums}
 .btitle{font-size:18px;margin:0 0 6px;line-height:1.35}
 .md p{margin:0 0 .55em}.md p:last-child{margin-bottom:0}
 .md ul{margin:0 0 .55em;padding-left:1.3em}
@@ -163,6 +174,8 @@ body[data-draw="box"] .pt,body[data-draw="lasso"] .pt{pointer-events:none}
 .bar.auto-break .lbl{border-color:var(--accent);color:var(--accent)}
 .bar.forced .lbl{border-color:var(--ink);color:var(--ink);font-weight:500}
 .bar.avoid .lbl{color:var(--c2);border-color:var(--c2)}
+.bar.beside .rule{border-top:1px dotted var(--line)}
+.bar.beside .lbl{color:var(--c3);border-color:var(--c3)}
 .bar:hover .lbl{background:var(--soft)}
 .pstart{font-size:12px;color:var(--muted);margin:10px 0 4px}
 .card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 16px 14px}
@@ -316,6 +329,7 @@ details.round summary{cursor:pointer;font-size:13.5px}
       <button type="button" class="btn" data-add="chart">Add chart</button>
       <button type="button" class="btn" data-add="table">Add table</button>
       <button type="button" class="btn" data-add="image">Add image</button>
+      <button type="button" class="btn" data-add="outline">Add contents</button>
       <input type="file" id="imgfile" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,.svg" hidden>
       <input type="file" id="datafile" accept=".csv,.txt,.json,text/csv,text/plain,application/json" hidden>
     </div>
@@ -402,7 +416,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Keep with previous": "與上一塊同頁",
  "Automatic break (page {n} starts)": "自動換頁（第 {n} 頁開始）",
  "Same page": "同一頁",
- "Click to switch: automatic, new page, keep with previous": "點一下切換：自動、強制換頁、與上一塊同頁",
  "(none)": "（無）",
  "Title (optional)": "標題（可留空）",
  "Supports **bold**, *italic*, and lists with lines starting with \"- \". Leave a blank line between paragraphs.": "支援 **粗體**、*斜體*，以及用「- 」開頭的清單；空一行分段。",
@@ -777,7 +790,14 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Ask your agent to write null instead (in Python: json.dump(..., allow_nan=False)).": "請 agent 改寫成 null（Python：json.dump(..., allow_nan=False)）。",
  "Your changes were saved over it. The unreadable file was kept as exports/{f}.": "你的修改已經存進去。無法讀取的那份檔案保留為 exports/{f}。",
  "The page keeps showing the last version it could read.": "頁面會繼續顯示最後一份能讀取的版本。",
- "Could not save report.json. Duetsheet keeps trying.": "無法儲存 report.json，Duetsheet 會持續重試。"
+ "Could not save report.json. Duetsheet keeps trying.": "無法儲存 report.json，Duetsheet 會持續重試。",
+ "Add contents": "新增目錄",
+ "Contents": "目錄",
+ "Blocks with a title after this one will be listed here.": "這個區塊之後有標題的區塊會列在這裡。",
+ "Made from the titles of the blocks after this one. Page numbers follow view mode; click a title to go there.": "依照這個區塊之後各區塊的標題自動產生。頁碼與檢視模式一致；點標題即可跳過去。",
+ "Beside previous (right column)": "放在前一塊旁邊（右欄）",
+ "Beside previous": "放在前一塊旁邊",
+ "Click to switch: automatic, new page, keep with previous, beside previous": "點一下切換：自動、強制換頁、與上一塊同頁、放在上一塊旁邊"
 },
 "zh-Hans": {
  "_name": "简体中文",
@@ -816,7 +836,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Keep with previous": "与上一块同页",
  "Automatic break (page {n} starts)": "自动分页（第 {n} 页开始）",
  "Same page": "同一页",
- "Click to switch: automatic, new page, keep with previous": "点击切换：自动、强制分页、与上一块同页",
  "(none)": "（无）",
  "Title (optional)": "标题（可留空）",
  "Supports **bold**, *italic*, and lists with lines starting with \"- \". Leave a blank line between paragraphs.": "支持 **粗体**、*斜体*，以及以“- ”开头的列表；空一行分段。",
@@ -1191,7 +1210,14 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Ask your agent to write null instead (in Python: json.dump(..., allow_nan=False)).": "请让 agent 改写为 null（Python：json.dump(..., allow_nan=False)）。",
  "Your changes were saved over it. The unreadable file was kept as exports/{f}.": "你的修改已经保存。无法读取的那份文件保留为 exports/{f}。",
  "The page keeps showing the last version it could read.": "页面会继续显示最后一份能读取的版本。",
- "Could not save report.json. Duetsheet keeps trying.": "无法保存 report.json，Duetsheet 会持续重试。"
+ "Could not save report.json. Duetsheet keeps trying.": "无法保存 report.json，Duetsheet 会持续重试。",
+ "Add contents": "添加目录",
+ "Contents": "目录",
+ "Blocks with a title after this one will be listed here.": "此区块之后带标题的区块会列在这里。",
+ "Made from the titles of the blocks after this one. Page numbers follow view mode; click a title to go there.": "根据此区块之后各区块的标题自动生成。页码与查看模式一致；点击标题即可跳转。",
+ "Beside previous (right column)": "放在前一块旁边（右栏）",
+ "Beside previous": "放在前一块旁边",
+ "Click to switch: automatic, new page, keep with previous, beside previous": "点击切换：自动、强制分页、与上一块同页、放在上一块旁边"
 },
 "ja": {
  "_name": "日本語",
@@ -1230,7 +1256,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Keep with previous": "前のブロックと同じページ",
  "Automatic break (page {n} starts)": "自動改ページ（{n} ページ目の開始）",
  "Same page": "同じページ",
- "Click to switch: automatic, new page, keep with previous": "クリックで切り替え：自動、改ページ、前のブロックと同じページ",
  "(none)": "（なし）",
  "Title (optional)": "タイトル（省略可）",
  "Supports **bold**, *italic*, and lists with lines starting with \"- \". Leave a blank line between paragraphs.": "**太字**、*斜体*、「- 」で始まる行のリストが使えます。段落の間は空行を入れてください。",
@@ -1605,7 +1630,14 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Ask your agent to write null instead (in Python: json.dump(..., allow_nan=False)).": "代わりに null を書くよう agent に頼んでください（Python：json.dump(..., allow_nan=False)）。",
  "Your changes were saved over it. The unreadable file was kept as exports/{f}.": "あなたの変更で上書き保存しました。読めなかったファイルは exports/{f} として残してあります。",
  "The page keeps showing the last version it could read.": "ページは最後に読めた版を表示し続けます。",
- "Could not save report.json. Duetsheet keeps trying.": "report.json を保存できませんでした。Duetsheet は再試行を続けます。"
+ "Could not save report.json. Duetsheet keeps trying.": "report.json を保存できませんでした。Duetsheet は再試行を続けます。",
+ "Add contents": "目次を追加",
+ "Contents": "目次",
+ "Blocks with a title after this one will be listed here.": "このブロックより後にある、タイトル付きのブロックがここに一覧表示されます。",
+ "Made from the titles of the blocks after this one. Page numbers follow view mode; click a title to go there.": "このブロックより後のブロックのタイトルから自動で作られます。ページ番号は閲覧モードと同じです。タイトルをクリックするとそのページへ移動します。",
+ "Beside previous (right column)": "前のブロックの横（右列）",
+ "Beside previous": "前のブロックの横",
+ "Click to switch: automatic, new page, keep with previous, beside previous": "クリックで切り替え：自動、改ページ、前のブロックと同じページ、前のブロックの横"
 },
 "ko": {
  "_name": "한국어",
@@ -1644,7 +1676,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Keep with previous": "앞 블록과 같은 페이지",
  "Automatic break (page {n} starts)": "자동 페이지 나눔 ({n}페이지 시작)",
  "Same page": "같은 페이지",
- "Click to switch: automatic, new page, keep with previous": "클릭하여 전환: 자동, 새 페이지, 앞 블록과 같은 페이지",
  "(none)": "(없음)",
  "Title (optional)": "제목 (선택)",
  "Supports **bold**, *italic*, and lists with lines starting with \"- \". Leave a blank line between paragraphs.": "**굵게**, *기울임*, \"- \"로 시작하는 줄의 목록을 쓸 수 있습니다. 문단 사이에는 빈 줄을 넣으세요.",
@@ -2019,7 +2050,14 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Ask your agent to write null instead (in Python: json.dump(..., allow_nan=False)).": "agent에게 대신 null을 쓰도록 요청하세요 (Python: json.dump(..., allow_nan=False)).",
  "Your changes were saved over it. The unreadable file was kept as exports/{f}.": "변경 사항을 그 위에 저장했습니다. 읽을 수 없던 파일은 exports/{f}(으)로 남겨 두었습니다.",
  "The page keeps showing the last version it could read.": "페이지는 마지막으로 읽을 수 있었던 버전을 계속 보여 줍니다.",
- "Could not save report.json. Duetsheet keeps trying.": "report.json을 저장하지 못했습니다. Duetsheet가 계속 다시 시도합니다."
+ "Could not save report.json. Duetsheet keeps trying.": "report.json을 저장하지 못했습니다. Duetsheet가 계속 다시 시도합니다.",
+ "Add contents": "목차 추가",
+ "Contents": "목차",
+ "Blocks with a title after this one will be listed here.": "이 블록 뒤에 있는 제목이 있는 블록이 여기에 나열됩니다.",
+ "Made from the titles of the blocks after this one. Page numbers follow view mode; click a title to go there.": "이 블록 뒤에 있는 블록의 제목으로 자동 생성됩니다. 페이지 번호는 보기 모드와 같으며, 제목을 클릭하면 해당 위치로 이동합니다.",
+ "Beside previous (right column)": "앞 블록 옆 (오른쪽 열)",
+ "Beside previous": "앞 블록 옆",
+ "Click to switch: automatic, new page, keep with previous, beside previous": "클릭하여 전환: 자동, 새 페이지, 앞 블록과 같은 페이지, 앞 블록 옆"
 },
 "es": {
  "_name": "Español",
@@ -2058,7 +2096,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Keep with previous": "Con el bloque anterior",
  "Automatic break (page {n} starts)": "Salto automático (empieza la página {n})",
  "Same page": "Misma página",
- "Click to switch: automatic, new page, keep with previous": "Haz clic para cambiar: automático, página nueva, con el bloque anterior",
  "(none)": "(ninguno)",
  "Title (optional)": "Título (opcional)",
  "Supports **bold**, *italic*, and lists with lines starting with \"- \". Leave a blank line between paragraphs.": "Admite **negrita**, *cursiva* y listas con líneas que empiezan por \"- \". Deja una línea en blanco entre párrafos.",
@@ -2433,7 +2470,14 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Ask your agent to write null instead (in Python: json.dump(..., allow_nan=False)).": "Pide a tu agente que escriba null en su lugar (en Python: json.dump(..., allow_nan=False)).",
  "Your changes were saved over it. The unreadable file was kept as exports/{f}.": "Tus cambios se guardaron encima. El archivo ilegible se conservó como exports/{f}.",
  "The page keeps showing the last version it could read.": "La página sigue mostrando la última versión que pudo leer.",
- "Could not save report.json. Duetsheet keeps trying.": "No se pudo guardar report.json. Duetsheet sigue intentándolo."
+ "Could not save report.json. Duetsheet keeps trying.": "No se pudo guardar report.json. Duetsheet sigue intentándolo.",
+ "Add contents": "Añadir índice",
+ "Contents": "Índice",
+ "Blocks with a title after this one will be listed here.": "Aquí aparecerán los bloques con título que vienen después de este.",
+ "Made from the titles of the blocks after this one. Page numbers follow view mode; click a title to go there.": "Se genera a partir de los títulos de los bloques que vienen después de este. Los números de página son los del modo de lectura; haz clic en un título para ir allí.",
+ "Beside previous (right column)": "Junto al bloque anterior (columna derecha)",
+ "Beside previous": "Junto al bloque anterior",
+ "Click to switch: automatic, new page, keep with previous, beside previous": "Haz clic para cambiar: automático, página nueva, con el bloque anterior, junto al bloque anterior"
 }
 }
 </script>
@@ -2763,8 +2807,34 @@ function buildViewBlock(b,interactive){
   else if(b.type==='chart'){const svg=el('svg',{});d.append(svg);const G=drawChart(svg,b);if(G){S.geo[b.id]=G;if(interactive)bindDraw(G,svg)}}
   else if(b.type==='table')buildTable(b,d);
   else if(b.type==='image')buildImage(b,d,interactive);
-  if(b.caption&&b.type!=='text')d.append(h('p',{class:'cap',text:b.caption}));
+  else if(b.type==='outline')d.append(buildOutline(b));
+  if(b.caption&&b.type!=='text'&&b.type!=='outline')d.append(h('p',{class:'cap',text:b.caption}));
   return d;
+}
+/* Outline: the titled blocks after this one, with their page; text titles are headings, figure and table titles sit under them */
+function buildOutline(b){
+  const all=orderedBlocks(),rest=all.slice(all.findIndex(x=>x.id===b.id)+1).filter(x=>x.title&&x.type!=='outline');
+  if(!rest.length)return h('p',{class:'cap',text:tr('Blocks with a title after this one will be listed here.')});
+  let under=false; // indent figures and tables only once a heading is above them
+  return h('ol',{class:'toc'},rest.map(x=>{const p=pageOfBlock(x.id);if(x.type==='text')under=true;
+    return h('li',{class:under&&x.type!=='text'?'l2':'l1'},[
+      h('button',{type:'button',class:'tocl',text:x.title,onclick:()=>jumpTo(x.id)}),
+      h('span',{class:'lead'}),h('span',{class:'pg',text:p>=0?String(p+1):''})])}));
+}
+/* Blocks that stay together. "avoid" goes under the previous block; "beside" starts a right-hand column next to the group. */
+function blockGroups(blocks){
+  const groups=[];
+  blocks.forEach(b=>{const bb=b.breakBefore||'auto',g=groups[groups.length-1];
+    if(g&&bb==='beside'){g.side.push(b);g.last=g.side}
+    else if(g&&bb==='avoid')g.last.push(b);
+    else{const main=[b];groups.push({main,side:[],last:main,force:bb==='page'})}});
+  groups.forEach(g=>{g.blocks=[...g.main,...g.side];delete g.last});
+  return groups;
+}
+function buildGroup(g,interactive){
+  if(!g.side.length)return g.main.map(b=>buildViewBlock(b,interactive));
+  const col=(cls,list)=>h('div',{class:'col '+cls},list.map(b=>buildViewBlock(b,interactive)));
+  return [h('div',{class:'duo'},[col('main',g.main),col('side',g.side)])];
 }
 
 /* ---------- Pagination: pages are computed from content, never stored ---------- */
@@ -2775,13 +2845,14 @@ function orderedBlocks(){const ids=(S.meta&&S.meta.order)||[];const seen=new Set
 function paginate(){
   const L=layoutVars();const blocks=orderedBlocks();const mh=$('#measure');mh.replaceChildren();
   const saveGeo=S.geo;S.geo={};
-  blocks.forEach(b=>{const n=buildViewBlock(b,false);mh.append(n)});
+  const groups=blockGroups(blocks);
+  const nodes=groups.map(g=>{const n=buildGroup(g,false);mh.append(...n);return n});
   const hts=new Map();$$('.blk',mh).forEach(n=>hts.set(n.dataset.id,n.getBoundingClientRect().height));
+  const ghs=groups.map((g,i)=>g.side.length?nodes[i][0].getBoundingClientRect().height:
+    g.blocks.reduce((s,b)=>s+(hts.get(b.id)||0),0)+L.gap*(g.blocks.length-1));
   mh.replaceChildren();S.geo=saveGeo;
-  const groups=[];blocks.forEach(b=>{const bb=b.breakBefore||'auto';
-    if(bb==='avoid'&&groups.length)groups[groups.length-1].blocks.push(b);else groups.push({blocks:[b],force:bb==='page'})});
   const pages=[];let cur=[],hsum=0;
-  groups.forEach(g=>{const gh=g.blocks.reduce((s,b)=>s+(hts.get(b.id)||0),0)+L.gap*(g.blocks.length-1);
+  groups.forEach((g,i)=>{const gh=ghs[i];
     const need=cur.length?hsum+L.gap+gh:gh;
     if(cur.length&&(g.force||need>L.innerH+1)){pages.push(cur);cur=[];hsum=0}
     hsum=cur.length?hsum+L.gap+gh:gh;cur.push(...g.blocks)});
@@ -2790,14 +2861,14 @@ function paginate(){
   S.starts=new Map();pages.forEach((p,i)=>S.starts.set(p[0].id,i));
   S.page=clamp(S.page,0,Math.max(0,pages.length-1));
 }
-function pageOfBlock(id){return S.pages.findIndex(p=>p.some(b=>b.id===id))}
+function pageOfBlock(id){return (S.pages||[]).findIndex(p=>p.some(b=>b.id===id))}
 
 /* ---------- View mode ---------- */
 function renderView(){
   const host=$('#pagehost');host.replaceChildren();S.geo={};
   const blocks=S.pages[S.page]||[];
   const pg=h('div',{class:'page'});const inner=h('div',{class:'inner'});pg.append(inner);
-  blocks.forEach(b=>inner.append(buildViewBlock(b,false)));
+  blockGroups(blocks).forEach(g=>inner.append(...buildGroup(g,false)));
   pg.append(h('span',{class:'pno',text:`${S.page+1} / ${S.pages.length}`}));
   host.append(pg);
   fitPage(inner,blocks);
@@ -2818,14 +2889,14 @@ function fitPage(inner,blocks){
 }
 
 /* ---------- Edit mode ---------- */
-const TYPE={text:'Text',chart:'Chart',table:'Table',image:'Image'};
+const TYPE={text:'Text',chart:'Chart',table:'Table',image:'Image',outline:'Contents'};
 const typeName=x=>TYPE[x]?tr(TYPE[x]):x;
-const BREAK_NEXT={auto:'page',page:'avoid',avoid:'auto'};
+const BREAK_NEXT={auto:'page',page:'avoid',avoid:'beside',beside:'auto'};
 function breakBar(b){
   const bb=b.breakBefore||'auto',auto=bb==='auto'&&S.starts.has(b.id);
-  const cls='bar '+(bb==='page'?'forced':bb==='avoid'?'avoid':auto?'auto-break':'');
-  const label=bb==='page'?tr('New page'):bb==='avoid'?tr('Keep with previous'):auto?tr('Automatic break (page {n} starts)',{n:S.starts.get(b.id)+1}):tr('Same page');
-  return h('button',{type:'button',class:cls,title:tr('Click to switch: automatic, new page, keep with previous'),
+  const cls='bar '+(bb==='page'?'forced':bb==='avoid'?'avoid':bb==='beside'?'beside':auto?'auto-break':'');
+  const label=bb==='page'?tr('New page'):bb==='avoid'?tr('Keep with previous'):bb==='beside'?tr('Beside previous (right column)'):auto?tr('Automatic break (page {n} starts)',{n:S.starts.get(b.id)+1}):tr('Same page');
+  return h('button',{type:'button',class:cls,title:tr('Click to switch: automatic, new page, keep with previous, beside previous'),
     onclick:()=>saveBlock({...b,breakBefore:BREAK_NEXT[bb]})},
     [h('span',{class:'rule'}),h('span',{class:'lbl',text:label}),h('span',{class:'rule'})]);
 }
@@ -2840,6 +2911,10 @@ function editForm(b){
   const box=h('div',{});
   box.append(h('input',{type:'text',class:'ed-title',value:b.title||'',placeholder:tr('Title (optional)'),'data-fid':fid(b,'title'),
     onchange:e=>saveBlock({...b,title:e.target.value.trim()})}));
+  if(b.type==='outline'){
+    box.append(buildOutline(b),h('p',{class:'cap',text:tr('Made from the titles of the blocks after this one. Page numbers follow view mode; click a title to go there.')}));
+    return box;
+  }
   if(b.type==='text'){
     const ta=h('textarea',{class:'ed-text','data-fid':fid(b,'text'),rows:String(Math.max(3,(b.text||'').split('\n').length+1))});ta.value=b.text||'';
     ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px'});
@@ -2937,7 +3012,7 @@ function valueText(f,v,blockId){
   if(f==='image.asset')return tr('Image file')+' '+String(v).slice(0,6);
   if(f==='image.source.data')return v&&v.name?v.name:tr('(none)');
   if(f==='chart.logY')return v?'log':tr('Linear');
-  if(f==='breakBefore')return{auto:tr('Auto'),page:tr('New page'),avoid:tr('Keep with previous')}[v]||v;
+  if(f==='breakBefore')return{auto:tr('Auto'),page:tr('New page'),avoid:tr('Keep with previous'),beside:tr('Beside previous')}[v]||v;
   if(f==='table.desc')return v?tr('Descending'):tr('Ascending');
   if(f==='image.src')return tr(String(v));
   if(f==='image.width')return v+'%';
@@ -3000,6 +3075,7 @@ async function addBlock(type,extra){
   const id=uid('b-');const base={id,type,title:'',caption:'',breakBefore:'auto',createdAt:now()};
   const ds=S.datasets.values().next().value;
   if(type==='text')base.text=tr('New paragraph.');
+  if(type==='outline')base.title=tr('Contents');
   const cd=styleNow().chartDefaults;
   if(type==='chart')base.chart={kind:cd.kind||'scatter',dataset:ds?ds.id:'exp',x:ds?ds.columns[0].key:'id',y:ds?ds.columns[ds.columns.length-1].key:'score',color:null,logY:cd.logY===true,yMin:null,yMax:null};
   if(type==='table')base.table={dataset:ds?ds.id:'exp',sortBy:ds?ds.columns[ds.columns.length-1].key:'score',desc:true,limit:5};
@@ -3727,7 +3803,7 @@ async function connectServer(){
 //   lang/        extra interface translations
 // An agent can edit report.json while the page is open: the page reloads it, and merges by document when both wrote.
 const FS_OK=typeof window.showDirectoryPicker==='function';
-const REPORT_FILE='report.json',SCHEMA='duetsheet/0.4';
+const REPORT_FILE='report.json',SCHEMA='duetsheet/0.5';
 const DATA_EXT=/\.(csv|tsv|txt|json)$/i,HABIT_EXT=/\.(svg|mplstyle|png|jpe?g|webp|gif|json)$/i;
 const ASSET_EXT={'image/svg+xml':'svg','image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/gif':'gif','text/csv':'csv','text/plain':'txt','application/json':'json'};
 function docsFromReport(j){

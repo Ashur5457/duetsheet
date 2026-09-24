@@ -16,7 +16,7 @@ Reply in the user's language. Tell the user what you are about to do before each
 1. **Choose the folder.** Use the folder the user names; otherwise the current working folder. It is normally the folder with the raw data. Say which folder you will use.
 2. **Find the report.** If the folder has `report.json`, that folder is the project folder (raw data in `data/`). Otherwise the report is `<folder>/duetsheet/report.json` and the raw data is the folder itself. Never modify raw data files.
 3. **Read** `{{DUETSHEET_DIR}}/AGENTS.md`.
-4. **If there is no report yet**: list the data files, propose the report in a few lines (topic, figures, tables) and wait for the user to agree. Then write `report.json` as AGENTS.md describes ("Write a new report"). Record each dataset's source (path relative to the folder of report.json, and SHA-256).
+4. **If there is no report yet**: list the data files, propose the report in a few lines (topic, figures, tables) and wait for the user to agree. Then write `report.json` as AGENTS.md describes ("Write a new report"). Record each dataset's source (path relative to the folder of report.json, and SHA-256). Lay it out for reading: a one-page summary first, then an `outline` block (a clickable table of contents), and each figure's discussion next to the figure (`breakBefore: "beside"`, see "Layout" in AGENTS.md).
 5. **Check** before starting:
    `python "{{DUETSHEET_DIR}}/duetsheet.py" check "<folder>"`
    Fix every ERROR and run it again until it prints OK.

@@ -21,7 +21,7 @@ Describing "the cluster of points in the upper left of the second figure looks o
 ## Features
 
 **Review**
-- **View mode**: clean, paginated 16:9 pages with automatic page breaks. Mark any block as "force a new page" or "keep with the previous block". Figures shrink to fit when a page overflows.
+- **View mode**: clean, paginated 16:9 pages with automatic page breaks. Mark any block as "force a new page", "keep with the previous block", or "beside the previous block", which puts a figure and its discussion side by side. A contents block lists the sections and figures with their page numbers as links. Figures shrink to fit when a page overflows.
 - **Edit mode**: edit titles, text and captions in place; change chart type, dataset, axes, ranges and log scale; crop and resize images; drag blocks to reorder; add or delete blocks.
 - **Visual annotation on figures**: box-select or free-hand lasso on charts and images, or click a single data point. On charts the annotation stores the **data-space range and the enclosed data points**, not pixels, so the agent knows exactly which measurements you mean.
 - **Per-block comments** with preset tags ("more concise", "add data", "use log scale", "add trend line", ...) and quotes of selected text.

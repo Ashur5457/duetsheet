@@ -141,9 +141,11 @@ def check_report(project):
         if b.get('id') != key:
             errors.append(f'{where}.id must be "{key}"')
         t = b.get('type')
-        if t not in ('text', 'chart', 'table', 'image'):
-            errors.append(f'{where}.type must be text, chart, table or image')
+        if t not in ('text', 'chart', 'table', 'image', 'outline'):
+            errors.append(f'{where}.type must be text, chart, table, image or outline')
             continue
+        if b.get('breakBefore', 'auto') not in ('auto', 'page', 'avoid', 'beside'):
+            errors.append(f'{where}.breakBefore must be auto, page, avoid or beside')
         if t in ('chart', 'table'):
             spec = b.get(t)
             if not isinstance(spec, dict):
