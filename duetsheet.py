@@ -28,7 +28,7 @@ so an agent running this command sees them.
 
 Python 3.8 or later, standard library only.
 """
-import argparse, base64, datetime, glob, hashlib, hmac, http.server, json, mimetypes, os, pathlib, posixpath, re, secrets, shutil, subprocess, sys, tempfile, threading, time, urllib.parse, webbrowser
+import argparse, base64, datetime, glob, hashlib, hmac, http.server, json, mimetypes, os, pathlib, posixpath, re, secrets, shutil, socket, subprocess, sys, tempfile, threading, time, urllib.parse, webbrowser
 
 VERSION = '0.6.0'
 SCHEMA = 'duetsheet/0.6'
@@ -850,6 +850,17 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send(503, f'the file is locked by another program: {err}')
 
 
+class Server(http.server.ThreadingHTTPServer):
+    # On Windows, SO_REUSEADDR lets a second launcher bind a port another one already uses, and requests then go to
+    # either of them. Take the port exclusively there, so a busy port is skipped and the next one is used.
+    allow_reuse_address = os.name != 'nt'
+
+    def server_bind(self):
+        if os.name == 'nt' and hasattr(socket, 'SO_EXCLUSIVEADDRUSE'):
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        super().server_bind()
+
+
 def serve(root, port, open_browser):
     project, data = project_of(root)
     if not PAGE.is_file():
@@ -867,7 +878,7 @@ def serve(root, port, open_browser):
     httpd = None
     for p in ([port] if port else range(8765, 8790)):
         try:
-            httpd = http.server.ThreadingHTTPServer(('127.0.0.1', p), Handler)
+            httpd = Server(('127.0.0.1', p), Handler)
             break
         except OSError:
             continue
