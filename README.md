@@ -8,7 +8,7 @@ It is a human-in-the-loop review tool for AI-generated, data-heavy reports: visu
 
 Why the name: in a duet, two performers play from **one sheet of music**. In Duetsheet, a human and an AI agent work from one shared page. Sheet music is also a set of steps that gets **played** again and again, which is where this project is heading: from recording and reviewing reports, to editable workflows you can rerun and branch.
 
-> **Status: v0.4 prototype.** Works on your computer with a project folder (Chrome, Edge), as a [Claude](https://claude.ai) Artifact, or with a saved report file in any modern browser. See the [tutorial](docs/tutorial.md) and the [roadmap](#roadmap).
+> **Status: v0.5 prototype.** Start it from Claude Code (`/duetsheet`) or with `python duetsheet.py` in your data folder, open it in Chrome or Edge and choose a folder, host it as a [Claude](https://claude.ai) Artifact, or use saved report files in any modern browser. See the [tutorial](docs/tutorial.md) and the [roadmap](#roadmap).
 
 ![Paginated view mode](docs/view-mode.png)
 
@@ -32,8 +32,8 @@ Describing "the cluster of points in the upper left of the second figure looks o
 - **Human vs. AI attribution**: edits made by the agent are recorded separately from yours.
 
 **Data and figures**
-- **Project folder** (Chrome, Edge): the report is saved to `report.json` in a folder you choose, next to `data/` for raw data and `habits/` for your own example figures. Your agent can edit the same folder while the page is open; the page reloads and merges by document.
-- **Raw data with provenance**: import CSV, TSV or JSON from `data/`. Each dataset records the file path and its SHA-256 fingerprint, and the page tells you when the source file changed after the import.
+- **Works in your data folder**: start Duetsheet in the folder with your raw data (`/duetsheet` in Claude Code, or `python duetsheet.py`) and the report opens already connected to it, with no folder to pick. The report is saved in a `duetsheet/` subfolder; raw data is only read. Your agent can edit the report while the page is open; the page reloads it and merges by document. In Chrome or Edge you can also open a folder from the page itself.
+- **Raw data with provenance**: import CSV, TSV or JSON files from your data folder and its subfolders. Each dataset records the file path and its SHA-256 fingerprint, and the page tells you when the source file changed after the import.
 - **Figures from any tool, with their source**: upload SVG (kept as vector) or PNG/JPEG/WebP/GIF from Origin, matplotlib, MATLAB, R, Igor Pro, Prism, Excel and others. Each image records which tool made it, the original file name, the plotting script and the raw data, so the agent knows how to regenerate it.
 
 **Your style**
@@ -42,6 +42,7 @@ Describing "the cluster of points in the upper left of the second figure looks o
 - **Habit suggestions**: when you make the same chart change on three charts (for example switching to a log axis), Duetsheet offers to make it the default.
 
 **For everyone**
+- **Problems you can see**: errors and warnings stay listed under **⚠** at the top (for a broken `report.json`, with the line and column). With the launcher they also reach your agent and are saved in `errors.log`. `NaN` and `Infinity` written by Python are read as empty values instead of breaking the page, and failed saves (for example while OneDrive holds the file) are retried.
 - **Six interface languages, plus your own**: English, Traditional Chinese, Simplified Chinese, Japanese, Korean and Spanish, picked from the browser language. Anyone can add a language or correct a translation from the language menu, with no code. See [docs/translating.md](docs/translating.md).
 - **Open format**: the report is plain JSON with a published [JSON Schema](schema/report.schema.json), so any program or LLM can read, generate and validate it.
 
@@ -55,19 +56,34 @@ Describing "the cluster of points in the upper left of the second figure looks o
 
 ## Quick start
 
-### On your computer (no account needed)
+### With Claude Code (recommended)
 
-1. Download [`duetsheet.html`](duetsheet.html), or clone this repository.
-2. Open it in **Chrome** or **Edge**.
-3. Click **Open project folder** and choose a folder. To try it, choose [`examples/demo-project`](examples/demo-project) from this repository; for your own work, choose an empty folder.
-4. In the **Folder** tab, import the files in `data/` and click **Learn my habits**.
-5. Switch to **Edit**, change things directly, and leave comments or draw on figures.
-6. Ask your AI agent (Claude Code, Codex, Gemini CLI, Cursor, ...), working in the same folder:
-   > Read AGENTS.md from the Duetsheet repository, then read the open annotations in report.json and revise the report.
+1. Clone this repository (or download it as a ZIP) anywhere on your computer. You need Python 3.8 or later; nothing else to install.
+2. Install the `/duetsheet` skill once:
+   ```bash
+   python duetsheet.py install-skill
+   ```
+3. Open Claude Code in the folder that holds your raw data (CSV, TSV, JSON; Excel is converted by Claude) and type `/duetsheet`, or just say:
+   > Start Duetsheet and write a report from the data in this folder.
 
-   The page picks up the agent's changes within a few seconds. Everything it changed appears in the change log, marked as the agent's.
+   Claude reads [`AGENTS.md`](AGENTS.md), proposes a report, writes it after you agree, checks it, and starts Duetsheet. The report opens in your browser, already connected to the folder. Duetsheet keeps its files in a `duetsheet/` subfolder; your raw data is never modified.
+4. Review in **Edit** mode: change things directly, comment, draw on figures. Click **Finish this round**.
+5. Tell Claude:
+   > Read my annotations and revise the report.
 
-Firefox and Safari cannot open folders: use **Save report file** and **Open report file** instead.
+   The page picks up Claude's changes within a few seconds. Everything it changed appears in the change log, marked as the agent's. If something goes wrong, the page reports it to Claude (and under **⚠** at the top), so Claude can fix it.
+
+### With any other agent, or none
+
+Start Duetsheet for your data folder yourself:
+
+```bash
+python path/to/duetsheet.py "path/to/your/data-folder"
+```
+
+It opens the report in your default browser (any modern browser). Your agent (Codex, Gemini CLI, Cursor, a script) edits `duetsheet/report.json` in that folder, following [`AGENTS.md`](AGENTS.md), and runs `python duetsheet.py check <folder>` to validate it.
+
+Without Python: open [`duetsheet.html`](duetsheet.html) in **Chrome** or **Edge**, click **Open project folder** and choose your data folder. To try the demo, choose [`examples/demo-project`](examples/demo-project). Firefox and Safari cannot open folders from the page: use the launcher, or **Save report file** and **Open report file**.
 
 ### In Claude (claude.ai)
 
@@ -80,20 +96,22 @@ Requirements: a [claude.ai](https://claude.ai) account where Claude can publish 
 4. Review the report in **Edit** mode, then go back to Claude, paste the Artifact link, and say:
    > Read the Duetsheet annotations and revise the report.
 
-The [tutorial](docs/tutorial.md) walks through both, step by step with screenshots.
+The [tutorial](docs/tutorial.md) walks through it step by step with screenshots.
 
 ## Use it with any AI agent
 
 Duetsheet does not call any AI model by itself (except the optional "estimate style from PNG" in a Claude Artifact). Your agent reads and writes the report as JSON:
 
 - [`AGENTS.md`](AGENTS.md): the data model, how to write `report.json` safely, and step-by-step tasks (revise from annotations, import data, learn figure habits, write a new report).
+- [`duetsheet.py`](duetsheet.py): the launcher (`python duetsheet.py <folder>`) and checker (`python duetsheet.py check <folder>`).
+- [`skills/duetsheet/SKILL.md`](skills/duetsheet/SKILL.md): the `/duetsheet` skill for Claude Code (`python duetsheet.py install-skill`).
 - [`schema/report.schema.json`](schema/report.schema.json): the formal JSON Schema.
 - [`examples/demo-project/`](examples/demo-project/): a complete project folder.
 - [`llms.txt`](llms.txt): a short index for LLMs.
 
 Prompts that work well:
 
-> Using AGENTS.md, write a Duetsheet report in report.json from the files in data/. Record where each dataset came from.
+> Using AGENTS.md, write a Duetsheet report from the data files in this folder. Record where each dataset came from, check it with duetsheet.py check, then start Duetsheet.
 
 > Look at my figures in habits/ and suggest a style in style/proposal. Do not change style/profile.
 
@@ -135,13 +153,13 @@ If your report is text only, a document editor's suggestion mode may be enough. 
 A single HTML file that shows a report made of text, charts, tables and images, lets a person edit and annotate it, records every change with its author, and stores everything as JSON that an AI agent can read and revise.
 
 **Do I need Claude or an account?**
-No. On your computer, Chrome or Edge can save the report to a folder, and any agent that can edit files can work with it. Claude Artifacts are one supported way to host it, not a requirement.
+No. On your computer, the launcher (`python duetsheet.py`, any browser) or Chrome and Edge alone can save the report to a folder, and any agent that can edit files can work with it. Claude Code and Claude Artifacts are supported ways to use it, not requirements.
 
 **Which AI models or agents work with it?**
 Any that can read and write JSON files: Claude Code, Codex, Gemini CLI, Cursor, local models with file access, or a script. They follow [`AGENTS.md`](AGENTS.md).
 
 **Where is my data stored?**
-In the folder you choose (`report.json`, `data/`, `assets/`), in your Claude Artifact, or in a file you save. Duetsheet has no server and sends nothing anywhere. It loads fonts from Google Fonts and one small library (SortableJS) from a CDN.
+In your data folder (Duetsheet's own files in its `duetsheet/` subfolder), in your Claude Artifact, or in a file you save. Duetsheet has no online service and sends nothing anywhere; the optional launcher is a small program that only listens on your own computer (127.0.0.1) and needs a random token. It loads fonts from Google Fonts and one small library (SortableJS) from a CDN.
 
 **How does the agent know which data point I mean?**
 When you click a point, draw a box or a lasso on a chart, the annotation stores the data range in the chart's units and the ids of the rows inside it, not screen pixels.
@@ -160,7 +178,7 @@ Yes, MIT licensed.
 
 ## Limitations
 
-- Opening a project folder needs Chrome or Edge (the File System Access API). Other browsers can save and open report files.
+- Opening a folder from the page itself needs Chrome or Edge (the File System Access API). With the launcher, any modern browser works; without either, save and open report files.
 - Designed for desktop browsers.
 - In a Claude Artifact, the database limits apply: roughly 256 kB per document and 5,000 documents per report. Without an asset store (report file mode), uploaded images are compressed to about 230 kB and stored inline.
 - Only chart and image blocks support box and lasso annotation; text and tables support block-level comments and quotes.
@@ -201,4 +219,4 @@ If you use Duetsheet in research, please cite it using [`CITATION.cff`](CITATION
 
 ---
 
-*Keywords: Duetsheet, human-in-the-loop AI, AI agent report review, LLM feedback, interactive HTML report, single-file HTML, figure annotation, chart annotation, lasso selection, data point annotation, change tracking, diff, review rounds, provenance, SHA-256, reproducible research, scientific workflow, matplotlib style, figure style, Claude Artifacts, Claude Code, AGENTS.md, JSON Schema.*
+*Keywords: Duetsheet, human-in-the-loop AI, AI agent report review, LLM feedback, interactive HTML report, single-file HTML, figure annotation, chart annotation, lasso selection, data point annotation, change tracking, diff, review rounds, provenance, SHA-256, reproducible research, scientific workflow, matplotlib style, figure style, Claude Artifacts, Claude Code, Claude Code skill, AGENTS.md, JSON Schema, local launcher.*

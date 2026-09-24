@@ -13,23 +13,45 @@ A report is a set of JSON documents. The same documents can live in three places
 
 | Mode | Where | How the agent reads and writes |
 |---|---|---|
-| **Project folder** (Chrome, Edge) | `report.json` in a folder on disk | Read and write the file directly. The page open in the browser picks up your changes within about two seconds. |
+| **Folder on disk** | `report.json` in a folder on the user's computer | Read and write the file directly. The page open in the browser picks up your changes within about two seconds. |
 | **Claude Artifact** (claude.ai) | The Artifact database: document paths `<collection>/<id>` | Use the Artifact database tools (`read_db`, `write_db`) on the Artifact URL. |
 | **Report file** | A `*.report.json` file the user saved or sent you | Same format as `report.json`. Give the user back a file they can open with **Open report file**. |
 
-### Project folder layout
+### Folder layout
+
+The user (or you) opens a folder. One rule decides where everything goes:
+
+- **The folder contains `report.json`**: it is the project folder, and raw data is in its `data/` subfolder.
+- **Otherwise** it is a raw data folder: the report goes into its `duetsheet/` subfolder, and the raw data files are wherever they already are in that folder. This is the usual case.
 
 ```
-my-report/
-  report.json      the report (all documents)
-  data/            raw data: CSV, TSV, JSON (the user or you put files here)
-  habits/          the user's own example figures (SVG, PNG), .mplstyle files, profile.json
-  assets/          images and files uploaded in the page, named <asset id>.<ext>
-  exports/         files the page exports (styles, report copies, translation templates)
-  lang/            extra interface translations (optional)
+battery-test-0924/            the raw data folder the user works in
+  cycling.csv                 raw data (any subfolder too); Duetsheet only reads it
+  XRD/xrd_0924.tsv
+  duetsheet/                  created by Duetsheet
+    report.json               the report (all documents)
+    habits/                   the user's own example figures (SVG, PNG), .mplstyle files, profile.json
+    assets/                   images and files uploaded in the page, named <asset id>.<ext>
+    exports/                  files the page exports (styles, report copies, translation templates)
+    lang/                     extra interface translations (optional)
+    errors.log                problems the page reported (written by the launcher)
 ```
 
-`duetsheet.html` itself does not need to be in the folder; the user opens it and chooses the folder.
+**Every path stored in `report.json` is relative to the folder that contains `report.json`.** In the layout above, the source of a dataset imported from `cycling.csv` is `../cycling.csv`; in a project folder with `data/`, it is `data/cycling.csv`.
+
+### Starting Duetsheet: the launcher
+
+`duetsheet.py`, next to `duetsheet.html`, starts Duetsheet for a folder and opens the browser already connected to it, with no folder picker (Python 3.8+, standard library only):
+
+```bash
+python duetsheet.py "<folder>"          # start (keep it running, for example as a background process)
+python duetsheet.py check "<folder>"    # check report.json; exit code 1 on errors
+```
+
+- It serves the page on `127.0.0.1` with a random token, and lets the page write only Duetsheet's own files (`report.json`, `assets/`, `exports/`, `habits/`, `lang/`, `errors.log`). Raw data is read only.
+- Every problem the page reports (a `report.json` it cannot read, a failed save, a failed import) is printed as `[duetsheet] ERROR ...` or `[duetsheet] WARNING ...` and appended to `errors.log` next to `report.json`. Watch this output after you write.
+- Without the launcher, the user can open `duetsheet.html` in Chrome or Edge and choose the folder; the same layout rule applies.
+- For Claude Code there is a `/duetsheet` skill: `python duetsheet.py install-skill` installs it (see `skills/duetsheet/SKILL.md`).
 
 ### `report.json`
 
@@ -54,7 +76,8 @@ Every top-level key except `schema` is a collection; inside it, each key is a do
 1. Read the file fresh right before you change it. Do not keep an old copy in memory across turns.
 2. Change only the documents you mean to change. Keep every other document, and any collection you do not know, exactly as it is.
 3. Write the whole file in one step (write a temporary file in the same folder, then rename it over `report.json`). The page merges by document: if you and the page change different documents at the same moment, both changes are kept. If both change the same document, the last writer wins.
-4. Keep it valid JSON with UTF-8 encoding. The page ignores a half-written or invalid file and tries again.
+4. Write **strict JSON** in UTF-8 without a byte order mark. `NaN`, `Infinity` and `-Infinity` are not JSON: a division by zero must become `null`. In Python, use `json.dump(obj, f, ensure_ascii=False, indent=1, allow_nan=False)` so a bad value raises an error instead of being written. (The page repairs NaN and Infinity and reports a warning, but other tools reading the file may not.)
+5. Run `python duetsheet.py check "<folder>"` after writing, and fix every ERROR.
 
 ## Collections
 
@@ -94,7 +117,7 @@ Write a block as a whole document, not as a partial merge, so nested objects nev
 { "id": "run12", "title": "run12",
   "columns": [{ "key": "id", "label": "Run" }, { "key": "temp_c", "label": "temp_C" }, { "key": "yield", "label": "yield" }],
   "rows": [{ "id": 1, "temp_c": 25, "yield": 0.34 }],
-  "source": { "path": "data/run12.csv", "sha256": "64 hex characters", "size": 167, "modified": "ISO-8601", "importedAt": "ISO-8601", "parser": "delimited" } }
+  "source": { "path": "../run12.csv", "sha256": "64 hex characters", "size": 167, "modified": "ISO-8601", "importedAt": "ISO-8601", "parser": "delimited" } }
 ```
 
 - Every row needs a unique numeric `id`. Annotations refer to rows by this id.
@@ -200,16 +223,16 @@ When the user asks you to "read the annotations and revise":
 6. Close your round: write a `rounds` document with `by: "claude"` and an `at` later than all of your changes.
 7. Summarise for the user which annotations you handled, which you left open, and why.
 
-### Import raw data from `data/`
+### Import raw data
 
 The page imports CSV, TSV and JSON files itself (Folder tab). Do it yourself when the user asks, or when the file needs work the page cannot do (Excel, instrument formats, several sheets, unit conversion):
 
-1. Leave the original file untouched. If it needs converting, write the converted table next to it in `data/` (for example `data/run12.xlsx` -> `data/run12.csv`) and import that file.
+1. Leave the original file untouched. If it needs converting, write the converted table next to the original (for example `run12.xlsx` -> `run12.csv`), or into `duetsheet/` if you must not add files to the raw data folder, and import that file.
 2. Build the dataset: an `id` column with unique numbers, lowercase ASCII column keys, the original headers as labels. Do not round, filter, or correct values; if something looks wrong, ask.
-3. Set `source` to the file you imported: `path` (relative to the project folder), `sha256` of the file bytes, `size`, `modified`, `importedAt`, and `parser` (for example `delimited`, `json`, or `pandas.read_excel`).
+3. Set `source` to the file you imported: `path` (relative to the folder of `report.json`, for example `../run12.csv`), `sha256` of the file bytes, `size`, `modified`, `importedAt`, and `parser` (for example `delimited`, `json`, or `pandas.read_excel`).
 4. Write a `changes` document with `field: "dataset"`, `datasetId`, `by: "claude"`, `before` / `after` as `{ rows, columns, sha256 }`, and `revertible: false`.
 
-### Learn the user's figure habits from `habits/`
+### Learn the user's figure habits from `habits/` (next to `report.json`)
 
 1. Read what is there: SVG figures (exact fonts, sizes, line widths, colours, figure width), `.mplstyle` files, plotting scripts (for example matplotlib `rcParams`), `profile.json` (habits the user saved before), and PNG/JPG figures (look at them and estimate).
 2. Prefer what most files agree on. Tell the user when files disagree.
@@ -221,7 +244,7 @@ The page imports CSV, TSV and JSON files itself (Folder tab). Do it yourself whe
 1. Create `report.json` with `report/meta`, the `datasets` (with `source` when they come from files) and the `blocks`. Charts and tables reference datasets by id and columns by key; every number in the text should come from a dataset.
 2. Put figures made in other tools in `assets/<id>.<ext>` (32-hex id) and reference them from image blocks, with `source` telling how they were made.
 3. Close a first round with `by: "claude"` so the user's review starts a new round.
-4. Tell the user to open the folder in Duetsheet (Chrome or Edge: **Open project folder**).
+4. Run `python duetsheet.py check "<folder>"`, fix every ERROR, then start `python duetsheet.py "<folder>"` in the background (or tell the user to open the folder in Duetsheet). Watch its output for problems the page reports.
 
 ## Rules
 

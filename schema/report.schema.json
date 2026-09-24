@@ -137,7 +137,7 @@
           "description": "Where the rows came from. Set when data is imported from a file.",
           "required": ["path", "sha256"],
           "properties": {
-            "path": { "type": "string", "description": "Path inside the project folder, for example data/run12.csv." },
+            "path": { "type": "string", "description": "Path relative to the folder that contains report.json, for example ../run12.csv or data/run12.csv." },
             "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
             "size": { "type": "integer" },
             "modified": { "$ref": "#/$defs/isoTime" },

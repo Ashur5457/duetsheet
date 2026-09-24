@@ -2,7 +2,26 @@
 
 This tutorial walks through one full review cycle: open a report, bring in raw data, comment on a figure, let an AI agent revise the report, and check what it changed. It uses the demo project in [`examples/demo-project`](../examples/demo-project) (synthetic data, not experimental results).
 
-You need Chrome or Edge on a desktop computer. No account, install or server is needed. A second path for Claude Artifacts is at the end.
+You need a desktop computer. There are two ways to open a report:
+
+- **From Claude Code (fastest)**: see the next section. Claude starts Duetsheet for your data folder and the report opens by itself.
+- **By hand**: open `duetsheet.html` in Chrome or Edge and choose the folder (steps 1 and 2 below). No install is needed.
+
+A third path, Claude Artifacts on claude.ai, is at the end.
+
+## 0. Fastest: start from Claude Code
+
+Once, in the folder where you cloned or unzipped Duetsheet (Python 3.8 or later):
+
+```bash
+python duetsheet.py install-skill
+```
+
+Then open Claude Code in the folder that holds your raw data and type `/duetsheet`. Claude reads `AGENTS.md`, proposes a report, writes it after you agree, checks it with `duetsheet.py check`, and starts the launcher. Your browser opens the report, already connected to the folder: skip to step 3.
+
+Without Claude Code you can start the launcher yourself: `python path/to/duetsheet.py "path/to/data-folder"`.
+
+Duetsheet keeps everything it writes in a `duetsheet/` subfolder of your data folder (`report.json`, uploaded images, exports, your figure habits). The raw data files stay where they are and are never modified.
 
 ## 1. Open Duetsheet
 
@@ -14,7 +33,7 @@ The interface follows your browser language (English, Traditional Chinese, Simpl
 
 ## 2. Open the project folder
 
-Until you open a folder, the yellow bar reminds you that nothing is saved. Click **Open project folder** and choose `examples/demo-project` (for your own work, choose an empty folder; Duetsheet creates `report.json` in it).
+Until you open a folder, the yellow bar reminds you that nothing is saved. Click **Open project folder** and choose `examples/demo-project`. For your own work, choose the folder that holds your raw data: Duetsheet creates `duetsheet/report.json` in it.
 
 ![The page before a folder is opened](open-folder.png)
 
@@ -32,6 +51,8 @@ demo-project/
   assets/          images uploaded in the page (created when needed)
   exports/         files the page exports (created when needed)
 ```
+
+The demo uses this project layout, with `report.json` at the top and the raw data in `data/`. When you open your own data folder, the same files go into its `duetsheet/` subfolder instead, and every data file in the folder (subfolders included) is listed in the Folder tab.
 
 ## 3. Bring in raw data
 
@@ -95,6 +116,12 @@ Duetsheet measures the SVG files exactly (font, sizes, line width, colours, figu
 The interface language never changes the report content or the stored data, so people working in different languages can review the same report.
 
 ![The same report with the Japanese interface](language-ja.png)
+
+## When something goes wrong
+
+Errors and warnings do not just flash by: a **⚠** button appears at the top right with the number of problems. Click it to see each one, with details (for a broken `report.json`, the line and column), and **Copy all** to paste them to your agent. When Duetsheet was started by the launcher, the same problems are printed in the launcher's output and saved in `duetsheet/errors.log`, so Claude Code sees them without you copying anything.
+
+Two common cases are handled for you: `NaN` and `Infinity` written by Python are read as empty values (with a warning), and a save that fails because another program holds the file for a moment (OneDrive, for example) is retried until it succeeds.
 
 ## Without a folder, and in Claude
 

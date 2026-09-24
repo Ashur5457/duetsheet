@@ -65,6 +65,14 @@ button,input,select,textarea{font:inherit;color:inherit}
 .langbox li.cl{display:flex;gap:10px;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--line)}
 .langbox h4{margin:14px 0 4px;font-size:13px;font-weight:500;color:var(--muted)}
 .langbox li.cl .linkbtn{margin-left:auto}
+.btn.issues{border-color:var(--mark);color:var(--mark);font-weight:500}
+.btn.issues.warn{border-color:var(--c2);color:var(--c2)}
+.issuebox{max-width:760px}
+.issuelist{list-style:none;padding:0;margin:6px 0 10px;max-height:60vh;overflow:auto}
+.issuelist li{border-bottom:1px solid var(--line);padding:6px 0;font-size:13px}
+.issuelist .lvl{font-size:11.5px;border-radius:4px;padding:0 6px;color:#fff;background:var(--mark)}
+.issuelist li.warning .lvl{background:var(--c2)}
+.issuelist pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.45 ui-monospace,Menlo,Consolas,monospace;background:var(--soft);padding:6px 8px;border-radius:5px;margin:4px 0 0}
 .btn{border:1px solid var(--line);background:var(--paper);border-radius:7px;padding:5px 12px;cursor:pointer}
 .btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .btn.small{padding:2px 9px;font-size:13px}
@@ -283,6 +291,7 @@ details.round summary{cursor:pointer;font-size:13.5px}
     <button type="button" data-mode="edit" aria-pressed="false">Edit</button>
   </div>
   <span class="hint" id="hint"></span>
+  <button type="button" class="btn issues" id="issuesBtn" hidden aria-label="Problems"></button>
   <select id="lang" aria-label="Language"></select>
   <button type="button" class="btn" id="helpBtn" aria-label="Help">?</button>
   <button type="button" class="btn" id="togglePanel">Panel</button>
@@ -674,8 +683,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "This is not a valid Duetsheet translation file.": "這不是有效的 Duetsheet 翻譯檔。",
  "Folder": "資料夾",
  "Project folder": "專案資料夾",
- "\"{name}\". The report is saved to report.json automatically. An agent can read and edit the same folder (see AGENTS.md).": "「{name}」。報告會自動存到 report.json。agent 可以讀寫同一個資料夾（見 AGENTS.md）。",
- "Project folder \"{name}\": changes are saved to report.json automatically.": "專案資料夾「{name}」：修改會自動存到 report.json。",
  "Saving…": "儲存中…",
  "All changes saved.": "所有修改都已儲存。",
  "Could not save ({m}).": "無法儲存（{m}）。",
@@ -691,8 +698,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Opened {file}": "已開啟 {file}",
  "Could not open the folder ({m}).": "無法開啟資料夾（{m}）。",
  "Permission to use the folder was not granted.": "沒有取得使用這個資料夾的權限。",
- "This folder has no report.json yet. Save the report that is open now into it? Cancel starts an empty report.": "這個資料夾還沒有 report.json。要把目前開著的報告存進去嗎？按「取消」會開始一份空白報告。",
- "Put raw data files in the data/ folder and example figures in habits/, then use the Folder tab. Or ask your agent to write the report into report.json (see AGENTS.md).": "把原始數據檔放進 data/ 資料夾、把範例圖放進 habits/，再到「資料夾」分頁操作。也可以請 agent 直接把報告寫進 report.json（見 AGENTS.md）。",
  "This is not a Duetsheet report file.": "這不是 Duetsheet 報告檔。",
  "Replace the report that is open now with {file}?": "要用 {file} 取代目前開著的報告嗎？",
  "report.json changed on disk; the page has been updated.": "report.json 在磁碟上被修改了，頁面已經更新。",
@@ -748,7 +753,31 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Open a project folder. Your agent (Claude Code, Codex, Gemini CLI, ...) edits report.json in the same folder, following AGENTS.md.": "開啟專案資料夾。你的 agent（Claude Code、Codex、Gemini CLI 等）會依照 AGENTS.md 修改同一個資料夾裡的 report.json。",
  "Tutorial with screenshots": "圖文教學",
  "AGENTS.md (for agents)": "AGENTS.md（給 agent 看的說明）",
- "Got it": "知道了"
+ "Got it": "知道了",
+ "\"{name}\". The report is saved to {file} automatically. An agent can read and edit the same folder (see AGENTS.md).": "「{name}」。報告會自動存到 {file}。agent 可以讀寫同一個資料夾（見 AGENTS.md）。",
+ "Project folder \"{name}\": changes are saved to {file} automatically.": "專案資料夾「{name}」：修改會自動存到 {file}。",
+ "Raw data (this folder)": "原始數據（這個資料夾）",
+ "No CSV, TSV or JSON files in this folder yet. Add some, then click Refresh.": "這個資料夾還沒有 CSV、TSV 或 JSON 檔。放進來後按「重新整理」。",
+ "Raw data files in this folder are listed in the Folder tab. Ask your agent to write the report (see AGENTS.md), or add blocks yourself in Edit mode.": "這個資料夾裡的原始數據會列在「資料夾」分頁。請 agent 撰寫報告（見 AGENTS.md），或在「編輯」模式自己新增方塊。",
+ "This folder has no report yet. Save the report that is open now into it? Cancel starts an empty report.": "這個資料夾還沒有報告。要把目前開著的報告存進去嗎？按「取消」會開始一份空白報告。",
+ "The report could not be opened. See Problems (⚠) for the reason, fix report.json, then reload this page.": "無法開啟報告。原因請看「問題」（⚠），修正 report.json 後重新載入這個頁面。",
+ "Reload": "重新載入",
+ "Problems": "問題",
+ "Error": "錯誤",
+ "Warning": "警告",
+ "Errors and warnings since the page was opened. Copy them to your agent if you need help.": "頁面開啟以來的錯誤和警告。需要協助時，可以複製給 agent。",
+ "Errors and warnings since the page was opened. They were also sent to the agent that started Duetsheet, and saved in errors.log.": "頁面開啟以來的錯誤和警告。這些也已傳給啟動 Duetsheet 的 agent，並存在 errors.log。",
+ "Copy all": "全部複製",
+ "Copied": "已複製",
+ "Copy failed. Select the text instead.": "無法複製，請直接選取文字。",
+ "Unexpected error": "未預期的錯誤",
+ "line {l}, column {c}": "第 {l} 行第 {c} 字",
+ "{file} is not a Duetsheet report: the \"report\" section with \"meta\" is missing.": "{file} 不是 Duetsheet 報告：缺少含有 \"meta\" 的 \"report\" 區段。",
+ "{file} had {n} values that are not valid JSON (NaN or Infinity). They were read as empty values.": "{file} 裡有 {n} 個不合 JSON 格式的值（NaN 或 Infinity），已當作空值讀取。",
+ "Ask your agent to write null instead (in Python: json.dump(..., allow_nan=False)).": "請 agent 改寫成 null（Python：json.dump(..., allow_nan=False)）。",
+ "Your changes were saved over it. The unreadable file was kept as exports/{f}.": "你的修改已經存進去。無法讀取的那份檔案保留為 exports/{f}。",
+ "The page keeps showing the last version it could read.": "頁面會繼續顯示最後一份能讀取的版本。",
+ "Could not save report.json. Duetsheet keeps trying.": "無法儲存 report.json，Duetsheet 會持續重試。"
 },
 "zh-Hans": {
  "_name": "简体中文",
@@ -1068,8 +1097,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "This is not a valid Duetsheet translation file.": "这不是有效的 Duetsheet 翻译文件。",
  "Folder": "文件夹",
  "Project folder": "项目文件夹",
- "\"{name}\". The report is saved to report.json automatically. An agent can read and edit the same folder (see AGENTS.md).": "“{name}”。报告会自动保存到 report.json。agent 可以读写同一个文件夹（见 AGENTS.md）。",
- "Project folder \"{name}\": changes are saved to report.json automatically.": "项目文件夹“{name}”：修改会自动保存到 report.json。",
  "Saving…": "保存中…",
  "All changes saved.": "所有修改均已保存。",
  "Could not save ({m}).": "无法保存（{m}）。",
@@ -1085,8 +1112,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Opened {file}": "已打开 {file}",
  "Could not open the folder ({m}).": "无法打开文件夹（{m}）。",
  "Permission to use the folder was not granted.": "没有获得使用该文件夹的权限。",
- "This folder has no report.json yet. Save the report that is open now into it? Cancel starts an empty report.": "此文件夹还没有 report.json。要把当前打开的报告保存进去吗？点击“取消”将新建一份空白报告。",
- "Put raw data files in the data/ folder and example figures in habits/, then use the Folder tab. Or ask your agent to write the report into report.json (see AGENTS.md).": "把原始数据文件放进 data/ 文件夹、把示例图放进 habits/，然后在“文件夹”标签页中操作。也可以让 agent 直接把报告写进 report.json（见 AGENTS.md）。",
  "This is not a Duetsheet report file.": "这不是 Duetsheet 报告文件。",
  "Replace the report that is open now with {file}?": "要用 {file} 替换当前打开的报告吗？",
  "report.json changed on disk; the page has been updated.": "report.json 在磁盘上被修改，页面已更新。",
@@ -1142,7 +1167,31 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Open a project folder. Your agent (Claude Code, Codex, Gemini CLI, ...) edits report.json in the same folder, following AGENTS.md.": "打开项目文件夹。你的 agent（Claude Code、Codex、Gemini CLI 等）会按照 AGENTS.md 修改同一个文件夹中的 report.json。",
  "Tutorial with screenshots": "图文教程",
  "AGENTS.md (for agents)": "AGENTS.md（写给 agent 的说明）",
- "Got it": "知道了"
+ "Got it": "知道了",
+ "\"{name}\". The report is saved to {file} automatically. An agent can read and edit the same folder (see AGENTS.md).": "“{name}”。报告会自动保存到 {file}。agent 可以读写同一个文件夹（见 AGENTS.md）。",
+ "Project folder \"{name}\": changes are saved to {file} automatically.": "项目文件夹“{name}”：修改会自动保存到 {file}。",
+ "Raw data (this folder)": "原始数据（此文件夹）",
+ "No CSV, TSV or JSON files in this folder yet. Add some, then click Refresh.": "此文件夹还没有 CSV、TSV 或 JSON 文件。放进来后点击“刷新”。",
+ "Raw data files in this folder are listed in the Folder tab. Ask your agent to write the report (see AGENTS.md), or add blocks yourself in Edit mode.": "此文件夹中的原始数据会列在“文件夹”标签页。请让 agent 撰写报告（见 AGENTS.md），或在“编辑”模式中自己添加区块。",
+ "This folder has no report yet. Save the report that is open now into it? Cancel starts an empty report.": "此文件夹还没有报告。要把当前打开的报告保存进去吗？点击“取消”将新建一份空白报告。",
+ "The report could not be opened. See Problems (⚠) for the reason, fix report.json, then reload this page.": "无法打开报告。原因请查看“问题”（⚠），修正 report.json 后重新加载此页面。",
+ "Reload": "重新加载",
+ "Problems": "问题",
+ "Error": "错误",
+ "Warning": "警告",
+ "Errors and warnings since the page was opened. Copy them to your agent if you need help.": "页面打开以来的错误和警告。需要帮助时，可以复制给 agent。",
+ "Errors and warnings since the page was opened. They were also sent to the agent that started Duetsheet, and saved in errors.log.": "页面打开以来的错误和警告。这些也已发送给启动 Duetsheet 的 agent，并保存在 errors.log。",
+ "Copy all": "全部复制",
+ "Copied": "已复制",
+ "Copy failed. Select the text instead.": "无法复制，请直接选中文字。",
+ "Unexpected error": "意外错误",
+ "line {l}, column {c}": "第 {l} 行第 {c} 列",
+ "{file} is not a Duetsheet report: the \"report\" section with \"meta\" is missing.": "{file} 不是 Duetsheet 报告：缺少包含 \"meta\" 的 \"report\" 部分。",
+ "{file} had {n} values that are not valid JSON (NaN or Infinity). They were read as empty values.": "{file} 中有 {n} 个不符合 JSON 格式的值（NaN 或 Infinity），已按空值读取。",
+ "Ask your agent to write null instead (in Python: json.dump(..., allow_nan=False)).": "请让 agent 改写为 null（Python：json.dump(..., allow_nan=False)）。",
+ "Your changes were saved over it. The unreadable file was kept as exports/{f}.": "你的修改已经保存。无法读取的那份文件保留为 exports/{f}。",
+ "The page keeps showing the last version it could read.": "页面会继续显示最后一份能读取的版本。",
+ "Could not save report.json. Duetsheet keeps trying.": "无法保存 report.json，Duetsheet 会持续重试。"
 },
 "ja": {
  "_name": "日本語",
@@ -1462,8 +1511,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "This is not a valid Duetsheet translation file.": "有効な Duetsheet 翻訳ファイルではありません。",
  "Folder": "フォルダ",
  "Project folder": "プロジェクトフォルダ",
- "\"{name}\". The report is saved to report.json automatically. An agent can read and edit the same folder (see AGENTS.md).": "「{name}」。レポートは report.json に自動保存されます。agent も同じフォルダを読み書きできます（AGENTS.md 参照）。",
- "Project folder \"{name}\": changes are saved to report.json automatically.": "プロジェクトフォルダ「{name}」：変更は report.json に自動保存されます。",
  "Saving…": "保存中…",
  "All changes saved.": "すべての変更を保存しました。",
  "Could not save ({m}).": "保存できませんでした（{m}）。",
@@ -1479,8 +1526,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Opened {file}": "{file} を開きました",
  "Could not open the folder ({m}).": "フォルダを開けませんでした（{m}）。",
  "Permission to use the folder was not granted.": "フォルダの使用が許可されませんでした。",
- "This folder has no report.json yet. Save the report that is open now into it? Cancel starts an empty report.": "このフォルダにはまだ report.json がありません。いま開いているレポートを保存しますか？「キャンセル」を押すと空のレポートから始めます。",
- "Put raw data files in the data/ folder and example figures in habits/, then use the Folder tab. Or ask your agent to write the report into report.json (see AGENTS.md).": "元データを data/ フォルダに、見本の図を habits/ に入れてから「フォルダ」タブを使ってください。agent にレポートを report.json へ直接書いてもらうこともできます（AGENTS.md 参照）。",
  "This is not a Duetsheet report file.": "Duetsheet のレポートファイルではありません。",
  "Replace the report that is open now with {file}?": "いま開いているレポートを {file} で置き換えますか？",
  "report.json changed on disk; the page has been updated.": "ディスク上の report.json が変更されたため、ページを更新しました。",
@@ -1536,7 +1581,31 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Open a project folder. Your agent (Claude Code, Codex, Gemini CLI, ...) edits report.json in the same folder, following AGENTS.md.": "プロジェクトフォルダを開きます。agent（Claude Code、Codex、Gemini CLI など）が AGENTS.md に従って同じフォルダの report.json を編集します。",
  "Tutorial with screenshots": "画像付きチュートリアル",
  "AGENTS.md (for agents)": "AGENTS.md（agent 向けの説明）",
- "Got it": "わかりました"
+ "Got it": "わかりました",
+ "\"{name}\". The report is saved to {file} automatically. An agent can read and edit the same folder (see AGENTS.md).": "「{name}」。レポートは {file} に自動保存されます。agent も同じフォルダを読み書きできます（AGENTS.md 参照）。",
+ "Project folder \"{name}\": changes are saved to {file} automatically.": "プロジェクトフォルダ「{name}」：変更は {file} に自動保存されます。",
+ "Raw data (this folder)": "元データ（このフォルダ）",
+ "No CSV, TSV or JSON files in this folder yet. Add some, then click Refresh.": "このフォルダにはまだ CSV・TSV・JSON ファイルがありません。入れてから「再読み込み」を押してください。",
+ "Raw data files in this folder are listed in the Folder tab. Ask your agent to write the report (see AGENTS.md), or add blocks yourself in Edit mode.": "このフォルダの元データは「フォルダ」タブに表示されます。agent にレポートを書いてもらうか（AGENTS.md 参照）、「編集」モードで自分でブロックを追加してください。",
+ "This folder has no report yet. Save the report that is open now into it? Cancel starts an empty report.": "このフォルダにはまだレポートがありません。いま開いているレポートを保存しますか？「キャンセル」を押すと空のレポートから始めます。",
+ "The report could not be opened. See Problems (⚠) for the reason, fix report.json, then reload this page.": "レポートを開けませんでした。理由は「問題」（⚠）を見て、report.json を直してからこのページを再読み込みしてください。",
+ "Reload": "再読み込み",
+ "Problems": "問題",
+ "Error": "エラー",
+ "Warning": "警告",
+ "Errors and warnings since the page was opened. Copy them to your agent if you need help.": "ページを開いてからのエラーと警告です。困ったときは agent にコピーして渡してください。",
+ "Errors and warnings since the page was opened. They were also sent to the agent that started Duetsheet, and saved in errors.log.": "ページを開いてからのエラーと警告です。Duetsheet を起動した agent にも送られ、errors.log に保存されています。",
+ "Copy all": "すべてコピー",
+ "Copied": "コピーしました",
+ "Copy failed. Select the text instead.": "コピーできませんでした。テキストを選択してください。",
+ "Unexpected error": "予期しないエラー",
+ "line {l}, column {c}": "{l} 行目 {c} 文字目",
+ "{file} is not a Duetsheet report: the \"report\" section with \"meta\" is missing.": "{file} は Duetsheet のレポートではありません：\"meta\" を含む \"report\" セクションがありません。",
+ "{file} had {n} values that are not valid JSON (NaN or Infinity). They were read as empty values.": "{file} に JSON として無効な値（NaN または Infinity）が {n} 個ありました。空の値として読み込みました。",
+ "Ask your agent to write null instead (in Python: json.dump(..., allow_nan=False)).": "代わりに null を書くよう agent に頼んでください（Python：json.dump(..., allow_nan=False)）。",
+ "Your changes were saved over it. The unreadable file was kept as exports/{f}.": "あなたの変更で上書き保存しました。読めなかったファイルは exports/{f} として残してあります。",
+ "The page keeps showing the last version it could read.": "ページは最後に読めた版を表示し続けます。",
+ "Could not save report.json. Duetsheet keeps trying.": "report.json を保存できませんでした。Duetsheet は再試行を続けます。"
 },
 "ko": {
  "_name": "한국어",
@@ -1856,8 +1925,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "This is not a valid Duetsheet translation file.": "올바른 Duetsheet 번역 파일이 아닙니다.",
  "Folder": "폴더",
  "Project folder": "프로젝트 폴더",
- "\"{name}\". The report is saved to report.json automatically. An agent can read and edit the same folder (see AGENTS.md).": "\"{name}\". 보고서는 report.json에 자동 저장됩니다. agent도 같은 폴더를 읽고 편집할 수 있습니다 (AGENTS.md 참고).",
- "Project folder \"{name}\": changes are saved to report.json automatically.": "프로젝트 폴더 \"{name}\": 변경 사항은 report.json에 자동 저장됩니다.",
  "Saving…": "저장 중…",
  "All changes saved.": "모든 변경 사항을 저장했습니다.",
  "Could not save ({m}).": "저장하지 못했습니다 ({m}).",
@@ -1873,8 +1940,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Opened {file}": "{file}을(를) 열었습니다",
  "Could not open the folder ({m}).": "폴더를 열지 못했습니다 ({m}).",
  "Permission to use the folder was not granted.": "폴더 사용 권한을 받지 못했습니다.",
- "This folder has no report.json yet. Save the report that is open now into it? Cancel starts an empty report.": "이 폴더에는 아직 report.json이 없습니다. 지금 열려 있는 보고서를 저장할까요? 취소하면 빈 보고서로 시작합니다.",
- "Put raw data files in the data/ folder and example figures in habits/, then use the Folder tab. Or ask your agent to write the report into report.json (see AGENTS.md).": "원본 데이터 파일은 data/ 폴더에, 예시 그림은 habits/에 넣은 뒤 '폴더' 탭을 사용하세요. agent에게 보고서를 report.json에 직접 쓰도록 요청할 수도 있습니다 (AGENTS.md 참고).",
  "This is not a Duetsheet report file.": "Duetsheet 보고서 파일이 아닙니다.",
  "Replace the report that is open now with {file}?": "지금 열려 있는 보고서를 {file}(으)로 바꿀까요?",
  "report.json changed on disk; the page has been updated.": "디스크의 report.json이 바뀌어 페이지를 갱신했습니다.",
@@ -1930,7 +1995,31 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Open a project folder. Your agent (Claude Code, Codex, Gemini CLI, ...) edits report.json in the same folder, following AGENTS.md.": "프로젝트 폴더를 여세요. agent(Claude Code, Codex, Gemini CLI 등)가 AGENTS.md에 따라 같은 폴더의 report.json을 편집합니다.",
  "Tutorial with screenshots": "그림이 있는 튜토리얼",
  "AGENTS.md (for agents)": "AGENTS.md (agent용 설명)",
- "Got it": "확인"
+ "Got it": "확인",
+ "\"{name}\". The report is saved to {file} automatically. An agent can read and edit the same folder (see AGENTS.md).": "\"{name}\". 보고서는 {file}에 자동 저장됩니다. agent도 같은 폴더를 읽고 편집할 수 있습니다 (AGENTS.md 참고).",
+ "Project folder \"{name}\": changes are saved to {file} automatically.": "프로젝트 폴더 \"{name}\": 변경 사항은 {file}에 자동 저장됩니다.",
+ "Raw data (this folder)": "원본 데이터 (이 폴더)",
+ "No CSV, TSV or JSON files in this folder yet. Add some, then click Refresh.": "이 폴더에는 아직 CSV, TSV, JSON 파일이 없습니다. 파일을 넣고 '새로 고침'을 누르세요.",
+ "Raw data files in this folder are listed in the Folder tab. Ask your agent to write the report (see AGENTS.md), or add blocks yourself in Edit mode.": "이 폴더의 원본 데이터는 '폴더' 탭에 나옵니다. agent에게 보고서 작성을 요청하거나 (AGENTS.md 참고) '편집' 모드에서 직접 블록을 추가하세요.",
+ "This folder has no report yet. Save the report that is open now into it? Cancel starts an empty report.": "이 폴더에는 아직 보고서가 없습니다. 지금 열려 있는 보고서를 저장할까요? 취소하면 빈 보고서로 시작합니다.",
+ "The report could not be opened. See Problems (⚠) for the reason, fix report.json, then reload this page.": "보고서를 열 수 없습니다. 원인은 '문제'(⚠)에서 확인하고, report.json을 고친 뒤 이 페이지를 다시 불러오세요.",
+ "Reload": "다시 불러오기",
+ "Problems": "문제",
+ "Error": "오류",
+ "Warning": "경고",
+ "Errors and warnings since the page was opened. Copy them to your agent if you need help.": "페이지를 연 뒤 생긴 오류와 경고입니다. 도움이 필요하면 agent에게 복사해 주세요.",
+ "Errors and warnings since the page was opened. They were also sent to the agent that started Duetsheet, and saved in errors.log.": "페이지를 연 뒤 생긴 오류와 경고입니다. Duetsheet를 시작한 agent에게도 전달되었고 errors.log에 저장되었습니다.",
+ "Copy all": "모두 복사",
+ "Copied": "복사했습니다",
+ "Copy failed. Select the text instead.": "복사하지 못했습니다. 텍스트를 직접 선택하세요.",
+ "Unexpected error": "예기치 않은 오류",
+ "line {l}, column {c}": "{l}행 {c}열",
+ "{file} is not a Duetsheet report: the \"report\" section with \"meta\" is missing.": "{file}은(는) Duetsheet 보고서가 아닙니다: \"meta\"가 있는 \"report\" 부분이 없습니다.",
+ "{file} had {n} values that are not valid JSON (NaN or Infinity). They were read as empty values.": "{file}에 JSON으로 올바르지 않은 값(NaN 또는 Infinity)이 {n}개 있어 빈 값으로 읽었습니다.",
+ "Ask your agent to write null instead (in Python: json.dump(..., allow_nan=False)).": "agent에게 대신 null을 쓰도록 요청하세요 (Python: json.dump(..., allow_nan=False)).",
+ "Your changes were saved over it. The unreadable file was kept as exports/{f}.": "변경 사항을 그 위에 저장했습니다. 읽을 수 없던 파일은 exports/{f}(으)로 남겨 두었습니다.",
+ "The page keeps showing the last version it could read.": "페이지는 마지막으로 읽을 수 있었던 버전을 계속 보여 줍니다.",
+ "Could not save report.json. Duetsheet keeps trying.": "report.json을 저장하지 못했습니다. Duetsheet가 계속 다시 시도합니다."
 },
 "es": {
  "_name": "Español",
@@ -2250,8 +2339,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "This is not a valid Duetsheet translation file.": "No es un archivo de traducción de Duetsheet válido.",
  "Folder": "Carpeta",
  "Project folder": "Carpeta del proyecto",
- "\"{name}\". The report is saved to report.json automatically. An agent can read and edit the same folder (see AGENTS.md).": "\"{name}\". El informe se guarda automáticamente en report.json. Un agente puede leer y editar la misma carpeta (consulta AGENTS.md).",
- "Project folder \"{name}\": changes are saved to report.json automatically.": "Carpeta del proyecto \"{name}\": los cambios se guardan automáticamente en report.json.",
  "Saving…": "Guardando…",
  "All changes saved.": "Todos los cambios guardados.",
  "Could not save ({m}).": "No se pudo guardar ({m}).",
@@ -2267,8 +2354,6 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Opened {file}": "{file} abierto",
  "Could not open the folder ({m}).": "No se pudo abrir la carpeta ({m}).",
  "Permission to use the folder was not granted.": "No se concedió permiso para usar la carpeta.",
- "This folder has no report.json yet. Save the report that is open now into it? Cancel starts an empty report.": "Esta carpeta todavía no tiene report.json. ¿Guardar en ella el informe abierto? Cancelar empieza un informe vacío.",
- "Put raw data files in the data/ folder and example figures in habits/, then use the Folder tab. Or ask your agent to write the report into report.json (see AGENTS.md).": "Pon los archivos de datos en la carpeta data/ y las figuras de ejemplo en habits/, y usa la pestaña Carpeta. O pide a tu agente que escriba el informe en report.json (consulta AGENTS.md).",
  "This is not a Duetsheet report file.": "No es un archivo de informe de Duetsheet.",
  "Replace the report that is open now with {file}?": "¿Reemplazar el informe abierto por {file}?",
  "report.json changed on disk; the page has been updated.": "report.json cambió en el disco; la página se ha actualizado.",
@@ -2324,7 +2409,31 @@ details.round summary{cursor:pointer;font-size:13.5px}
  "Open a project folder. Your agent (Claude Code, Codex, Gemini CLI, ...) edits report.json in the same folder, following AGENTS.md.": "Abre una carpeta de proyecto. Tu agente (Claude Code, Codex, Gemini CLI, ...) edita report.json en la misma carpeta siguiendo AGENTS.md.",
  "Tutorial with screenshots": "Tutorial con capturas",
  "AGENTS.md (for agents)": "AGENTS.md (para agentes)",
- "Got it": "Entendido"
+ "Got it": "Entendido",
+ "\"{name}\". The report is saved to {file} automatically. An agent can read and edit the same folder (see AGENTS.md).": "\"{name}\". El informe se guarda automáticamente en {file}. Un agente puede leer y editar la misma carpeta (consulta AGENTS.md).",
+ "Project folder \"{name}\": changes are saved to {file} automatically.": "Carpeta del proyecto \"{name}\": los cambios se guardan automáticamente en {file}.",
+ "Raw data (this folder)": "Datos originales (esta carpeta)",
+ "No CSV, TSV or JSON files in this folder yet. Add some, then click Refresh.": "Todavía no hay archivos CSV, TSV ni JSON en esta carpeta. Añade alguno y haz clic en Actualizar.",
+ "Raw data files in this folder are listed in the Folder tab. Ask your agent to write the report (see AGENTS.md), or add blocks yourself in Edit mode.": "Los datos originales de esta carpeta aparecen en la pestaña Carpeta. Pide a tu agente que escriba el informe (consulta AGENTS.md) o añade bloques tú mismo en el modo Edición.",
+ "This folder has no report yet. Save the report that is open now into it? Cancel starts an empty report.": "Esta carpeta todavía no tiene informe. ¿Guardar en ella el informe abierto? Cancelar empieza un informe vacío.",
+ "The report could not be opened. See Problems (⚠) for the reason, fix report.json, then reload this page.": "No se pudo abrir el informe. Mira el motivo en Problemas (⚠), corrige report.json y vuelve a cargar esta página.",
+ "Reload": "Volver a cargar",
+ "Problems": "Problemas",
+ "Error": "Error",
+ "Warning": "Aviso",
+ "Errors and warnings since the page was opened. Copy them to your agent if you need help.": "Errores y avisos desde que se abrió la página. Cópialos para tu agente si necesitas ayuda.",
+ "Errors and warnings since the page was opened. They were also sent to the agent that started Duetsheet, and saved in errors.log.": "Errores y avisos desde que se abrió la página. También se enviaron al agente que inició Duetsheet y se guardaron en errors.log.",
+ "Copy all": "Copiar todo",
+ "Copied": "Copiado",
+ "Copy failed. Select the text instead.": "No se pudo copiar. Selecciona el texto.",
+ "Unexpected error": "Error inesperado",
+ "line {l}, column {c}": "línea {l}, columna {c}",
+ "{file} is not a Duetsheet report: the \"report\" section with \"meta\" is missing.": "{file} no es un informe de Duetsheet: falta la sección \"report\" con \"meta\".",
+ "{file} had {n} values that are not valid JSON (NaN or Infinity). They were read as empty values.": "{file} tenía {n} valores que no son JSON válido (NaN o Infinity). Se leyeron como valores vacíos.",
+ "Ask your agent to write null instead (in Python: json.dump(..., allow_nan=False)).": "Pide a tu agente que escriba null en su lugar (en Python: json.dump(..., allow_nan=False)).",
+ "Your changes were saved over it. The unreadable file was kept as exports/{f}.": "Tus cambios se guardaron encima. El archivo ilegible se conservó como exports/{f}.",
+ "The page keeps showing the last version it could read.": "La página sigue mostrando la última versión que pudo leer.",
+ "Could not save report.json. Duetsheet keeps trying.": "No se pudo guardar report.json. Duetsheet sigue intentándolo."
 }
 }
 </script>
@@ -2789,8 +2898,8 @@ const strip=b=>{if(!b)return null;const{prev,...rest}=b;return rest};
 function shortTime(iso){if(!iso)return'';const d=new Date(iso);const p=n=>String(n).padStart(2,'0');return`${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`}
 function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,2600)}
 function writeErr(e){const c=e&&e.code;return c==='invalid_argument'?tr('No write permission. This account may be view-only.'):c==='quota_exceeded'?tr('Storage limit reached.'):c==='resource_exhausted'?tr('Too many requests. Please try again shortly.'):tr('Save failed. Please try again.')}
-async function put(path,data){try{await db.doc(path).set(data)}catch(e){toast(writeErr(e))}}
-async function drop(path){try{await db.doc(path).delete()}catch(e){toast(writeErr(e))}}
+async function put(path,data){try{await db.doc(path).set(data)}catch(e){fail(writeErr(e),e)}}
+async function drop(path){try{await db.doc(path).delete()}catch(e){fail(writeErr(e),e)}}
 
 /* ---------- Change log: field definitions ---------- */
 const FIELDS=['title','text','caption','breakBefore',
@@ -2946,7 +3055,7 @@ $('#datafile').addEventListener('change',async e=>{const f=e.target.files[0];if(
   if(!type){toast(tr('Only CSV, TXT and JSON files are supported.'));return}
   try{const r=await S.caps.assets.upload(f,{type});S.assetURL.set(r.id,r.url);
     const im=b.image||{};saveBlock({...b,image:{...im,source:{...(im.source||{}),data:{asset:r.id,name:f.name,type}}}});toast(tr('Data file attached: ')+f.name)}
-  catch(err){toast(uploadErr(err))}});
+  catch(err){fail(uploadErr(err),err)}});
 function uploadErr(e){const c=e&&e.code;
   return c==='too_large'?tr('File too large: SVG up to 2 MB, other files up to 20 MB.'):c==='unsupported_type'?tr('This file type is not supported.'):c==='quota_or_state'?tr('This report has run out of storage.')
     :c==='invalid_request'?tr('The file could not be read. Make sure it is UTF-8 encoded.'):c==='rate_limited'?tr('Too many requests. Please try again shortly.'):tr('Upload failed. Please try again.')}
@@ -2983,7 +3092,7 @@ $('#imgfile').addEventListener('change',async e=>{const f=e.target.files[0];if(!
     else if(target){const b=S.blocks.get(target);if(b){const old=b.image||{};const{src,asset,mime,w,h:hh,name,...keep}=old;
       saveBlock({...b,image:{...keep,...img,crop:{t:0,r:0,b:0,l:0},source:{...(old.source||{}),file:(old.source&&old.source.file)||img.name}}})}}
     else addBlock('image',img)}
-  catch(err){toast(err&&err.code?uploadErr(err):tr('The image is too large or unreadable. Please choose a smaller image.'))}});
+  catch(err){fail(err&&err.code?uploadErr(err):tr('The image is too large or unreadable. Please choose a smaller image.'),err)}});
 
 /* ---------- Edit mode: block cards and comment boxes ---------- */
 const PRESETS={
@@ -3317,7 +3426,7 @@ async function learnFromExamples(){
       }
     }else if(rasters.length&&!svgs.length){toast(tr('This view cannot send images to Claude. Ask Claude in chat to analyse the examples, or upload SVG examples.'))}
     S.proposal=rows;if(!rows.length)toast(tr('The examples already match the current style. Nothing to change.'));
-  }catch(e){const c=e&&e.code;toast(c==='not_granted'||c==='sampling_disabled'?tr('Permission to use Claude was not granted.'):c==='rate_limited'?tr('Too many requests. Please try again shortly.'):c==='invalid_json'?tr('Could not read Claude\'s reply. Please try again.'):tr('Analysis failed. Please try again.'))}
+  }catch(e){const c=e&&e.code;fail(c==='not_granted'||c==='sampling_disabled'?tr('Permission to use Claude was not granted.'):c==='rate_limited'?tr('Too many requests. Please try again shortly.'):c==='invalid_json'?tr('Could not read Claude\'s reply. Please try again.'):tr('Analysis failed. Please try again.'),e)}
   finally{S.learning=false;renderPanel()}
 }
 function proposalNote(r){const pct=Math.round((r.conf||0)*100),from=r.from?' '+r.from:'';
@@ -3514,6 +3623,100 @@ document.addEventListener('keydown',e=>{
 });
 let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(render,150)});
 
+/* ---------- Problems log ---------- */
+// Errors and warnings stay listed here (a toast disappears after a few seconds). With the launcher they are also
+// sent to it, so the agent that started Duetsheet sees them, and they are saved in errors.log.
+const LOG=[];
+function logIssue(level,msg,detail){
+  const e={t:new Date().toISOString(),level,msg:String(msg||''),detail:detail?String(detail).slice(0,4000):''};
+  LOG.push(e);if(LOG.length>200)LOG.shift();renderIssues();
+  try{(level==='error'?console.error:console.warn)('[duetsheet]',e.msg,e.detail)}catch(x){}
+  if(S.server)S.server.log(e);
+}
+const errText=e=>e==null?'':typeof e==='string'?e:String(e.detail||e.message||e.msg||e.code||e.name||'');
+function fail(msg,e){toast(msg);logIssue('error',msg,errText(e))}
+function renderIssues(){const b=$('#issuesBtn');if(!b)return;b.hidden=!LOG.length;b.textContent='⚠ '+LOG.length;b.classList.toggle('warn',!LOG.some(x=>x.level==='error'))}
+function openIssues(){
+  const time=t=>{const d=new Date(t),p=n=>String(n).padStart(2,'0');return p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())};
+  const asText=()=>LOG.map(x=>x.t+' '+x.level.toUpperCase()+' '+x.msg+(x.detail?'\n  '+x.detail.replace(/\n/g,'\n  '):'')).join('\n');
+  openModal(tr('Problems'),[h('div',{class:'langbox issuebox'},[
+    h('p',{class:'cap',text:S.server?tr('Errors and warnings since the page was opened. They were also sent to the agent that started Duetsheet, and saved in errors.log.')
+      :tr('Errors and warnings since the page was opened. Copy them to your agent if you need help.')}),
+    h('ol',{class:'issuelist'},[...LOG].reverse().map(x=>h('li',{class:x.level},[
+      h('div',{},[h('span',{class:'lvl',text:x.level==='error'?tr('Error'):tr('Warning')}),' '+time(x.t)+' ',h('strong',{text:x.msg})]),
+      x.detail?h('pre',{text:x.detail}):null]))),
+    h('div',{class:'crow'},[h('button',{type:'button',class:'btn small',text:tr('Copy all'),onclick:async()=>{
+        try{await navigator.clipboard.writeText(asText());toast(tr('Copied'))}catch(e){toast(tr('Copy failed. Select the text instead.'))}}}),
+      h('span',{class:'sp'}),h('button',{type:'button',class:'btn small',text:tr('Clear'),onclick:()=>{LOG.length=0;renderIssues();closeModal()}})])])]);
+}
+$('#issuesBtn').addEventListener('click',openIssues);
+addEventListener('error',e=>logIssue('error',tr('Unexpected error'),(e.message||'')+(e.error&&e.error.stack?'\n'+e.error.stack:'')));
+addEventListener('unhandledrejection',e=>logIssue('error',tr('Unexpected error'),errText(e.reason)+(e.reason&&e.reason.stack?'\n'+e.reason.stack:'')));
+
+/* ---------- Reading JSON written by other programs ---------- */
+// Python writes NaN and Infinity, and some Windows tools start a file with a byte order mark; browsers accept neither.
+function lenientJSON(text){
+  if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);
+  try{return{value:JSON.parse(text),fixed:0}}catch(e0){
+    let out='',inStr=false,n=0;
+    for(let i=0;i<text.length;i++){const c=text[i];
+      if(inStr){out+=c;if(c==='\\'){out+=text[i+1]||'';i++}else if(c==='"')inStr=false;continue}
+      if(c==='"'){inStr=true;out+=c;continue}
+      if(c==='N'&&text.startsWith('NaN',i)){out+='null';i+=2;n++;continue}
+      if(c==='I'&&text.startsWith('Infinity',i)){out+='null';i+=7;n++;continue}
+      if(c==='-'&&text.startsWith('-Infinity',i)){out+='null';i+=8;n++;continue}
+      out+=c}
+    if(n){try{return{value:JSON.parse(out),fixed:n}}catch(e1){throw{json:true,message:e1.message,text:out}}} // the real problem is elsewhere
+    throw{json:true,message:e0.message,text}}
+}
+function jsonDetail(err){
+  if(!err||!err.json)return errText(err);const m=/position (\d+)/.exec(err.message||'');if(!m)return err.message;
+  const pos=+m[1],before=err.text.slice(0,pos),line=before.split('\n').length,col=pos-before.lastIndexOf('\n');
+  return tr('line {l}, column {c}',{l:line,c:col})+': '+err.message+'\n'+err.text.slice(Math.max(0,pos-40),pos+40).replace(/\s+/g,' ');
+}
+function readReport(text,label){ // report.json text -> documents; what could be repaired is logged as a warning
+  let r;try{r=lenientJSON(text)}catch(e){throw{msg:tr('{file} is not valid JSON.',{file:label}),detail:jsonDetail(e)}}
+  let docs;try{docs=docsFromReport(r.value)}catch(e){throw{msg:tr('{file} is not a Duetsheet report: the "report" section with "meta" is missing.',{file:label})}}
+  if(r.fixed)logIssue('warning',tr('{file} had {n} values that are not valid JSON (NaN or Infinity). They were read as empty values.',{file:label,n:r.fixed}),
+    tr('Ask your agent to write null instead (in Python: json.dump(..., allow_nan=False)).'));
+  return docs;
+}
+
+/* ---------- Launcher (python duetsheet.py) ---------- */
+// When duetsheet.py serves the page, the folder it was started in is reached through it, with no folder picker.
+// httpRoot() offers the part of the File System Access API that the folder code uses, so that code stays the same.
+function httpRoot(token,name){
+  const call=(path,opt)=>fetch('/fs/'+path.split('/').map(encodeURIComponent).join('/'),{...(opt||{}),headers:{'X-Duetsheet-Token':token}});
+  const missing=n=>new DOMException(n+' not found','NotFoundError');
+  const file=(path,fname,meta)=>({kind:'file',name:fname,meta,
+    async getFile(){const r=await call(path);if(r.status===404)throw missing(fname);if(!r.ok)throw new Error(fname+': '+r.status+' '+await r.text());
+      return new File([await r.blob()],fname,{type:r.headers.get('Content-Type')||'',lastModified:+r.headers.get('X-Mtime')||Date.now()})},
+    async mtime(){const r=await call(path,{method:'HEAD'});if(!r.ok)throw missing(fname);return +r.headers.get('X-Mtime')},
+    async createWritable(){const parts=[];return{async write(d){parts.push(d)},
+      async close(){const r=await call(path,{method:'PUT',body:new Blob(parts)});if(!r.ok)throw new Error(r.status+' '+await r.text())}}}});
+  const dir=(path,dname)=>({kind:'directory',name:dname,virtual:true,
+    async getFileHandle(n,o){const p=path+n,r=await call(p,{method:'HEAD'});
+      if(!r.ok){if(!(o&&o.create))throw missing(n);const w=await call(p,{method:'PUT',body:''});if(!w.ok)throw new Error(w.status+' '+await w.text())} // like the real API: create an empty file
+      return file(p,n)},
+    async getDirectoryHandle(n,o){const p=path+n+'/',r=await call(p,{method:o&&o.create?'POST':'HEAD'});if(!r.ok)throw missing(n);return dir(p,n)},
+    async *entries(){const r=await call(path);if(!r.ok)return;
+      for(const x of await r.json())yield[x.name,x.kind==='file'?file(path+x.name,x.name,{size:x.size,lastModified:x.mtime}):dir(path+x.name+'/',x.name)]},
+    async queryPermission(){return'granted'},async requestPermission(){return'granted'}});
+  return dir('',name);
+}
+async function connectServer(){
+  if(!/^https?:$/.test(location.protocol))return false;
+  const m=/token=([0-9a-f]{16,})/.exec(location.hash);let token=m&&m[1];
+  try{if(token){sessionStorage.setItem('duetsheet-token',token);history.replaceState(null,'',location.pathname+location.search)}else token=sessionStorage.getItem('duetsheet-token')}catch(e){}
+  if(!token)return false;
+  let info;try{const r=await fetch('/api/info',{headers:{'X-Duetsheet-Token':token}});if(!r.ok)return false;info=await r.json()}catch(e){return false}
+  S.server={info,log:e=>fetch('/api/log',{method:'POST',headers:{'X-Duetsheet-Token':token,'Content-Type':'application/json'},body:JSON.stringify(e)}).catch(()=>{})};
+  LOG.forEach(e=>S.server.log(e)); // problems logged before the connection
+  await openFolder(httpRoot(token,info.name),false);
+  if(!S.folder)renderLocalBar();
+  return true;
+}
+
 /* ---------- Local project folder ---------- */
 // In browsers with the File System Access API (Chrome, Edge) a report can live in a folder on disk:
 //   report.json  the report: { "schema": ..., "<collection>": { "<id>": document } }
@@ -3558,33 +3761,47 @@ const idb={ // remembers the last folder between visits (the browser asks again 
   get(k){return this.run('readonly',s=>s.get(k))},set(k,v){return this.run('readwrite',s=>s.put(v,k))}};
 
 async function folderDB(dir,seedDocs){
-  let fh=null,known=0,docs=null;
-  try{fh=await dir.getFileHandle(REPORT_FILE);const f=await fh.getFile();docs=docsFromReport(JSON.parse(await f.text()));known=f.lastModified}
+  let fh=null,known=0,docs=null,retry=0,retryT=null,bad=null;
+  try{fh=await dir.getFileHandle(REPORT_FILE);const f=await fh.getFile();docs=readReport(await f.text(),REPORT_FILE);known=f.lastModified}
   catch(e){if(!(e&&e.name==='NotFoundError'))throw e}
+  const stamp=async()=>fh.mtime?await fh.mtime():(await fh.getFile()).lastModified;
   const dirty=new Set();let timer=null,busy=false;
   const mem=memDB(docs||seedDocs||{},p=>{dirty.add(p);setSave('pending');clearTimeout(timer);timer=setTimeout(flush,400)});
   async function flush(){
     if(busy){clearTimeout(timer);timer=setTimeout(flush,200);return}
-    if(!dirty.size)return;busy=true;const mine=new Set(dirty);dirty.clear();
+    if(!dirty.size)return;busy=true;const mine=new Set(dirty);dirty.clear();clearTimeout(retryT);
     try{fh=fh||await dir.getFileHandle(REPORT_FILE,{create:true});
       const f=await fh.getFile();let all=mem.dump();
       if(f.size&&f.lastModified!==known){ // someone else wrote the file since we read it: keep their documents, put ours on top
-        const next=docsFromReport(JSON.parse(await f.text()));mine.forEach(p=>{if(p in all)next[p]=all[p];else delete next[p]});all=next;mem.load(all)}
+        const text=await f.text();let next=null;
+        try{next=readReport(text,REPORT_FILE)}catch(e){ // unreadable: keep a copy of it, then save ours
+          const copy='report-unreadable-'+new Date().toISOString().replace(/[:.]/g,'-')+'.json';
+          try{await writeFile(await subdir(dir,'exports',true),copy,text)}catch(x){}
+          logIssue('error',e.msg,(e.detail?e.detail+'\n':'')+tr('Your changes were saved over it. The unreadable file was kept as exports/{f}.',{f:copy}))}
+        if(next){mine.forEach(p=>{if(p in all)next[p]=all[p];else delete next[p]});all=next;mem.load(all)}}
       await writeFile(dir,REPORT_FILE,JSON.stringify(reportFromDocs(all),null,1)+'\n');
-      known=(await fh.getFile()).lastModified;setSave(dirty.size?'pending':'saved')}
-    catch(e){mine.forEach(p=>dirty.add(p));setSave('error',e)}
+      known=await stamp();retry=0;setSave(dirty.size?'pending':'saved')}
+    catch(e){mine.forEach(p=>dirty.add(p));setSave('error',e);
+      if(!retry)logIssue('error',tr('Could not save report.json. Duetsheet keeps trying.'),errText(e));
+      retry++;retryT=setTimeout(flush,Math.min(30000,2000*2**(retry-1)))} // sync clients such as OneDrive can lock a file for a moment
     finally{busy=false}
   }
   async function poll(){
     if(busy||dirty.size)return;
-    try{fh=fh||await dir.getFileHandle(REPORT_FILE);const f=await fh.getFile();if(f.lastModified===known)return;
-      const next=docsFromReport(JSON.parse(await f.text()));known=f.lastModified;await loadAssetURLs(dir);mem.load(next);
+    try{fh=fh||await dir.getFileHandle(REPORT_FILE);if(await stamp()===known)return;
+      const f=await fh.getFile();let next;
+      try{next=readReport(await f.text(),REPORT_FILE)}
+      catch(e){ // perhaps half-written: report it only when it is still unreadable on the next check
+        if(bad&&bad.m===f.lastModified){if(!bad.logged){bad.logged=true;logIssue('error',e.msg,(e.detail?e.detail+'\n':'')+tr('The page keeps showing the last version it could read.'))}}
+        else bad={m:f.lastModified};
+        return}
+      bad=null;known=f.lastModified;await loadAssetURLs(dir);mem.load(next);
       toast(tr('report.json changed on disk; the page has been updated.'));refreshFolderFiles()}
-    catch(e){} // missing or half-written file: try again on the next tick
+    catch(e){} // no report.json yet
   }
   const iv=setInterval(poll,1500);
   if(!docs){dirty.add('report/meta');await flush()} // a new folder gets its report.json right away
-  return{...mem,name:dir.name,dir,flush,pending:()=>dirty.size>0||busy,close(){clearInterval(iv);clearTimeout(timer)}};
+  return{...mem,name:dir.name,dir,flush,pending:()=>dirty.size>0||busy,close(){clearInterval(iv);clearTimeout(timer);clearTimeout(retryT)}};
 }
 async function loadAssetURLs(dir){
   for(const fh of await listFiles(await subdir(dir,'assets'))){const id=fh.name.replace(/\.[^.]+$/,'');
@@ -3599,25 +3816,32 @@ function folderCaps(dir){return{
 function starterDocs(name){const t=now(),id='b-start';
   return{'report/meta':{title:name,order:[id],schema:SCHEMA,createdAt:t},
     ['blocks/'+id]:{id,type:'text',title:'',caption:'',breakBefore:'auto',createdAt:t,
-      text:tr('Put raw data files in the data/ folder and example figures in habits/, then use the Folder tab. Or ask your agent to write the report into report.json (see AGENTS.md).')}}}
+      text:tr('Raw data files in this folder are listed in the Folder tab. Ask your agent to write the report (see AGENTS.md), or add blocks yourself in Edit mode.')}}}
 function useDB(next){db=next;
   Object.assign(S,{meta:null,blocks:new Map(),datasets:new Map(),annos:[],changes:[],rounds:[],style:null,examples:[],agentProposal:null,proposal:null,drafts:new Map(),page:0,stale:new Set(),folderFiles:null});
   subscribe()}
 async function pickFolder(){let dir;try{dir=await window.showDirectoryPicker({mode:'readwrite',id:'duetsheet'})}catch(e){return}await openFolder(dir,true)}
-async function openFolder(dir,ask){
+async function openFolder(root,ask){
   try{
-    if(dir.requestPermission&&await dir.requestPermission({mode:'readwrite'})!=='granted'){toast(tr('Permission to use the folder was not granted.'));return}
+    if(root.requestPermission&&await root.requestPermission({mode:'readwrite'})!=='granted'){fail(tr('Permission to use the folder was not granted.'));return}
+    // One rule for every way of opening a folder: a folder with report.json is the project folder (raw data in data/);
+    // any other folder is a raw data folder, and the report goes into its duetsheet/ subfolder.
+    const has=async d=>!!d&&await d.getFileHandle(REPORT_FILE).then(()=>true,()=>false);
+    let dir=root,dataDir,prefix;
+    if(await has(root)){dataDir=await subdir(root,'data');prefix='data/'}
+    else{dir=await root.getDirectoryHandle('duetsheet',{create:true});dataDir=root;prefix='../'}
     let seed=null;
-    if(!await dir.getFileHandle(REPORT_FILE).then(()=>true,()=>false))
-      seed=ask&&S.meta&&S.blocks.size&&confirm(tr('This folder has no report.json yet. Save the report that is open now into it? Cancel starts an empty report.'))?docsFromReport(reportFromState()):starterDocs(dir.name);
+    if(!await has(dir))seed=ask&&S.meta&&S.blocks.size&&confirm(tr('This folder has no report yet. Save the report that is open now into it? Cancel starts an empty report.'))
+      ?docsFromReport(reportFromState()):starterDocs(root.name);
     const f=await folderDB(dir,seed);
     if(S.folder)S.folder.close();
-    S.folder=f;S.lastFolder=dir;S.caps=folderCaps(dir);S.assetURL=new Map();await loadAssetURLs(dir);
+    Object.assign(f,{name:root.name,root,dataDir,prefix,file:prefix==='../'?'duetsheet/'+REPORT_FILE:REPORT_FILE});
+    S.folder=f;S.lastFolder=root;S.caps=folderCaps(dir);S.assetURL=new Map();await loadAssetURLs(dir);
     useDB(f);await loadFolderLangs(dir);
-    try{await idb.set('folder',dir)}catch(e){}
+    if(!root.virtual)try{await idb.set('folder',root)}catch(e){}
     S.tab='folder';S.panelInView=true;document.body.classList.remove('nopanel');
-    renderLocalBar();refreshFolderFiles();toast(tr('Opened folder {name}',{name:dir.name}))}
-  catch(e){toast(tr('Could not open the folder ({m}).',{m:(e&&(e.message||e.name||e.code))||tr('unknown')}))}
+    renderLocalBar();refreshFolderFiles();toast(tr('Opened folder {name}',{name:root.name}))}
+  catch(e){fail(e&&e.msg?e.msg:tr('Could not open the folder ({m}).',{m:errText(e)||tr('unknown')}),e&&e.detail)}
 }
 async function restoreFolder(){
   if(!FS_OK)return;let d=null;try{d=await idb.get('folder')}catch(e){}if(!d)return;S.lastFolder=d;
@@ -3628,9 +3852,13 @@ function renderLocalBar(){
   if(S.cloud)return;
   const B=(t,fn,primary)=>h('button',{type:'button',class:'btn small'+(primary?' primary':''),text:t,onclick:fn});const acts=[];let text;
   if(S.folder){
-    text=tr('Project folder "{name}": changes are saved to report.json automatically.',{name:S.folder.name})+' '+
+    text=tr('Project folder "{name}": changes are saved to {file} automatically.',{name:S.folder.name,file:S.folder.file})+' '+
       ({pending:tr('Saving…'),saved:tr('All changes saved.'),error:tr('Could not save ({m}).',{m:S.saveError})}[S.saveState]||'');
-    acts.push(B(tr('Open another folder'),pickFolder),B(tr('Save a copy'),exportReport));
+    if(!S.server)acts.push(B(tr('Open another folder'),pickFolder));
+    acts.push(B(tr('Save a copy'),exportReport));
+  }else if(S.server){
+    text=tr('The report could not be opened. See Problems (⚠) for the reason, fix report.json, then reload this page.');
+    acts.push(B(tr('Reload'),()=>location.reload(),true));
   }else{
     text=(S.initError?S.initError+' ':'')+(FS_OK?tr('Not saved: changes are lost when you close this tab. Open a project folder to save automatically, or save the report as a file.')
       :tr('Not saved: changes are lost when you close this tab. This browser cannot open folders (use Chrome or Edge), but you can save the report as a file and open it again later.'));
@@ -3643,7 +3871,7 @@ function renderLocalBar(){
 function exportReport(){const name=((S.meta&&S.meta.title)||'report').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'report';
   saveTextFile(name+'.report.json',JSON.stringify(reportFromState(),null,1)+'\n','application/json')}
 $('#reportfile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;
-  let docs;try{docs=docsFromReport(JSON.parse(await f.text()))}catch(err){toast(tr('This is not a Duetsheet report file.'));return}
+  let docs;try{docs=readReport(await f.text(),f.name)}catch(err){fail(err&&err.msg||tr('This is not a Duetsheet report file.'),err&&err.detail);return}
   if(S.blocks.size&&!confirm(tr('Replace the report that is open now with {file}?',{file:f.name})))return;
   useDB(memDB(docs));renderLocalBar();toast(tr('Opened {file}',{file:f.name}))});
 addEventListener('beforeunload',e=>{if(S.folder&&S.folder.pending()){S.folder.flush();e.preventDefault();e.returnValue=''}});
@@ -3653,10 +3881,18 @@ async function loadFolderLangs(dir){
   renderLangMenu()}
 
 /* data/: raw data imported into datasets, with the source file recorded */
+async function listDeep(d,re,base,depth,out){ // data files in the raw data folder and its subfolders, Duetsheet's own folder skipped
+  out=out||[];base=base||'';depth=depth||0;if(!d||depth>3)return out;
+  for await(const[name,hd]of d.entries()){if(out.length>=300)break;
+    if(name.startsWith('.')||(!depth&&name==='duetsheet')||name==='node_modules'||name==='__pycache__')continue;
+    if(hd.kind==='file'){if(re.test(name))out.push({fh:hd,rel:base+name})}else await listDeep(hd,re,base+name+'/',depth+1,out)}
+  return out;
+}
 async function refreshFolderFiles(){
-  if(!S.folder)return;const dir=S.folder.dir;
-  const data=await Promise.all((await listFiles(await subdir(dir,'data'),DATA_EXT)).map(async fh=>{const f=await fh.getFile();
-    return{name:fh.name,path:'data/'+fh.name,fh,size:f.size,modified:new Date(f.lastModified).toISOString()}}));
+  if(!S.folder)return;const F=S.folder,dir=F.dir;
+  const found=(await listDeep(F.dataDir,DATA_EXT)).sort((a,b)=>a.rel<b.rel?-1:1);
+  const data=await Promise.all(found.map(async({fh,rel})=>{const f=fh.meta||await fh.getFile();
+    return{name:rel,path:F.prefix+rel,fh,size:f.size,modified:new Date(f.lastModified).toISOString()}}));
   const habits=(await listFiles(await subdir(dir,'habits'),HABIT_EXT)).map(fh=>fh.name);
   // a dataset is stale when its source file changed after the import: size and date first, then the content hash
   const stale=new Set();
@@ -3712,7 +3948,7 @@ async function importDataFile(f){
     const c={id:uid('c'),by:'user',at:now(),blockId:null,datasetId:id,field:'dataset',before:sum(old),after:sum(ds),name:ds.title,revertible:false};
     S.changes=[...S.changes,c];renderPanel();await put('changes/'+c.id,c);
     toast(tr('Imported {file}: {n} rows, {c} columns.',{file:f.name,n:ds.rows.length,c:ds.columns.length}));refreshFolderFiles()}
-  catch(e){toast(e&&e.msg?e.msg:tr('Could not read {file}.',{file:f.name}))}
+  catch(e){fail(e&&e.msg?e.msg:tr('Could not read {file}.',{file:f.name}),e)}
 }
 
 /* habits/: learn the user's figure style from their own files, then let them confirm */
@@ -3764,28 +4000,28 @@ async function learnHabits(){
         from:tr('{k} of {n} files: {files}',{k:best.files.length,n,files:best.files.slice(0,3).join(', ')+(best.files.length>3?', …':'')})})});
     S.proposal=rows;S.tab='style';
     if(!rows.length)toast(n||profile?tr('Your habits already match the current style. Nothing to change.'):tr('No SVG, .mplstyle or profile.json files in habits/.'))}
-  catch(e){toast(tr('Analysis failed. Please try again.'))}
+  catch(e){fail(tr('Analysis failed. Please try again.'),e)}
   finally{S.learning=false;renderPanel()}
 }
 async function saveHabits(){
   if(!S.folder)return;
   try{await writeFile(await subdir(S.folder.dir,'habits',true),'profile.json',JSON.stringify({...styleExport(styleNow()),savedAt:now()},null,1)+'\n');
     toast(tr('Saved to {p}',{p:'habits/profile.json'}));refreshFolderFiles()}
-  catch(e){toast(tr('Save failed. Please try again.'))}
+  catch(e){fail(tr('Save failed. Please try again.'),e)}
 }
 function renderFolder(){
   const box=$('#tab-folder');box.replaceChildren();if(!S.folder)return;
   const F=S.folderFiles||{data:[],habits:[]},B=(t,fn,cls,dis)=>h('button',{type:'button',class:'btn small'+(cls?' '+cls:''),text:t,disabled:dis?'':null,onclick:fn});
   box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Project folder')}),
-    h('p',{class:'cap',text:tr('"{name}". The report is saved to report.json automatically. An agent can read and edit the same folder (see AGENTS.md).',{name:S.folder.name})}),
+    h('p',{class:'cap',text:tr('"{name}". The report is saved to {file} automatically. An agent can read and edit the same folder (see AGENTS.md).',{name:S.folder.name,file:S.folder.file})}),
     h('div',{class:'crow'},[B(tr('Refresh'),refreshFolderFiles)])]));
   const dl=h('ul',{class:'flist'});
-  if(!F.data.length)dl.append(h('li',{class:'empty',text:tr('No files yet. Put CSV, TSV or JSON files in the data/ folder, then click Refresh.')}));
+  if(!F.data.length)dl.append(h('li',{class:'empty',text:(S.folder.prefix==='../'?tr('No CSV, TSV or JSON files in this folder yet. Add some, then click Refresh.'):tr('No files yet. Put CSV, TSV or JSON files in the data/ folder, then click Refresh.'))}));
   F.data.forEach(f=>{const ds=[...S.datasets.values()].find(d=>d.source&&d.source.path===f.path),stale=!!ds&&S.stale.has(ds.id);
     dl.append(h('li',{},[h('span',{class:'fname',text:f.name}),
       h('span',{class:'fstat'+(stale?' stale':''),text:!ds?tr('not imported'):stale?tr('changed since import'):tr('imported as "{t}", {n} rows',{t:ds.title||ds.id,n:ds.rows.length})}),
       B(ds?tr('Update'):tr('Import'),()=>importDataFile(f),stale?'primary':'')]))});
-  box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Raw data (data/)')}),dl,
+  box.append(h('div',{class:'stsec'},[h('h4',{text:S.folder.prefix==='../'?tr('Raw data (this folder)'):tr('Raw data (data/)')}),dl,
     h('p',{class:'cap',text:tr('Each import records the file path and a fingerprint (SHA-256), so you can see when the file changes. Excel files: save them as CSV, or ask your agent.')})]));
   const cnt=re=>F.habits.filter(x=>re.test(x)).length,svg=cnt(/\.svg$/i),mpl=cnt(/\.mplstyle$/i),ras=cnt(/\.(png|jpe?g|webp|gif)$/i),prof=F.habits.includes('profile.json');
   box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Figure habits (habits/)')}),
@@ -3823,7 +4059,7 @@ async function seedIfEmpty(){
   await db.doc('report/meta').set({title:tr('NIMO demo report'),order:blocks.map(b=>b.id),schema:SCHEMA,createdAt:t});
 }
 function subscribe(){
-  const fail=e=>showNote(tr('Failed to read cloud data (')+((e&&e.code)||tr('unknown'))+tr('). Please reload.'));
+  const fail=e=>{const m=tr('Failed to read cloud data (')+((e&&e.code)||tr('unknown'))+tr('). Please reload.');showNote(m);logIssue('error',m,errText(e))};
   const quiet=fn=>{if(editingNow()){renderPanel()}else fn()};
   db.doc('report/meta').onSnapshot(s=>{if(s.exists){S.meta=s.data();render()}},fail);
   db.collection('blocks').limit(500).onSnapshot(s=>{S.blocks=new Map(s.docs.map(d=>[d.id,d.data()]).filter(x=>x[1]));render()},fail);
@@ -3842,12 +4078,12 @@ async function start(){
   setMode('view');
   let cloud=null;try{cloud=(window.claude&&window.claude.use)?await window.claude.use('db'):null}catch(e){cloud=null}
   if(cloud){db=cloud;S.cloud=true}else db=memDB();
-  try{await seedIfEmpty()}catch(e){if(S.cloud){S.initError=tr('Failed to initialise cloud data (')+((e&&e.code)||tr('unknown'))+tr('). Showing local mode.');db=memDB();S.cloud=false;await seedIfEmpty()}}
+  try{await seedIfEmpty()}catch(e){if(S.cloud){S.initError=tr('Failed to initialise cloud data (')+((e&&e.code)||tr('unknown'))+tr('). Showing local mode.');logIssue('error',S.initError,errText(e));db=memDB();S.cloud=false;await seedIfEmpty()}}
   subscribe();
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(render);
   if(S.cloud){const tryUse=async n=>{try{return await window.claude.use(n)}catch(e){return null}};
     const[a,sm,dl]=await Promise.all(['assets','sample','downloads'].map(tryUse));S.caps={assets:a,sample:sm,downloads:dl};render()}
-  else{renderLocalBar();restoreFolder()}
+  else if(!await connectServer()){renderLocalBar();restoreFolder()}
   welcomeOnce();
 }
 $('#lang').addEventListener('change',e=>{const v=e.target.value;if(v==='__add'){e.target.value=LANG;openLangDialog();return}if(v!==LANG)switchLang(v)});
@@ -3855,7 +4091,7 @@ $('#langfile').addEventListener('change',async e=>{const f=e.target.files[0];if(
   try{if(f.size>1e6)throw{};const text=await f.text(),r=importLang(JSON.parse(text));closeModal();switchLang(r.code);
     if(S.folder)subdir(S.folder.dir,'lang',true).then(d=>d&&writeFile(d,r.code+'.json',text)).catch(()=>{});
     toast(tr('Loaded {name}: {n} sentences',{name:r.name,n:r.n})+(r.bad?tr(' ({b} skipped: placeholders do not match)',{b:r.bad}):''))}
-  catch(err){toast(err&&err.msg?err.msg:tr('This is not a valid Duetsheet translation file.'))}});
+  catch(err){fail(err&&err.msg?err.msg:tr('This is not a valid Duetsheet translation file.'),err)}});
 collectStatic();applyStatic();
 start();
 })();
