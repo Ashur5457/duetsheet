@@ -18,7 +18,7 @@ so an agent running this command sees them.
 
 Python 3.8 or later, standard library only.
 """
-import argparse, base64, hashlib, hmac, http.server, json, mimetypes, os, pathlib, re, secrets, subprocess, sys, threading, time, urllib.parse, webbrowser
+import argparse, base64, hashlib, hmac, http.server, json, mimetypes, os, pathlib, re, secrets, shutil, subprocess, sys, tempfile, threading, time, urllib.parse, webbrowser
 
 VERSION = '0.5.0'
 HERE = pathlib.Path(__file__).resolve().parent
@@ -457,16 +457,25 @@ def make_shortcut(root, target):
     dest.mkdir(parents=True, exist_ok=True)
     name, py, script = shortcut_name(root), sys.executable, HERE / 'duetsheet.py'
     if os.name == 'nt':
+        # The .lnk is made in a temporary folder and then moved: Windows may keep PowerShell from writing to the
+        # desktop (controlled folder access) while still letting Python do it.
         link = dest / (name + '.lnk')
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix='duetsheet-')) / 'shortcut.lnk'
         q = lambda v: "'" + str(v).replace("'", "''") + "'"
-        ps = (f'$s=(New-Object -ComObject WScript.Shell).CreateShortcut({q(link)});$s.TargetPath={q(py)};'
+        ps = (f'$s=(New-Object -ComObject WScript.Shell).CreateShortcut({q(tmp)});$s.TargetPath={q(py)};'
               f'$s.Arguments={q(chr(34) + str(script) + chr(34) + " " + chr(34) + str(root) + chr(34))};'
               f'$s.WorkingDirectory={q(root)};$s.Description={q("Start Duetsheet for " + str(root))};$s.Save()')
         enc = base64.b64encode(ps.encode('utf-16-le')).decode('ascii')
-        r = subprocess.run(['powershell', '-NoProfile', '-NonInteractive', '-EncodedCommand', enc], capture_output=True, text=True)
-        if r.returncode or not link.is_file():
-            say('ERROR', 'could not create the shortcut:', (r.stderr or r.stdout).strip()[:500])
+        r = subprocess.run(['powershell', '-NoProfile', '-NonInteractive', '-EncodedCommand', enc], capture_output=True, text=True, errors='replace')
+        try:
+            if r.returncode or not tmp.is_file():
+                raise OSError(re.sub(r'<[^>]+>', ' ', r.stderr or r.stdout).strip()[-400:])
+            shutil.move(str(tmp), str(link))
+        except OSError as err:
+            say('ERROR', 'could not create the shortcut:', err)
             return 1
+        finally:
+            shutil.rmtree(tmp.parent, ignore_errors=True)
     else:
         link = dest / (name + ('.command' if sys.platform == 'darwin' else '.sh'))
         sh = lambda v: "'" + str(v).replace("'", "'\\''") + "'"
