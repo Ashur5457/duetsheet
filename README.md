@@ -61,12 +61,16 @@ Describing "the cluster of points in the upper left of the second figure looks o
 
 You need Python 3.8 or later (nothing else to install).
 
-1. In Claude Code (terminal, VS Code, JetBrains or desktop app), install once:
+1. In Claude Code in a terminal, VS Code or JetBrains, install once:
    ```
    /plugin marketplace add Ashur5457/duetsheet
    /plugin install duetsheet@duetsheet
    ```
-   Other ways to install (git, no plugin system) and how to update: [tutorial, section 0](docs/tutorial.md#0-install).
+   In the **Claude desktop app** (which cannot add plugin marketplaces), run this in a terminal instead:
+   ```bash
+   git clone https://github.com/Ashur5457/duetsheet.git && python duetsheet/duetsheet.py install-skill
+   ```
+   Updating, removing, and installing without git: [tutorial, section 0](docs/tutorial.md#0-install).
 2. Open Claude Code in the folder that holds your raw data (CSV, TSV, JSON; Excel is converted by Claude) and type `/duetsheet`, or just say:
    > Start Duetsheet and write a report from the data in this folder.
 

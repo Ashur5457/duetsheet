@@ -13,29 +13,34 @@ A third path, Claude Artifacts on claude.ai, is at the end.
 
 Every way of using Duetsheet on your computer needs **Python 3.8 or later** (nothing else: no packages to install). Check with `python --version`.
 
-### With Claude Code (recommended)
+### With Claude Code in a terminal, VS Code or JetBrains
 
-In Claude Code (terminal, VS Code extension, JetBrains plugin or desktop app, with a subscription or an API key), type these two lines once:
+In Claude Code (with a subscription or an API key), type these two lines once:
 
 ```
 /plugin marketplace add Ashur5457/duetsheet
 /plugin install duetsheet@duetsheet
 ```
 
-Start a new session and type `/`: **duetsheet** is in the list. That's it.
+Start a new session and type `/`: **duetsheet** is in the list.
 
 - **Update**: `/plugin marketplace update duetsheet`, then start a new session.
 - **Remove**: `/plugin uninstall duetsheet@duetsheet`.
 
-### Without the plugin system
+### With the Claude desktop app, or without the plugin system
 
-If you prefer a copy of the repository on your computer (you need [git](https://git-scm.com/)):
+The desktop app cannot add plugin marketplaces with `/plugin`. Install the skill from a copy of the repository instead (you need [git](https://git-scm.com/)). In a terminal, in the folder where you want to keep Duetsheet:
 
 ```bash
 git clone https://github.com/Ashur5457/duetsheet.git && python duetsheet/duetsheet.py install-skill
 ```
 
-This installs the same `/duetsheet` skill into `~/.claude/skills/`, pointing to that copy. To update: `git pull` in that folder, then run `python duetsheet.py install-skill` again. If you move the folder, run `install-skill` again.
+This installs the `/duetsheet` skill into `~/.claude/skills/`, where the desktop app, the terminal and the editor extensions all find it. Start a new session and type `/`: **duetsheet** is in the list.
+
+- **Update**: run `git pull` in the `duetsheet` folder, then `python duetsheet.py install-skill` again.
+- **Moved the folder?** Run `python duetsheet.py install-skill` again from its new place.
+- **Remove**: delete the folder `~/.claude/skills/duetsheet`.
+- No git? [Download the ZIP](https://github.com/Ashur5457/duetsheet/archive/refs/heads/main.zip), unzip it, and run `python duetsheet.py install-skill` in the unzipped folder.
 
 ### With other AI agents (Copilot, Cursor, Codex, Gemini CLI, Cline and others)
 
