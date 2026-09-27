@@ -1103,7 +1103,8 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "The data drawn in this chart": "這張圖畫出來的數據",
  "To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).": "要換數據、欄位、數據組或其他任何修改，請寫在下方的留言框（可參考「範例句」）。",
  "Draw around points on the chart with the mouse, or click one point.": "在圖上按住滑鼠畫一圈圈出資料點，或直接點一個點。",
- "Draw around a region of the figure with the mouse.": "在圖上按住滑鼠畫一圈，圈出一塊區域。"
+ "Draw around a region of the figure with the mouse.": "在圖上按住滑鼠畫一圈，圈出一塊區域。",
+ "The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.": "Duetsheet 的啟動程式已經停止，現在無法讀取或儲存任何東西。請重新啟動它（例如用桌面捷徑），再重新整理這個頁面。"
 },
 "zh-Hans": {
  "_name": "简体中文",
@@ -1748,7 +1749,8 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "The data drawn in this chart": "这张图画出来的数据",
  "To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).": "要换数据、栏位、数据组或其他任何修改，请写在下方的留言框（可参考“范例句”）。",
  "Draw around points on the chart with the mouse, or click one point.": "在图上按住鼠标画一圈圈出数据点，或直接点击一个点。",
- "Draw around a region of the figure with the mouse.": "在图上按住鼠标画一圈，圈出一块区域。"
+ "Draw around a region of the figure with the mouse.": "在图上按住鼠标画一圈，圈出一块区域。",
+ "The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.": "Duetsheet 的启动程序已经停止，现在无法读取或保存任何内容。请重新启动它（例如用桌面快捷方式），再刷新这个页面。"
 },
 "ja": {
  "_name": "日本語",
@@ -2393,7 +2395,8 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "The data drawn in this chart": "このグラフに描かれたデータ",
  "To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).": "データ、列、系列などを変えたいときは、下のコメント欄に書いてください（「依頼の例」を参照）。",
  "Draw around points on the chart with the mouse, or click one point.": "グラフ上でマウスを押したまま点を囲むか、1 つの点をクリックします。",
- "Draw around a region of the figure with the mouse.": "図の上でマウスを押したまま範囲を囲みます。"
+ "Draw around a region of the figure with the mouse.": "図の上でマウスを押したまま範囲を囲みます。",
+ "The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.": "Duetsheet の起動プログラムが停止したため、読み込みも保存もできません。もう一度起動して（デスクトップのショートカットなど）、このページを再読み込みしてください。"
 },
 "ko": {
  "_name": "한국어",
@@ -3038,7 +3041,8 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "The data drawn in this chart": "이 차트에 그려진 데이터",
  "To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).": "데이터, 열, 계열 등 다른 것을 바꾸려면 아래 댓글 상자에 적어 주세요 (\"요청 예시\" 참고).",
  "Draw around points on the chart with the mouse, or click one point.": "차트에서 마우스를 누른 채 점들을 둘러 그리거나, 점 하나를 클릭하세요.",
- "Draw around a region of the figure with the mouse.": "그림에서 마우스를 누른 채 영역을 둘러 그리세요."
+ "Draw around a region of the figure with the mouse.": "그림에서 마우스를 누른 채 영역을 둘러 그리세요.",
+ "The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.": "Duetsheet 실행 프로그램이 멈춰서 더 이상 읽거나 저장할 수 없습니다. 다시 실행한 뒤(예: 바탕화면 바로 가기) 이 페이지를 새로 고치세요."
 },
 "es": {
  "_name": "Español",
@@ -3683,7 +3687,8 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "The data drawn in this chart": "Los datos dibujados en este gráfico",
  "To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).": "Para cambiar los datos, las columnas, las series o cualquier otra cosa, escríbelo en el cuadro de comentarios de abajo (ver Ejemplos de peticiones).",
  "Draw around points on the chart with the mouse, or click one point.": "Rodea puntos del gráfico arrastrando el ratón, o haz clic en un solo punto.",
- "Draw around a region of the figure with the mouse.": "Rodea una región de la figura arrastrando el ratón."
+ "Draw around a region of the figure with the mouse.": "Rodea una región de la figura arrastrando el ratón.",
+ "The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.": "El lanzador de Duetsheet se ha detenido, así que ya no se lee ni se guarda nada. Vuelve a iniciarlo (por ejemplo con el acceso directo del escritorio) y recarga esta página."
 }
 }
 </script>
@@ -5135,7 +5140,13 @@ function openIssues(){
 }
 $('#issuesBtn').addEventListener('click',openIssues);
 addEventListener('error',e=>logIssue('error',tr('Unexpected error'),(e.message||'')+(e.error&&e.error.stack?'\n'+e.error.stack:'')));
-addEventListener('unhandledrejection',e=>logIssue('error',tr('Unexpected error'),errText(e.reason)+(e.reason&&e.reason.stack?'\n'+e.reason.stack:'')));
+/* When the launcher is closed while the page stays open, every request to it fails. Say so once, in words, and stop asking
+   it (folder list, agent status) instead of reporting each failed request as an unexpected error. */
+let launcherGone=false;
+const LAUNCHER_GONE='The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.';
+function launcherFetch(url,opt){return fetch(url,opt).catch(e=>{launcherLost();throw e})}
+function launcherLost(){if(launcherGone)return;launcherGone=true;logIssue('error',tr(LAUNCHER_GONE));renderLocalBar()}
+addEventListener('unhandledrejection',e=>launcherGone&&e.reason instanceof TypeError?e.preventDefault():logIssue('error',tr('Unexpected error'),errText(e.reason)+(e.reason&&e.reason.stack?'\n'+e.reason.stack:'')));
 
 /* ---------- Reading JSON written by other programs ---------- */
 // Python writes NaN and Infinity, and some Windows tools start a file with a byte order mark; browsers accept neither.
@@ -5170,7 +5181,7 @@ function readReport(text,label){ // report.json text -> documents; what could be
 // When duetsheet.py serves the page, the folder it was started in is reached through it, with no folder picker.
 // httpRoot() offers the part of the File System Access API that the folder code uses, so that code stays the same.
 function httpRoot(token,name){
-  const call=(path,opt)=>fetch('/fs/'+path.split('/').map(encodeURIComponent).join('/'),{...(opt||{}),headers:{'X-Duetsheet-Token':token}});
+  const call=(path,opt)=>launcherFetch('/fs/'+path.split('/').map(encodeURIComponent).join('/'),{...(opt||{}),headers:{'X-Duetsheet-Token':token}});
   const missing=n=>new DOMException(n+' not found','NotFoundError');
   const file=(path,fname,meta)=>({kind:'file',name:fname,meta,
     async getFile(){const r=await call(path);if(r.status===404)throw missing(fname);if(!r.ok)throw new Error(fname+': '+r.status+' '+await r.text());
@@ -5337,6 +5348,7 @@ async function restoreFolder(){
 function setSave(state,e){S.saveState=state;S.saveError=e?String(e.message||e.name||e.code||e):'';renderLocalBar()}
 function renderLocalBar(){
   if(S.cloud)return;
+  if(launcherGone){showNote(tr(LAUNCHER_GONE),[h('button',{type:'button',class:'btn small primary',text:tr('Reload'),onclick:()=>location.reload()})],false);return}
   const B=(t,fn,primary)=>h('button',{type:'button',class:'btn small'+(primary?' primary':''),text:t,onclick:fn});const acts=[];let text;
   if(S.folder){
     text=tr('Project folder "{name}": changes are saved to {file} automatically.',{name:S.folder.name,file:S.folder.file})+' '+
@@ -5375,7 +5387,7 @@ $('#reportfile').addEventListener('change',async e=>{const f=e.target.files[0];i
   if(S.blocks.size&&!confirm(tr('Replace the report that is open now with {file}?',{file:f.name})))return;
   useDB(memDB(docs));renderLocalBar();toast(tr('Opened {file}',{file:f.name}))});
 addEventListener('beforeunload',e=>{if(S.folder&&S.folder.pending()){S.folder.flush();e.preventDefault();e.returnValue=''}});
-addEventListener('focus',()=>{if(S.folder)refreshFolderFiles()});
+addEventListener('focus',()=>{if(S.folder&&!launcherGone)refreshFolderFiles()});
 async function loadFolderLangs(dir){
   for(const fh of await listFiles(await subdir(dir,'lang'),/\.json$/i)){try{importLang(JSON.parse(await(await fh.getFile()).text()))}catch(e){}}
   renderLangMenu()}
@@ -5389,7 +5401,7 @@ async function listDeep(d,re,base,depth,out){ // data files in the raw data fold
   return out;
 }
 async function refreshFolderFiles(){
-  if(!S.folder)return;const F=S.folder,dir=F.dir;
+  if(!S.folder||launcherGone)return;const F=S.folder,dir=F.dir;
   const found=(await listDeep(F.dataDir,DATA_EXT)).sort((a,b)=>a.rel<b.rel?-1:1);
   const data=await Promise.all(found.map(async({fh,rel})=>{const f=fh.meta||await fh.getFile();
     return{name:rel,path:F.prefix+rel,fh,size:f.size,modified:new Date(f.lastModified).toISOString()}}));
@@ -5760,7 +5772,7 @@ async function newInputsNow(){ // step id -> files matching its patterns that it
   return found;
 }
 async function serverFingerprints(list){
-  const r=await fetch('/api/fingerprints',{method:'POST',headers:{'X-Duetsheet-Token':S.server.token,'Content-Type':'application/json'},body:JSON.stringify({files:list})});
+  const r=await launcherFetch('/api/fingerprints',{method:'POST',headers:{'X-Duetsheet-Token':S.server.token,'Content-Type':'application/json'},body:JSON.stringify({files:list})});
   if(!r.ok)throw new Error(r.status+' '+await r.text());return r.json()}
 async function verifyChain(){
   const seq=S.verifySeq=(S.verifySeq||0)+1;
@@ -5786,7 +5798,7 @@ async function verifyChain(){
 function revealBtn(path){
   return h('button',{type:'button',class:'linkbtn rv',text:S.server?tr('Show in folder'):tr('Copy path'),title:path,onclick:async e=>{e.stopPropagation();
     if(!S.server){try{await navigator.clipboard.writeText(path);toast(tr('Copied'))}catch(x){}return}
-    try{const r=await fetch('/api/reveal',{method:'POST',headers:{'X-Duetsheet-Token':S.server.token,'Content-Type':'application/json'},body:JSON.stringify({path})});
+    try{const r=await launcherFetch('/api/reveal',{method:'POST',headers:{'X-Duetsheet-Token':S.server.token,'Content-Type':'application/json'},body:JSON.stringify({path})});
       if(!r.ok)throw new Error(r.status+' '+await r.text())}catch(x){fail(tr('Could not open the folder.'),x)}}});
 }
 const datasetOf=f=>[...S.datasets.values()].find(d=>d.source&&normPath(d.source.path)===normPath(f.path));
@@ -5991,7 +6003,7 @@ function writingSection(F,B){
 
 /* Personal habits: one copy in ~/.duetsheet/habits/ shared by all projects (through the launcher) */
 async function personalCall(method,body){
-  const r=await fetch('/api/personal',{method,headers:{'X-Duetsheet-Token':S.server.token,'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
+  const r=await launcherFetch('/api/personal',{method,headers:{'X-Duetsheet-Token':S.server.token,'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
   if(!r.ok)throw new Error(r.status+' '+await r.text());return method==='GET'?r.json():null;
 }
 async function savePersonal(){
@@ -6051,15 +6063,15 @@ async function askAgent(){
   const open=openCount();
   if(currentChanges().some(c=>c.by==='user'))await finishRound();
   if(!S.server){openAgentPrompt();return}
-  try{const r=await fetch('/api/revise',{method:'POST',headers:{'X-Duetsheet-Token':S.server.token,'Content-Type':'application/json'},body:JSON.stringify({kind:'revise',open})});
+  try{const r=await launcherFetch('/api/revise',{method:'POST',headers:{'X-Duetsheet-Token':S.server.token,'Content-Type':'application/json'},body:JSON.stringify({kind:'revise',open})});
     if(!r.ok)throw new Error(r.status+' '+await r.text());S.agent=await r.json()}
   catch(e){fail(tr('Could not send the request to the agent.'),e);return}
   renderAgentBar();
   if(S.agent.listening)toast(tr('Sent. The agent will revise the report; this page updates by itself.'));else openAgentPrompt();
 }
 async function pollAgent(){
-  if(!S.server)return;
-  try{const r=await fetch('/api/agent',{headers:{'X-Duetsheet-Token':S.server.token}});if(r.ok)S.agent=await r.json()}catch(e){}
+  if(!S.server||launcherGone)return;
+  try{const r=await launcherFetch('/api/agent',{headers:{'X-Duetsheet-Token':S.server.token}});if(r.ok)S.agent=await r.json()}catch(e){}
   renderAgentBar();
 }
 function agentPrompt(){

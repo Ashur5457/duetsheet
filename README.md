@@ -6,11 +6,15 @@ Duetsheet is an open-source, single-file interactive HTML report that people and
 
 It is a human-in-the-loop review tool for AI-generated, data-heavy reports: visual annotation on charts, per-block comments, change tracking with diffs, review rounds on a timeline, raw-data provenance, and a figure style that follows your own habits. One HTML file, no install, no build, no server.
 
-Why the name: in a duet, two performers play from **one sheet of music**. In Duetsheet, a human and an AI agent work from one shared page. Sheet music is also a set of steps that gets **played** again and again, which is where this project is heading: from recording and reviewing reports, to editable workflows you can rerun and branch.
+Why the name: in a duet, two performers play from **one sheet of music**. In Duetsheet, a human and an AI agent work from one shared page. Sheet music is also a set of steps that gets **played** again and again: every change is recorded, and every figure can be traced back to the raw files and scripts behind it.
 
 > **Status: v0.6 prototype.** Start it from Claude Code (`/duetsheet`) or with `python duetsheet.py` in your data folder, open it in Chrome or Edge and choose a folder, host it as a [Claude](https://claude.ai) Artifact, or use saved report files in any modern browser. See the [tutorial](docs/tutorial.md) and the [roadmap](#roadmap).
 
+![The review loop: the agent writes the report, you review it, one button asks the agent to revise, the agent replies under each comment, you check what changed](docs/review-loop.svg)
+
 ![Paginated view mode](docs/view-mode.png)
+
+> **Keeping the whole research, not only the report?** [Duetkifu](https://github.com/Ashur5457/duetkifu) records every attempt that led to a report, the dead ends included, as a tree you and your agent write together and can recompute. It builds on Duetsheet and reads the same `report.json`.
 
 ## Why
 
@@ -231,8 +235,8 @@ Duetsheet is planned in four stages: **record and review** (today), **workflows*
 - An agent that starts with the desktop shortcut, so **Ask the agent to revise** works without pasting a prompt even when no conversation is open (for example with the Claude Code command-line tool)
 - Regenerate figures from their source: run the recorded Python script, or drive Origin through its Python API, so an annotation such as "use a log axis" is applied in the original tool
 - Axis calibration for imported images, so box and lasso annotations on an Origin or matplotlib image are stored in data coordinates
-- **Research branches**: sections of a report as a tree, each with its status (active, paused, stopped, done), built on the data chain so you can see where branches use different data or computations
-- **Workflow mode**: re-run the recorded steps that need recomputing from the page (`duetsheet.py run`); fork a branch from any step to compare parameters side by side
+- **Workflow mode**: re-run the recorded steps that need recomputing from the page (`duetsheet.py run`)
+- Research branches, dead ends and the record of every attempt now live in [Duetkifu](https://github.com/Ashur5457/duetkifu)
 - Agent decision trace per data point (which step, which model, what evidence)
 - Connecting physical experiment steps in self-driving labs, behind explicit human approval
 - Turning accumulated annotations and change logs into evaluation sets for measuring agent performance
@@ -243,7 +247,8 @@ Issues and pull requests are welcome, especially real-world report types, annota
 
 - `duetsheet.html` is the only source file. There is no build step: edit it and open it in a browser.
 - New interface text goes through `tr('English text')` and needs an entry in the translation tables. [docs/translating.md](docs/translating.md) explains how.
-- Before sending a pull request, run `python tools/check.py`. It checks that code and comments are English, that the translation tables are valid, and that no interface text is missing a translation entry.
+- Before sending a pull request, run `python tools/check.py`. It checks that code and comments are English, that the translation tables are valid, that no interface text is missing a translation entry, and (with Node.js installed) that the page's JavaScript parses.
+- `python tests/test_chain.py` and `python tests/test_agent.py` test the launcher: the data chain, the checks, and the "Ask the agent to revise" loop. They use temporary folders and the demo project, never your data.
 
 ## Citation
 

@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 390" width="900" height="390" role="img" aria-labelledby="t d">
+  <title id="t">The Duetsheet review loop</title>
+  <desc id="d">Your agent writes the report from your data folder. You review it in the browser: edit text, comment, draw around points on a chart. One button asks the agent to revise. The agent makes the smallest change for each comment and replies under it. You check every change, by whom, and can revert any. Then the next round begins. Every chart is traced back to its raw files.</desc>
+  <style>
+    .bg{fill:#ffffff}
+    .box{fill:#f6f8fa;stroke:#d0d7de;stroke-width:1.5}
+    .you{fill:#e8f1f8;stroke:#1f6f8b;stroke-width:1.5}
+    .agent{fill:#f1ecf8;stroke:#6b4fa0;stroke-width:1.5}
+    .h{font:700 17px system-ui,-apple-system,"Segoe UI",sans-serif;fill:#1f2328}
+    .t{font:400 13.5px system-ui,-apple-system,"Segoe UI",sans-serif;fill:#424a53}
+    .n{font:700 13px system-ui,-apple-system,"Segoe UI",sans-serif;fill:#ffffff}
+    .who{font:600 12px system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.04em}
+    .wy{fill:#1f6f8b}.wa{fill:#6b4fa0}
+    .dy{fill:#1f6f8b}.da{fill:#6b4fa0}
+    .ar{fill:none;stroke:#8c959f;stroke-width:2}
+    .ah{fill:#8c959f}
+    .chain{font:400 13px ui-monospace,Menlo,Consolas,monospace;fill:#424a53}
+    .ok{fill:#2e7d4f}.bad{fill:#b83b5e}
+    @media (prefers-color-scheme:dark){
+      .bg{fill:#0d1117}
+      .box{fill:#161b22;stroke:#30363d}
+      .you{fill:#0f2a36;stroke:#5db7d4}
+      .agent{fill:#241c33;stroke:#a98be0}
+      .h{fill:#e6edf3}.t,.chain{fill:#9da7b3}
+      .wy,.dy{fill:#5db7d4}.wa,.da{fill:#a98be0}
+      .ar{stroke:#6e7681}.ah{fill:#6e7681}
+      .ok{fill:#6cc38a}.bad{fill:#f07a9c}
+    }
+  </style>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="ah" d="M0,0L10,5L0,10Z"/></marker></defs>
+  <rect class="bg" width="900" height="390" rx="12"/>
+
+  <!-- 1 start -->
+  <rect class="agent" x="24" y="40" width="200" height="120" rx="10"/>
+  <circle class="da" cx="48" cy="66" r="12"/><text class="n" x="48" y="70.5" text-anchor="middle">1</text>
+  <text class="who wa" x="68" y="70">AGENT</text>
+  <text class="h" x="40" y="100">Write the report</text>
+  <text class="t" x="40" y="122">from your data folder</text>
+  <text class="t" x="40" y="141">with /duetsheet</text>
+
+  <!-- 2 review -->
+  <rect class="you" x="274" y="40" width="270" height="120" rx="10"/>
+  <circle class="dy" cx="298" cy="66" r="12"/><text class="n" x="298" y="70.5" text-anchor="middle">2</text>
+  <text class="who wy" x="318" y="70">YOU</text>
+  <text class="h" x="290" y="100">Review in the browser</text>
+  <text class="t" x="290" y="122">edit text, write comments,</text>
+  <text class="t" x="290" y="141">draw around points on a chart</text>
+
+  <!-- 3 ask -->
+  <rect class="you" x="604" y="40" width="272" height="120" rx="10"/>
+  <circle class="dy" cx="628" cy="66" r="12"/><text class="n" x="628" y="70.5" text-anchor="middle">3</text>
+  <text class="who wy" x="648" y="70">YOU</text>
+  <text class="h" x="620" y="100">Ask the agent to revise</text>
+  <text class="t" x="620" y="122">one button; your comments</text>
+  <text class="t" x="620" y="141">go to the waiting agent</text>
+
+  <!-- 4 revise -->
+  <rect class="agent" x="604" y="214" width="272" height="120" rx="10"/>
+  <circle class="da" cx="628" cy="240" r="12"/><text class="n" x="628" y="244.5" text-anchor="middle">4</text>
+  <text class="who wa" x="648" y="244">AGENT</text>
+  <text class="h" x="620" y="274">Revise, reply to each</text>
+  <text class="t" x="620" y="296">the smallest change per comment,</text>
+  <text class="t" x="620" y="315">an answer under every comment</text>
+
+  <!-- 5 check -->
+  <rect class="you" x="274" y="214" width="270" height="120" rx="10"/>
+  <circle class="dy" cx="298" cy="240" r="12"/><text class="n" x="298" y="244.5" text-anchor="middle">5</text>
+  <text class="who wy" x="318" y="244">YOU</text>
+  <text class="h" x="290" y="274">Check what changed</text>
+  <text class="t" x="290" y="296">every change, who made it;</text>
+  <text class="t" x="290" y="315">revert any of them</text>
+
+  <!-- arrows -->
+  <path class="ar" d="M226,100H270" marker-end="url(#a)"/>
+  <path class="ar" d="M546,100H600" marker-end="url(#a)"/>
+  <path class="ar" d="M740,162V210" marker-end="url(#a)"/>
+  <path class="ar" d="M602,274H548" marker-end="url(#a)"/>
+  <path class="ar" d="M409,212V164" marker-end="url(#a)"/>
+  <text class="t" x="418" y="193">next round</text>
+
+  <!-- the data chain -->
+  <rect class="box" x="24" y="214" width="200" height="120" rx="10"/>
+  <text class="h" x="40" y="244">Every chart traced</text>
+  <text class="t" x="40" y="264">back to its raw files</text>
+  <text class="chain" x="40" y="292">chart ← table</text>
+  <text class="chain" x="40" y="311">← script ← raw</text>
+  <circle class="ok" cx="168" cy="288" r="5.5"/><text class="t" x="178" y="292">ok</text>
+  <circle class="bad" cx="168" cy="307" r="5.5"/><text class="t" x="178" y="311">redo</text>
+
+  <text class="t" x="24" y="372">The report is report.json in your data folder; raw data is only read, never changed.</text>
+</svg>

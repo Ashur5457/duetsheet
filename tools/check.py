@@ -8,11 +8,15 @@
 3. Every tr('...') string used in the code has an entry in the reference table (zh-Hant),
    so the "Download template" button offers it to translators.
 4. Reports how complete each language is (missing sentences fall back to English).
+5. The page's JavaScript parses (node --check), when node is installed; otherwise this step is skipped.
 
 Usage: python tools/check.py          (from the repository root)
 Exit code 1 if any error is found.
 """
-import json, os, re, sys
+import json, os, re, shutil, subprocess, sys, tempfile
+
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')   # language names print on any console
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HTML = os.path.join(ROOT, 'duetsheet.html')
@@ -100,6 +104,24 @@ print(f'{len(ref_keys)} sentences in the reference table ({REFERENCE})')
 for code, table in tables.items():
     n = sum(1 for k in ref_keys if isinstance(table.get(k), str) and table[k].strip())
     print(f'  {code:8} {table.get("_name", "?")}: {n}/{len(ref_keys)}' + ('' if n == len(ref_keys) else f'  ({len(ref_keys) - n} fall back to English)'))
+
+# 5. the JavaScript parses: a syntax error anywhere stops the whole page, and nothing above would notice
+node = shutil.which('node')
+if not node:
+    print('JavaScript syntax: skipped (node is not installed)')
+else:
+    page = open(HTML, encoding='utf-8').read()
+    code = '\n;\n'.join(re.findall(r'<script(?![^>]*application/json)[^>]*>(.*?)</script>', page, re.S))
+    with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False, encoding='utf-8') as f:
+        f.write(code)
+    try:
+        r = subprocess.run([node, '--check', f.name], capture_output=True, text=True, encoding='utf-8', errors='replace')
+    finally:
+        os.unlink(f.name)
+    if r.returncode:
+        err('JavaScript syntax error in duetsheet.html:\n' + (r.stderr or r.stdout).strip())
+    else:
+        print('JavaScript syntax: OK')
 
 if errors:
     print(f'\n{len(errors)} error(s)')
