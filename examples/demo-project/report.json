@@ -3,7 +3,7 @@
  "blocks": {
   "b-intro": {
    "id": "b-intro",
-   "title": "NIMO optimisation report (demo)",
+   "title": "Formulation search report (demo)",
    "caption": "",
    "breakBefore": "auto",
    "type": "text",
@@ -452,7 +452,7 @@
  },
  "report": {
   "meta": {
-   "title": "NIMO demo report",
+   "title": "Demo report",
    "order": [
     "b-intro",
     "b-fig1",

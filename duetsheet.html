@@ -39,7 +39,7 @@
 :root:lang(zh-Hans){--sans:'Noto Sans','Noto Sans SC','PingFang SC','Microsoft YaHei',system-ui,sans-serif;--serif:'Noto Serif','Noto Serif SC','Songti SC','SimSun',serif}
 :root:lang(ja){--sans:'Noto Sans','Noto Sans JP','Hiragino Sans','Yu Gothic','Meiryo',system-ui,sans-serif;--serif:'Noto Serif','Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif}
 :root:lang(ko){--sans:'Noto Sans','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;--serif:'Noto Serif','Noto Serif KR','AppleMyungjo','Batang',serif}
-html,body{height:100%}
+html{height:100%}body{min-height:100%} /* not height:100%: the body must grow with the page, or the sticky top bar scrolls away on a long page */
 html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 var(--sans)}
 h1,h2,.btitle{font-family:var(--serif);font-weight:700}
@@ -468,7 +468,7 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Additive B (wt%)": "添加劑 B（wt%）",
  "Score": "分數",
  "Demo figure, not measured": "示範圖，非實測",
- "NIMO optimisation report (demo)": "NIMO 優化報告（示範）",
+ "Formulation search report (demo)": "配方搜尋報告（示範）",
  "This report uses **synthetic demo data**, not experimental results. It is here to try out viewing, editing and annotation.\n\n- 45 runs in 3 cycles\n- Goal: find the additive A and B combination with the highest score": "本報告使用**程式產生的示範資料**，不是實驗結果，用來測試閱覽與編輯註記的流程。\n\n- 共 45 次實驗，分成 3 個 Cycle\n- 目標：找出分數最高的添加劑 A、B 組合",
  "Figure 1  Optimisation progress": "圖 1　優化進度",
  "Each point is one run; the line connects runs in order; marker shape shows the cycle.": "每個點是一次實驗，折線依序連接各次的分數，形狀代表 Cycle。",
@@ -610,7 +610,7 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Area too small. Drag a larger rectangle": "範圍太小，請拖曳大一點",
  "Lasso too small. Draw a larger closed shape": "圈選範圍太小，請畫大一點的封閉形狀",
  " | Duetsheet": "｜Duetsheet",
- "NIMO demo report": "NIMO 示範報告",
+ "Demo report": "示範報告",
  "Failed to read cloud data (": "讀取雲端資料失敗（",
  "unknown": "未知",
  "). Please reload.": "），請重新整理。",
@@ -1114,7 +1114,7 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Additive B (wt%)": "添加剂 B（wt%）",
  "Score": "分数",
  "Demo figure, not measured": "示例图，非实测",
- "NIMO optimisation report (demo)": "NIMO 优化报告（示例）",
+ "Formulation search report (demo)": "配方搜索报告（示例）",
  "This report uses **synthetic demo data**, not experimental results. It is here to try out viewing, editing and annotation.\n\n- 45 runs in 3 cycles\n- Goal: find the additive A and B combination with the highest score": "本报告使用**程序生成的示例数据**，不是实验结果，用来试用浏览、编辑和批注功能。\n\n- 共 45 次实验，分为 3 个 Cycle\n- 目标：找出分数最高的添加剂 A、B 组合",
  "Figure 1  Optimisation progress": "图 1　优化进度",
  "Each point is one run; the line connects runs in order; marker shape shows the cycle.": "每个点是一次实验，折线按顺序连接各次的分数，形状代表 Cycle。",
@@ -1256,7 +1256,7 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Area too small. Drag a larger rectangle": "范围太小，请拖得大一些",
  "Lasso too small. Draw a larger closed shape": "圈选范围太小，请画一个大一些的封闭形状",
  " | Duetsheet": "｜Duetsheet",
- "NIMO demo report": "NIMO 示例报告",
+ "Demo report": "示例报告",
  "Failed to read cloud data (": "读取云端数据失败（",
  "unknown": "未知",
  "). Please reload.": "），请刷新页面。",
@@ -1760,7 +1760,7 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Additive B (wt%)": "添加剤 B（wt%）",
  "Score": "スコア",
  "Demo figure, not measured": "デモ用の図（実測ではありません）",
- "NIMO optimisation report (demo)": "NIMO 最適化レポート（デモ）",
+ "Formulation search report (demo)": "配合探索レポート（デモ）",
  "This report uses **synthetic demo data**, not experimental results. It is here to try out viewing, editing and annotation.\n\n- 45 runs in 3 cycles\n- Goal: find the additive A and B combination with the highest score": "このレポートは実験結果ではなく、**プログラムで生成したデモデータ**を使っています。閲覧・編集・コメントの流れを試すためのものです。\n\n- 全 45 回の実験、3 つの Cycle\n- 目標：スコアが最も高い添加剤 A・B の組み合わせを見つける",
  "Figure 1  Optimisation progress": "図 1　最適化の進捗",
  "Each point is one run; the line connects runs in order; marker shape shows the cycle.": "各点が 1 回の実験です。線は実験を順につなぎ、マーカーの形は Cycle を表します。",
@@ -1902,7 +1902,7 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Area too small. Drag a larger rectangle": "範囲が小さすぎます。もっと大きくドラッグしてください",
  "Lasso too small. Draw a larger closed shape": "なげなわの範囲が小さすぎます。もっと大きな閉じた形を描いてください",
  " | Duetsheet": "｜Duetsheet",
- "NIMO demo report": "NIMO デモレポート",
+ "Demo report": "デモレポート",
  "Failed to read cloud data (": "クラウドのデータを読み込めませんでした（",
  "unknown": "不明",
  "). Please reload.": "）。ページを再読み込みしてください。",
@@ -2406,7 +2406,7 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Additive B (wt%)": "첨가제 B (wt%)",
  "Score": "점수",
  "Demo figure, not measured": "데모용 그림, 실측 아님",
- "NIMO optimisation report (demo)": "NIMO 최적화 보고서 (데모)",
+ "Formulation search report (demo)": "배합 탐색 보고서 (데모)",
  "This report uses **synthetic demo data**, not experimental results. It is here to try out viewing, editing and annotation.\n\n- 45 runs in 3 cycles\n- Goal: find the additive A and B combination with the highest score": "이 보고서는 실험 결과가 아닌 **프로그램으로 생성한 데모 데이터**를 사용합니다. 보기, 편집, 주석 기능을 시험해 보기 위한 것입니다.\n\n- 총 45회 실험, 3개 Cycle\n- 목표: 점수가 가장 높은 첨가제 A, B 조합 찾기",
  "Figure 1  Optimisation progress": "그림 1  최적화 진행 상황",
  "Each point is one run; the line connects runs in order; marker shape shows the cycle.": "각 점은 한 번의 실험이며, 선은 실험을 순서대로 잇고, 마커 모양은 Cycle을 나타냅니다.",
@@ -2548,7 +2548,7 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Area too small. Drag a larger rectangle": "범위가 너무 작습니다. 더 크게 드래그하세요",
  "Lasso too small. Draw a larger closed shape": "올가미 범위가 너무 작습니다. 더 큰 닫힌 모양을 그리세요",
  " | Duetsheet": " | Duetsheet",
- "NIMO demo report": "NIMO 데모 보고서",
+ "Demo report": "데모 보고서",
  "Failed to read cloud data (": "클라우드 데이터를 읽지 못했습니다 (",
  "unknown": "알 수 없음",
  "). Please reload.": "). 페이지를 새로 고치세요.",
@@ -3052,7 +3052,7 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Additive B (wt%)": "Aditivo B (% en peso)",
  "Score": "Puntuación",
  "Demo figure, not measured": "Figura de demostración, no medida",
- "NIMO optimisation report (demo)": "Informe de optimización NIMO (demostración)",
+ "Formulation search report (demo)": "Informe de búsqueda de formulación (demostración)",
  "This report uses **synthetic demo data**, not experimental results. It is here to try out viewing, editing and annotation.\n\n- 45 runs in 3 cycles\n- Goal: find the additive A and B combination with the highest score": "Este informe usa **datos de demostración sintéticos**, no resultados experimentales. Sirve para probar la lectura, la edición y los comentarios.\n\n- 45 ensayos en 3 ciclos\n- Objetivo: encontrar la combinación de aditivos A y B con la puntuación más alta",
  "Figure 1  Optimisation progress": "Figura 1  Progreso de la optimización",
  "Each point is one run; the line connects runs in order; marker shape shows the cycle.": "Cada punto es un ensayo; la línea une los ensayos en orden; la forma del marcador indica el ciclo.",
@@ -3194,7 +3194,7 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Area too small. Drag a larger rectangle": "Área demasiado pequeña. Arrastra un rectángulo más grande",
  "Lasso too small. Draw a larger closed shape": "Lazo demasiado pequeño. Dibuja una forma cerrada más grande",
  " | Duetsheet": " | Duetsheet",
- "NIMO demo report": "Informe de demostración NIMO",
+ "Demo report": "Informe de demostración",
  "Failed to read cloud data (": "No se pudieron leer los datos en la nube (",
  "unknown": "desconocido",
  "). Please reload.": "). Vuelve a cargar la página.",
@@ -3878,7 +3878,7 @@ function nyquistSVG(){
 function seedBlocks(){
   const B=(id,o)=>({id,title:'',caption:'',breakBefore:'auto',...o});
   return [
-    B('b-intro',{type:'text',title:tr('NIMO optimisation report (demo)'),text:tr('This report uses **synthetic demo data**, not experimental results. It is here to try out viewing, editing and annotation.\n\n- 45 runs in 3 cycles\n- Goal: find the additive A and B combination with the highest score')}),
+    B('b-intro',{type:'text',title:tr('Formulation search report (demo)'),text:tr('This report uses **synthetic demo data**, not experimental results. It is here to try out viewing, editing and annotation.\n\n- 45 runs in 3 cycles\n- Goal: find the additive A and B combination with the highest score')}),
     B('b-fig1',{type:'chart',title:tr('Figure 1  Optimisation progress'),caption:tr('Each point is one run; the line connects runs in order; marker shape shows the cycle.'),
       chart:{kind:'line',dataset:'exp',x:'id',y:'score',color:'cycle',logY:false,yMin:null,yMax:null}}),
     B('b-fig1-note',{type:'text',breakBefore:'avoid',text:tr('In Cycle 3, scores cluster between 0.7 and 0.96, clearly above the first two cycles, which suggests the search has converged on a high-scoring region.')}),
@@ -6117,7 +6117,7 @@ async function seedIfEmpty(){
   const ds=seedData(),blocks=seedBlocks(),t=now();
   await db.doc('datasets/'+ds.id).set(ds);
   for(const b of blocks)await db.doc('blocks/'+b.id).set({...b,createdAt:t});
-  await db.doc('report/meta').set({title:tr('NIMO demo report'),order:blocks.map(b=>b.id),schema:SCHEMA,createdAt:t});
+  await db.doc('report/meta').set({title:tr('Demo report'),order:blocks.map(b=>b.id),schema:SCHEMA,createdAt:t});
 }
 function subscribe(){
   const fail=e=>{const m=tr('Failed to read cloud data (')+((e&&e.code)||tr('unknown'))+tr('). Please reload.');showNote(m);logIssue('error',m,errText(e))};

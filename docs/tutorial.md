@@ -197,3 +197,5 @@ Errors and warnings do not just flash by: a **⚠** button appears at the top ri
 ## Going further: the whole research record
 
 A report tells the finished story. To keep every attempt that led there, the dead ends included, as a tree you and your agent write together and can recompute, see [Duetkifu](https://github.com/Ashur5457/duetkifu). It reads the same `report.json`.
+
+Duetkifu also goes further on the report side: you can ask the agent about a figure or a passage while you only read (draw around part of a figure, or select some text), arrange the page and use a floating side panel, undo your own changes, and take snapshots from a File menu. Its [tutorial](https://github.com/Ashur5457/duetkifu/blob/main/docs/tutorial.md) has short clips of each.
