@@ -174,6 +174,7 @@ main{min-width:0}
 .fsec{margin:4px 0}.fsec>summary{list-style:none;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 2px;cursor:pointer;font-size:13px}
 .fsec>summary::-webkit-details-marker{display:none}
 .ftree .dname,.fsec .dname{font-weight:600;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}
+.fsec>summary>.dname{font-family:inherit;font-size:13px} /* a section title is words, not a folder name */
 .fsearch{display:flex;gap:6px;align-items:center;margin:4px 0 8px}.fsearch input{flex:1;min-width:0;font:inherit;font-size:13px;padding:5px 9px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)}
 
 /* page (view) */
@@ -191,6 +192,7 @@ main{min-width:0}
 .pgrip{position:absolute;right:-6px;bottom:-6px;width:18px;height:18px;cursor:nwse-resize;touch-action:none;border-radius:0 0 8px 0;opacity:.6;
   background:linear-gradient(135deg,transparent 0 55%,var(--muted) 55% 62%,transparent 62% 72%,var(--muted) 72% 79%,transparent 79%)}
 .pgrip:hover{opacity:1}
+body.pgdrag{user-select:none;-webkit-user-select:none}
 .pager{display:flex;align-items:center;justify-content:center;gap:12px;margin:16px 0 10px}
 .pager .cnt{min-width:96px;text-align:center;color:var(--muted);font-variant-numeric:tabular-nums}
 .thumbs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
@@ -5248,7 +5250,7 @@ function renderChanges(){
       h('ol',{class:'chlist'},list.map(changeItem))]);if(S.histRound===r.id)det.open=true;hl.append(det)});
 }
 function renderPanel(){
-  S.chainMemo=null;renderAgentBar();
+  S.chainMemo=null;renderAgentBar();showUndo(); // a change is recorded without a full render: Undo follows it at once
   const open=S.annos.filter(a=>a.status!=='done').length,curN=currentChanges().length;
   $('#togglePanel').textContent=tr('Panel')+' ('+open+' / '+curN+')';$('#togglePanel').title=tr('Panel (comments {a}, changes {b})',{a:open,b:curN});
   $$('#tabs button').forEach(b=>{b.setAttribute('aria-selected',String(b.dataset.tab===S.tab));
@@ -5719,9 +5721,9 @@ function keepPageReachable(){ // the bar above the page stays in the window, so 
   if(r.right<60)PG.dx+=60-r.right;if(r.left>innerWidth-60)PG.dx-=r.left-(innerWidth-60);if(r.top+scrollY<0)PG.dy-=r.top+scrollY;placePage()}
 function bindPage(bar,grip){
   const track=(el,onMove)=>el.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(x){}
-    takePage();const x0=e.clientX,y0=e.clientY;let st=null;
+    takePage();const x0=e.clientX,y0=e.clientY;let st=null;document.body.classList.add('pgdrag');getSelection().removeAllRanges(); // no text is selected while dragging
     const move=ev=>{st=st||{...PG};onMove(ev.clientX-x0,ev.clientY-y0,st)};
-    const up=()=>{el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);keepPageReachable();savePG()};
+    const up=()=>{el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);document.body.classList.remove('pgdrag');keepPageReachable();savePG()};
     el.addEventListener('pointermove',move);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)});
   track(bar,(dx,dy,st)=>{PG.dx=st.dx+dx;PG.dy=st.dy+dy;placePage()});
   // the corner: the page grows or shrinks from its top left corner
