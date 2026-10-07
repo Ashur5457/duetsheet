@@ -168,6 +168,15 @@ main{min-width:0}
 .page .inner{position:absolute;inset:0;padding:var(--py) var(--px);overflow:hidden;display:flex;flex-direction:column;gap:var(--gap)}
 .page.scrolls .inner{overflow:auto}
 .page .pno{position:absolute;right:14px;bottom:8px;font-size:12px;color:var(--muted)}
+/* View: the page is scaled as a whole; a bar above it moves it, its corner resizes it */
+#pagehost{position:relative;margin:0 auto}
+.pgbox{position:relative}.pgbox .page{margin:0;transform-origin:0 0}
+.pgbar{height:16px;margin:0 0 3px;display:flex;justify-content:center;align-items:center;color:var(--muted);font-size:12px;letter-spacing:2px;
+  cursor:move;user-select:none;touch-action:none;border-radius:6px;opacity:.55}
+.pgbar:hover{opacity:1;background:var(--soft)}
+.pgrip{position:absolute;right:-6px;bottom:-6px;width:18px;height:18px;cursor:nwse-resize;touch-action:none;border-radius:0 0 8px 0;opacity:.6;
+  background:linear-gradient(135deg,transparent 0 55%,var(--muted) 55% 62%,transparent 62% 72%,var(--muted) 72% 79%,transparent 79%)}
+.pgrip:hover{opacity:1}
 .pager{display:flex;align-items:center;justify-content:center;gap:12px;margin:16px 0 10px}
 .pager .cnt{min-width:96px;text-align:center;color:var(--muted);font-variant-numeric:tabular-nums}
 .thumbs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
@@ -1164,7 +1173,9 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Why is it so?": "為什麼會這樣？",
  "Can it be trusted?": "可信嗎？",
  "How does it compare?": "和其他的比呢？",
- "ui|Side panel": "側欄"
+ "ui|Side panel": "側欄",
+ "Drag to move the page. Drag its corner to make it larger or smaller. Double-click here to put it back.": "拖曳可移動頁面；拖右下角可放大縮小；按兩下這裡還原。",
+ "Drag to make the page larger or smaller": "拖曳可放大或縮小頁面"
 },
 "zh-Hans": {
  "_name": "简体中文",
@@ -1840,7 +1851,9 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Why is it so?": "为什么会这样？",
  "Can it be trusted?": "可信吗？",
  "How does it compare?": "和其他的比呢？",
- "ui|Side panel": "侧栏"
+ "ui|Side panel": "侧栏",
+ "Drag to move the page. Drag its corner to make it larger or smaller. Double-click here to put it back.": "拖动可移动页面；拖右下角可放大缩小；双击这里还原。",
+ "Drag to make the page larger or smaller": "拖动可放大或缩小页面"
 },
 "ja": {
  "_name": "日本語",
@@ -2516,7 +2529,9 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Why is it so?": "なぜこうなる？",
  "Can it be trusted?": "信頼できる？",
  "How does it compare?": "ほかと比べると？",
- "ui|Side panel": "サイドパネル"
+ "ui|Side panel": "サイドパネル",
+ "Drag to move the page. Drag its corner to make it larger or smaller. Double-click here to put it back.": "ドラッグでページを移動、右下の角をドラッグで拡大・縮小、ここをダブルクリックで元に戻す。",
+ "Drag to make the page larger or smaller": "ドラッグでページを拡大・縮小"
 },
 "ko": {
  "_name": "한국어",
@@ -3192,7 +3207,9 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Why is it so?": "왜 이렇게 되나요?",
  "Can it be trusted?": "믿을 수 있나요?",
  "How does it compare?": "다른 것과 비교하면?",
- "ui|Side panel": "사이드 패널"
+ "ui|Side panel": "사이드 패널",
+ "Drag to move the page. Drag its corner to make it larger or smaller. Double-click here to put it back.": "드래그하여 페이지 이동, 오른쪽 아래 모서리를 드래그하여 확대·축소, 여기를 더블클릭하면 원래대로.",
+ "Drag to make the page larger or smaller": "드래그하여 페이지 확대·축소"
 },
 "es": {
  "_name": "Español",
@@ -3868,7 +3885,9 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Why is it so?": "¿Por qué es así?",
  "Can it be trusted?": "¿Es fiable?",
  "How does it compare?": "¿Cómo se compara?",
- "ui|Side panel": "Panel lateral"
+ "ui|Side panel": "Panel lateral",
+ "Drag to move the page. Drag its corner to make it larger or smaller. Double-click here to put it back.": "Arrastra para mover la página; arrastra su esquina para agrandarla o reducirla; doble clic aquí para restablecerla.",
+ "Drag to make the page larger or smaller": "Arrastra para agrandar o reducir la página"
 }
 }
 </script>
@@ -4097,9 +4116,11 @@ const S={mode:'view',page:0,tab:'annos',filter:'all',showHist:false,histRound:nu
 let db=null;
 
 /* ---------- Sizes ---------- */
+// Pages are always laid out at the same width, so a page holds the same blocks on every screen; View scales the
+// whole page to fit (placePage), the way a slide is zoomed, instead of cutting the pages again.
+const PAGE_W=1080;
 function layoutVars(){
-  const host=$('main');const avail=Math.max(480,host.clientWidth);
-  const pw=Math.min(avail,1080),ph=Math.round(pw*9/16);
+  const pw=PAGE_W,ph=Math.round(pw*9/16);
   const px=Math.round(pw*0.045),py=Math.round(pw*0.035),gap=14;
   const r=document.documentElement.style;
   r.setProperty('--pw',pw+'px');r.setProperty('--ph',ph+'px');r.setProperty('--px',px+'px');r.setProperty('--py',py+'px');
@@ -4306,7 +4327,7 @@ function paginate(){
     if(cur.length&&(g.force||need>L.innerH+1)){pages.push(cur);cur=[];hsum=0}
     hsum=cur.length?hsum+L.gap+gh:gh;cur.push(...g.blocks)});
   if(cur.length)pages.push(cur);
-  S.pages=pages;S.heights=hts;S.innerH=L.innerH;
+  S.pages=pages;S.heights=hts;S.innerH=L.innerH;S.pw=L.pw;S.ph=L.ph;
   S.starts=new Map();pages.forEach((p,i)=>S.starts.set(p[0].id,i));
   S.page=clamp(S.page,0,Math.max(0,pages.length-1));
 }
@@ -4319,8 +4340,10 @@ function renderView(){
   const pg=h('div',{class:'page'});const inner=h('div',{class:'inner'});pg.append(inner);
   blockGroups(blocks).forEach(g=>inner.append(...buildGroup(g,!S.readonly))); // interactive: draw on a figure to ask about it
   pg.append(h('span',{class:'pno',text:`${S.page+1} / ${S.pages.length}`}));
-  host.append(pg);
-  fitPage(inner,blocks);
+  const bar=h('div',{class:'pgbar',title:tr('Drag to move the page. Drag its corner to make it larger or smaller. Double-click here to put it back.')},[h('span',{text:'⠿'})]);
+  const grip=h('div',{class:'pgrip',title:tr('Drag to make the page larger or smaller')});
+  host.append(bar,h('div',{class:'pgbox'},[pg]),grip);bindPage(bar,grip);
+  fitPage(inner,blocks);placePage();
   $('#pcount').textContent=S.pages.length?tr('Page {a} of {b}',{a:S.page+1,b:S.pages.length}):tr('No content');
   $('#prev').disabled=S.page<=0;$('#next').disabled=S.page>=S.pages.length-1;
   const th=$('#thumbs');th.replaceChildren();
@@ -5337,11 +5360,44 @@ function placeQA(box){ // keep it on screen
 function dockQA(){
   const box=$('#qa'),m=$('main');if(!box||!m)return;
   let need=0;
-  if(!box.hidden&&!QA.min&&QA.x==null){const old=m.style.marginRight;m.style.marginRight='';
+  if(!box.hidden&&!QA.min&&QA.x==null&&!pageSet()){const old=m.style.marginRight;m.style.marginRight='';
     const r=m.getBoundingClientRect(),edge=innerWidth-box.offsetWidth-16-12;
     need=Math.max(0,Math.ceil(r.right-edge));if(edge-r.left<640)need=0;m.style.marginRight=old}
   const v=need?need+'px':'';if(m.style.marginRight===v)return;
   m.style.marginRight=v;clearTimeout(S.dockT);S.dockT=setTimeout(()=>{if(S.mode==='view')render()},0)} // the pages are cut to the new width
+/* ---------- The page in View: moved and scaled by the reader ----------
+   s is the scale of the page (0 = fit the width, and make room for the questions panel); dx, dy move it, with the page
+   bar and the thumbnails, from where it would be. Kept in this browser, never in the report. */
+const PG_KEY='duetsheet-page';
+let PG=(()=>{const d={s:0,dx:0,dy:0};try{const v=JSON.parse(localStorage.getItem(PG_KEY)||'null');
+  if(v&&typeof v==='object'){if(Number.isFinite(v.s)&&v.s>0)d.s=clamp(v.s,.3,2);['dx','dy'].forEach(k=>{if(Number.isFinite(v[k]))d[k]=v[k]})}}catch(e){}return d})();
+function savePG(){try{localStorage.setItem(PG_KEY,JSON.stringify(PG))}catch(e){}}
+const pageSet=()=>PG.s>0; // the reader has moved or resized the page
+function pageScale(){return PG.s||clamp(($('#view').clientWidth||PAGE_W)/(S.pw||PAGE_W),.3,1)}
+function placePage(){
+  const host=$('#pagehost'),pg=$('.pgbox .page',host);if(!pg)return;
+  const s=pageScale(),w=Math.round(S.pw*s),hh=Math.round(S.ph*s);
+  pg.style.transform=s===1?'':`scale(${s})`;$('.pgbox',host).style.height=hh+'px';host.style.width=w+'px';
+  // once placed by the reader, the page column (page, page buttons, thumbnails) is as wide as the page, from the left
+  host.style.margin=pageSet()?'0':'';$('#view').style.width=pageSet()?w+'px':'';
+  $('#view').style.transform=PG.dx||PG.dy?`translate(${Math.round(PG.dx)}px,${Math.round(PG.dy)}px)`:''}
+function takePage(){ // the first move or resize: keep the page where and as large as it is now, then follow the reader
+  if(pageSet())return;const r0=$('#pagehost').getBoundingClientRect();
+  PG.s=pageScale();$('main').style.marginRight='';placePage();
+  const r1=$('#pagehost').getBoundingClientRect();PG.dx+=r0.left-r1.left;PG.dy+=r0.top-r1.top;placePage()}
+function keepPageReachable(){ // the bar above the page stays in the window, so it can be grabbed again
+  const r=$('#pagehost .pgbar').getBoundingClientRect();
+  if(r.right<60)PG.dx+=60-r.right;if(r.left>innerWidth-60)PG.dx-=r.left-(innerWidth-60);if(r.top+scrollY<0)PG.dy-=r.top+scrollY;placePage()}
+function bindPage(bar,grip){
+  const track=(el,onMove)=>el.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(x){}
+    takePage();const x0=e.clientX,y0=e.clientY;let st=null;
+    const move=ev=>{st=st||{...PG};onMove(ev.clientX-x0,ev.clientY-y0,st)};
+    const up=()=>{el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);keepPageReachable();savePG()};
+    el.addEventListener('pointermove',move);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)});
+  track(bar,(dx,dy,st)=>{PG.dx=st.dx+dx;PG.dy=st.dy+dy;placePage()});
+  // the corner: the page grows or shrinks from its top left corner
+  track(grip,(dx,dy,st)=>{const w0=S.pw*st.s;PG.s=clamp(st.s*(w0+dx)/w0,.3,2);placePage()});
+  bar.addEventListener('dblclick',()=>{PG={s:0,dx:0,dy:0};savePG();placePage();dockQA();render()})}
 function renderQA(force){
   const box=$('#qa');if(!box)return;
   const show=!!S.meta&&!S.readonly&&!editingMode();box.hidden=!show;if(!show){box.dataset.key='';dockQA();return}
