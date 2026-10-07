@@ -118,6 +118,15 @@ details.ex{margin:4px 0;font-size:12.5px}details.ex summary{cursor:pointer;color
 .wrap{max-width:1500px;margin:0 auto;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:26px;align-items:start}
 body.nopanel .wrap{grid-template-columns:minmax(0,1fr)}
 body.nopanel #panel{display:none}
+/* the side panel of edit mode floats (moved by its header, resized from its corner, folded to one line) or is pinned on the right */
+#panel .pnh{display:flex;align-items:center;gap:6px;margin:-8px -10px 8px;padding:4px 6px 6px;border-bottom:1px solid var(--line);font-size:13px;cursor:move;user-select:none;touch-action:none}
+#panel .pnh .sp{flex:1}#panel .pnh button{border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:6px;height:24px;min-width:26px;font:inherit;font-size:12px;cursor:pointer;padding:0 7px}
+body:not(.pfloat) #panel .pnh{cursor:default}
+body.pfloat .wrap{grid-template-columns:minmax(0,1fr)}
+body.pfloat #panel{box-sizing:border-box;position:fixed;z-index:48;right:16px;top:90px;width:380px;height:min(640px,calc(100vh - 110px));max-height:calc(100vh - 16px);min-width:260px;min-height:120px;
+  max-width:calc(100vw - 16px);resize:both;box-shadow:0 6px 24px rgba(0,0,0,.14)}
+body.pfloat #panel.min{height:auto!important;min-height:0;resize:none;overflow:hidden}
+#panel.min>:not(.pnh){display:none}#panel.min .pnh{margin-bottom:-8px;border-bottom:0}
 main{min-width:0}
 #note-db{background:var(--hl-fill);border:1px solid var(--hl-stroke);border-radius:8px;padding:8px 12px;margin:0 0 14px;font-size:13.5px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
 #note-db.saved{background:var(--ok-fill);border-color:var(--ok)}
@@ -282,6 +291,8 @@ details.set summary{cursor:pointer;font-size:13px;color:var(--accent)}
 .btn[aria-pressed="true"]{background:var(--hl-fill);border-color:var(--hl-stroke)}
 .ctarget{margin:0 0 8px;font-size:12.5px;color:var(--ink);background:var(--hl-fill);border-radius:5px;padding:3px 8px;display:flex;gap:10px;align-items:baseline}
 .chint{margin:6px 0 0;font-size:12px;color:var(--muted)}
+.chiprow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}.chiprow .chipk{font-size:11.5px;color:var(--muted);min-width:2.5em}
+.chips.two{display:block}
 .linkbtn{border:0;background:none;padding:0;color:var(--accent);font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .tags{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}
 .tag{font-size:12px;border-radius:4px;padding:0 6px;background:var(--soft);border:1px solid var(--line)}
@@ -359,6 +370,22 @@ details.round summary{cursor:pointer;font-size:13.5px}
 #qc .qrow{margin:0 0 8px;font-size:12.5px;color:var(--muted);white-space:pre-line;line-height:1.45;overflow-wrap:anywhere}
 #qc textarea{width:100%;box-sizing:border-box;font:inherit;font-size:13px;margin:0 0 8px}
 #qc .crow{display:flex;gap:8px;align-items:center}#qc .sp{flex:1}
+/* view mode: a button next to selected text, and the floating questions panel */
+#asksel{position:fixed;z-index:56;font-size:12.5px;padding:3px 10px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+#qa{box-sizing:border-box;position:fixed;z-index:50;right:16px;bottom:16px;width:360px;height:min(560px,calc(100vh - 110px));min-width:260px;min-height:180px;max-width:calc(100vw - 16px);
+  max-height:calc(100vh - 16px);display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--line);border-radius:10px;
+  box-shadow:0 6px 24px rgba(0,0,0,.14);resize:both;overflow:hidden;font-size:13px}
+#qa[hidden]{display:none}
+#qa.min{resize:none;width:auto!important;height:auto!important;min-width:0;min-height:0}
+#qa .qah{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--line);cursor:move;user-select:none;touch-action:none}
+#qa.min .qah{border-bottom:0}
+#qa .qah b{font-size:13.5px}#qa .qah .sp{flex:1}#qa .qah .qan{font-size:12px;color:var(--muted)}
+#qa .qah button{border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:6px;min-width:26px;height:24px;cursor:pointer;font:inherit}
+#qa .qab{flex:1;overflow:auto;padding:8px 10px;display:flex;flex-direction:column;gap:8px}
+#qa .qaf{border-top:1px solid var(--line);padding:8px 10px;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+#qa .qaf .sp{flex:1}#qa .qaf .ast{font-size:12px;color:var(--muted)}#qa .conn{display:inline-flex;gap:6px;align-items:center}
+#qa .anno{margin:0}#qa .empty{color:var(--muted);font-size:12.5px;margin:4px 0}
+#qa .where{margin:2px 0}
 .flowbar{max-width:var(--pw);margin:0 auto 8px;display:flex;justify-content:flex-end}
 #flow.compact .pgsep{font-size:12px;color:var(--muted);margin:14px 0 4px;border-bottom:1px dotted var(--line);padding-bottom:2px}
 #flow.compact .cg{display:flex;gap:10px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:6px 10px;margin:4px 0;cursor:grab}
@@ -416,6 +443,7 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
   </section>
 </main>
 <aside id="panel" aria-label="Panel">
+  <div class="pnh" id="pnh"><b id="pnTitle">Side panel</b><span class="sp"></span><button type="button" id="pnPin"></button><button type="button" id="pnMin"></button></div>
   <div class="tabs" id="tabs" role="tablist">
     <button type="button" role="tab" data-tab="annos" aria-selected="true">Comments</button>
     <button type="button" role="tab" data-tab="changes" aria-selected="false">Changes</button>
@@ -454,6 +482,8 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
 <input type="file" id="reportfile" accept=".json,application/json" hidden>
 <div id="tip" hidden></div>
 <div id="qc" hidden role="dialog" aria-label="Comment"></div>
+<button type="button" class="btn small primary" id="asksel" hidden>Ask the agent</button>
+<aside id="qa" hidden aria-label="Questions"></aside>
 <div id="toast" hidden></div>
 
 <!-- Interface translations. Keys are the English text; "context|English" keys disambiguate the same English in different places.
@@ -830,7 +860,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Welcome to Duetsheet": "歡迎使用 Duetsheet",
  "Duetsheet is a report that you and an AI agent revise together. Every change is recorded with who made it.": "Duetsheet 是你和 AI agent 一起修改的報告。每一筆修改都會記下是誰改的。",
  "Read.": "閱讀。",
- "View shows the report as pages. Turn pages with the arrow keys.": "「閱覽」模式把報告顯示成一頁一頁，用方向鍵翻頁。",
  "Review.": "審閱。",
  "In Edit, change text and charts directly. Under each block, write a comment or pick a tag. On a chart, click a point or draw a box or a lasso.": "在「編輯」模式直接修改文字和圖表。每個方塊下方可以寫意見或選標籤；在圖表上可以點一個資料點，或框選、圈選一塊範圍。",
  "Keep track.": "追蹤修改。",
@@ -879,7 +908,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Read-only copy. Use the arrow keys or the buttons below to turn pages.": "唯讀副本。用方向鍵或下方按鈕翻頁。",
  "Reorder (titles only)": "整理順序（只看標題）",
  "This file": "這個檔案",
- "What should change here? Ctrl + Enter to send.": "這裡想怎麼改？Ctrl + Enter 送出。",
  "{title} (read-only)": "{title}（唯讀）",
  "… {n} more": "…還有 {n} 項",
  "1 derived file": "1 個衍生檔",
@@ -1104,7 +1132,39 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).": "要換數據、欄位、數據組或其他任何修改，請寫在下方的留言框（可參考「範例句」）。",
  "Draw around points on the chart with the mouse, or click one point.": "在圖上按住滑鼠畫一圈圈出資料點，或直接點一個點。",
  "Draw around a region of the figure with the mouse.": "在圖上按住滑鼠畫一圈，圈出一塊區域。",
- "The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.": "Duetsheet 的啟動程式已經停止，現在無法讀取或儲存任何東西。請重新啟動它（例如用桌面捷徑），再重新整理這個頁面。"
+ "The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.": "Duetsheet 的啟動程式已經停止，現在無法讀取或儲存任何東西。請重新啟動它（例如用桌面捷徑），再重新整理這個頁面。",
+ "Add to my questions": "加入我的問題",
+ "Ask": "詢問",
+ "Ask the agent": "詢問 agent",
+ "Ask the agent ({n})": "詢問 agent（{n}）",
+ "Ask while you read": "閱讀時也能發問",
+ "Change": "修改",
+ "Collapse": "收合成一排",
+ "Drag on a figure to draw around a region, or click a point of a chart.": "在圖上拖曳圈出一塊，或點圖表上的一個點。",
+ "Drag on the chart to draw around points, or click one point, to ask the agent about them.": "在圖表上拖曳圈出一些點，或點一個點，就能詢問 agent。",
+ "Drag on the figure to draw around a region and ask the agent about it.": "在圖上拖曳圈出一塊，就能詢問 agent。",
+ "Drag to move": "拖曳可移動",
+ "Expand": "展開",
+ "Figures.": "圖：",
+ "Float": "改為浮動",
+ "No questions yet. Draw around part of a figure, or select some text, to ask the agent about it.": "還沒有問題。在圖上圈出一塊，或選取一段文字，就能詢問 agent。",
+ "Pin on the right": "固定在右側",
+ "Question #{n} added. Send your questions with \"Ask the agent\" in the questions panel.": "已加入問題 #{n}。請用問答側欄的「詢問 agent」一起送出。",
+ "Questions": "問答",
+ "Select some text; an \"Ask the agent\" button appears next to it.": "選取一段文字，旁邊會出現「詢問 agent」按鈕。",
+ "Send.": "送出：",
+ "Text.": "文字：",
+ "View shows the report as pages. Turn pages with the arrow keys. To ask the agent about a figure or a passage, draw around part of the figure or select the text.": "閱覽模式把報告分頁顯示，用方向鍵翻頁。想問 agent 圖表或段落的問題，在圖上圈出一塊，或選取文字。",
+ "What would you like to ask or change? Ctrl + Enter to send.": "想要詢問或修改什麼？（Ctrl + Enter 送出）",
+ "Your questions wait in the questions panel. Send them together with \"Ask the agent\"; the answers come back there, and you can reply.": "問題會先放在問答側欄，用「詢問 agent」一起送出；回答也會回到那裡，你可以接著回覆。",
+ "{n} open": "{n} 則待處理",
+ "What does this mean?": "這是什麼意思？",
+ "Where does the data come from?": "資料從哪來？",
+ "How was it computed?": "怎麼算出來的？",
+ "Why is it so?": "為什麼會這樣？",
+ "Can it be trusted?": "可信嗎？",
+ "How does it compare?": "和其他的比呢？",
+ "ui|Side panel": "側欄"
 },
 "zh-Hans": {
  "_name": "简体中文",
@@ -1476,7 +1536,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Welcome to Duetsheet": "欢迎使用 Duetsheet",
  "Duetsheet is a report that you and an AI agent revise together. Every change is recorded with who made it.": "Duetsheet 是你和 AI agent 一起修改的报告。每一处修改都会记下是谁改的。",
  "Read.": "阅读。",
- "View shows the report as pages. Turn pages with the arrow keys.": "“浏览”模式把报告显示为一页一页，用方向键翻页。",
  "Review.": "审阅。",
  "In Edit, change text and charts directly. Under each block, write a comment or pick a tag. On a chart, click a point or draw a box or a lasso.": "在“编辑”模式中直接修改文字和图表。每个区块下方可以写意见或选标签；在图表上可以点击一个数据点，或框选、圈选一块范围。",
  "Keep track.": "跟踪修改。",
@@ -1525,7 +1584,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Read-only copy. Use the arrow keys or the buttons below to turn pages.": "只读副本。用方向键或下方按钮翻页。",
  "Reorder (titles only)": "调整顺序（只看标题）",
  "This file": "此文件",
- "What should change here? Ctrl + Enter to send.": "这里想怎么改？Ctrl + Enter 发送。",
  "{title} (read-only)": "{title}（只读）",
  "… {n} more": "…还有 {n} 项",
  "1 derived file": "1 个衍生文件",
@@ -1750,7 +1808,39 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).": "要换数据、栏位、数据组或其他任何修改，请写在下方的留言框（可参考“范例句”）。",
  "Draw around points on the chart with the mouse, or click one point.": "在图上按住鼠标画一圈圈出数据点，或直接点击一个点。",
  "Draw around a region of the figure with the mouse.": "在图上按住鼠标画一圈，圈出一块区域。",
- "The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.": "Duetsheet 的启动程序已经停止，现在无法读取或保存任何内容。请重新启动它（例如用桌面快捷方式），再刷新这个页面。"
+ "The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.": "Duetsheet 的启动程序已经停止，现在无法读取或保存任何内容。请重新启动它（例如用桌面快捷方式），再刷新这个页面。",
+ "Add to my questions": "加入我的问题",
+ "Ask": "询问",
+ "Ask the agent": "询问 agent",
+ "Ask the agent ({n})": "询问 agent（{n}）",
+ "Ask while you read": "阅读时也能提问",
+ "Change": "修改",
+ "Collapse": "收起成一行",
+ "Drag on a figure to draw around a region, or click a point of a chart.": "在图上拖动圈出一块，或点图表上的一个点。",
+ "Drag on the chart to draw around points, or click one point, to ask the agent about them.": "在图表上拖动圈出一些点，或点一个点，就能询问 agent。",
+ "Drag on the figure to draw around a region and ask the agent about it.": "在图上拖动圈出一块，就能询问 agent。",
+ "Drag to move": "拖动可移动",
+ "Expand": "展开",
+ "Figures.": "图：",
+ "Float": "改为浮动",
+ "No questions yet. Draw around part of a figure, or select some text, to ask the agent about it.": "还没有问题。在图上圈出一块，或选取一段文字，就能询问 agent。",
+ "Pin on the right": "固定在右侧",
+ "Question #{n} added. Send your questions with \"Ask the agent\" in the questions panel.": "已加入问题 #{n}。请用问答侧栏的“询问 agent”一起发送。",
+ "Questions": "问答",
+ "Select some text; an \"Ask the agent\" button appears next to it.": "选取一段文字，旁边会出现“询问 agent”按钮。",
+ "Send.": "发送：",
+ "Text.": "文字：",
+ "View shows the report as pages. Turn pages with the arrow keys. To ask the agent about a figure or a passage, draw around part of the figure or select the text.": "阅览模式把报告分页显示，用方向键翻页。想问 agent 图表或段落的问题，在图上圈出一块，或选取文字。",
+ "What would you like to ask or change? Ctrl + Enter to send.": "想要询问或修改什么？（Ctrl + Enter 发送）",
+ "Your questions wait in the questions panel. Send them together with \"Ask the agent\"; the answers come back there, and you can reply.": "问题会先放在问答侧栏，用“询问 agent”一起发送；回答也会回到那里，你可以接着回复。",
+ "{n} open": "{n} 条待处理",
+ "What does this mean?": "这是什么意思？",
+ "Where does the data come from?": "数据从哪来？",
+ "How was it computed?": "怎么算出来的？",
+ "Why is it so?": "为什么会这样？",
+ "Can it be trusted?": "可信吗？",
+ "How does it compare?": "和其他的比呢？",
+ "ui|Side panel": "侧栏"
 },
 "ja": {
  "_name": "日本語",
@@ -2122,7 +2212,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Welcome to Duetsheet": "Duetsheet へようこそ",
  "Duetsheet is a report that you and an AI agent revise together. Every change is recorded with who made it.": "Duetsheet は、あなたと AI agent が一緒に手直しするレポートです。すべての変更が、誰が行ったかとともに記録されます。",
  "Read.": "読む。",
- "View shows the report as pages. Turn pages with the arrow keys.": "「閲覧」ではレポートをページ単位で表示します。矢印キーでページをめくります。",
  "Review.": "確認する。",
  "In Edit, change text and charts directly. Under each block, write a comment or pick a tag. On a chart, click a point or draw a box or a lasso.": "「編集」ではテキストやグラフを直接変更できます。各ブロックの下にコメントを書くかタグを選び、グラフでは点をクリックするか、矩形やなげなわで範囲を描きます。",
  "Keep track.": "記録を追う。",
@@ -2171,7 +2260,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Read-only copy. Use the arrow keys or the buttons below to turn pages.": "閲覧専用コピーです。矢印キーか下のボタンでページをめくります。",
  "Reorder (titles only)": "順序を整理（タイトルのみ）",
  "This file": "このファイル",
- "What should change here? Ctrl + Enter to send.": "ここをどう直しますか？Ctrl + Enter で送信。",
  "{title} (read-only)": "{title}（閲覧専用）",
  "… {n} more": "…ほか {n} 項目",
  "1 derived file": "派生ファイル 1 件",
@@ -2396,7 +2484,39 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).": "データ、列、系列などを変えたいときは、下のコメント欄に書いてください（「依頼の例」を参照）。",
  "Draw around points on the chart with the mouse, or click one point.": "グラフ上でマウスを押したまま点を囲むか、1 つの点をクリックします。",
  "Draw around a region of the figure with the mouse.": "図の上でマウスを押したまま範囲を囲みます。",
- "The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.": "Duetsheet の起動プログラムが停止したため、読み込みも保存もできません。もう一度起動して（デスクトップのショートカットなど）、このページを再読み込みしてください。"
+ "The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.": "Duetsheet の起動プログラムが停止したため、読み込みも保存もできません。もう一度起動して（デスクトップのショートカットなど）、このページを再読み込みしてください。",
+ "Add to my questions": "質問に追加",
+ "Ask": "質問",
+ "Ask the agent": "agent に聞く",
+ "Ask the agent ({n})": "agent に聞く（{n}）",
+ "Ask while you read": "読みながら質問できます",
+ "Change": "修正",
+ "Collapse": "1行にたたむ",
+ "Drag on a figure to draw around a region, or click a point of a chart.": "図の上をドラッグして範囲を囲むか、グラフの点をクリック。",
+ "Drag on the chart to draw around points, or click one point, to ask the agent about them.": "グラフ上をドラッグして点を囲むか、点をクリックすると agent に質問できます。",
+ "Drag on the figure to draw around a region and ask the agent about it.": "図の上をドラッグして範囲を囲むと agent に質問できます。",
+ "Drag to move": "ドラッグで移動",
+ "Expand": "展開する",
+ "Figures.": "図：",
+ "Float": "浮かせる",
+ "No questions yet. Draw around part of a figure, or select some text, to ask the agent about it.": "まだ質問はありません。図の一部を囲むか、文章を選ぶと agent に質問できます。",
+ "Pin on the right": "右側に固定",
+ "Question #{n} added. Send your questions with \"Ask the agent\" in the questions panel.": "質問 #{n} を追加しました。質問パネルの「agent に聞く」でまとめて送ってください。",
+ "Questions": "質問",
+ "Select some text; an \"Ask the agent\" button appears next to it.": "文章を選ぶと、横に「agent に聞く」ボタンが出ます。",
+ "Send.": "送信：",
+ "Text.": "文章：",
+ "View shows the report as pages. Turn pages with the arrow keys. To ask the agent about a figure or a passage, draw around part of the figure or select the text.": "閲覧モードではレポートがページで表示され、矢印キーでめくれます。図や文章について agent に聞くには、図の一部を囲むか、文章を選びます。",
+ "What would you like to ask or change? Ctrl + Enter to send.": "質問や修正したいことは？（Ctrl + Enter で送信）",
+ "Your questions wait in the questions panel. Send them together with \"Ask the agent\"; the answers come back there, and you can reply.": "質問は質問パネルにたまり、「agent に聞く」でまとめて送ります。回答もそこに届き、返信できます。",
+ "{n} open": "未対応 {n} 件",
+ "What does this mean?": "これはどういう意味？",
+ "Where does the data come from?": "データの出どころは？",
+ "How was it computed?": "どう計算した？",
+ "Why is it so?": "なぜこうなる？",
+ "Can it be trusted?": "信頼できる？",
+ "How does it compare?": "ほかと比べると？",
+ "ui|Side panel": "サイドパネル"
 },
 "ko": {
  "_name": "한국어",
@@ -2768,7 +2888,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Welcome to Duetsheet": "Duetsheet에 오신 것을 환영합니다",
  "Duetsheet is a report that you and an AI agent revise together. Every change is recorded with who made it.": "Duetsheet는 사용자와 AI agent가 함께 고치는 보고서입니다. 모든 변경은 누가 했는지와 함께 기록됩니다.",
  "Read.": "읽기.",
- "View shows the report as pages. Turn pages with the arrow keys.": "'보기'에서는 보고서를 페이지 단위로 보여 줍니다. 화살표 키로 페이지를 넘기세요.",
  "Review.": "검토.",
  "In Edit, change text and charts directly. Under each block, write a comment or pick a tag. On a chart, click a point or draw a box or a lasso.": "'편집'에서 텍스트와 차트를 바로 고칩니다. 각 블록 아래에 의견을 쓰거나 태그를 고르고, 차트에서는 점을 클릭하거나 사각형·올가미로 범위를 그립니다.",
  "Keep track.": "기록 확인.",
@@ -2817,7 +2936,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Read-only copy. Use the arrow keys or the buttons below to turn pages.": "읽기 전용 사본입니다. 방향키나 아래 버튼으로 페이지를 넘기세요.",
  "Reorder (titles only)": "순서 정리 (제목만)",
  "This file": "이 파일",
- "What should change here? Ctrl + Enter to send.": "여기를 어떻게 바꿀까요? Ctrl + Enter로 보내기.",
  "{title} (read-only)": "{title} (읽기 전용)",
  "… {n} more": "… 외 {n}개",
  "1 derived file": "파생 파일 1개",
@@ -3042,7 +3160,39 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).": "데이터, 열, 계열 등 다른 것을 바꾸려면 아래 댓글 상자에 적어 주세요 (\"요청 예시\" 참고).",
  "Draw around points on the chart with the mouse, or click one point.": "차트에서 마우스를 누른 채 점들을 둘러 그리거나, 점 하나를 클릭하세요.",
  "Draw around a region of the figure with the mouse.": "그림에서 마우스를 누른 채 영역을 둘러 그리세요.",
- "The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.": "Duetsheet 실행 프로그램이 멈춰서 더 이상 읽거나 저장할 수 없습니다. 다시 실행한 뒤(예: 바탕화면 바로 가기) 이 페이지를 새로 고치세요."
+ "The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.": "Duetsheet 실행 프로그램이 멈춰서 더 이상 읽거나 저장할 수 없습니다. 다시 실행한 뒤(예: 바탕화면 바로 가기) 이 페이지를 새로 고치세요.",
+ "Add to my questions": "내 질문에 추가",
+ "Ask": "질문",
+ "Ask the agent": "agent에게 묻기",
+ "Ask the agent ({n})": "agent에게 묻기 ({n})",
+ "Ask while you read": "읽으면서 질문하기",
+ "Change": "수정",
+ "Collapse": "한 줄로 접기",
+ "Drag on a figure to draw around a region, or click a point of a chart.": "그림 위를 드래그해 영역을 둘러싸거나 차트의 점을 누르세요.",
+ "Drag on the chart to draw around points, or click one point, to ask the agent about them.": "차트 위를 드래그해 점들을 둘러싸거나 점 하나를 누르면 agent에게 물을 수 있습니다.",
+ "Drag on the figure to draw around a region and ask the agent about it.": "그림 위를 드래그해 영역을 둘러싸면 agent에게 물을 수 있습니다.",
+ "Drag to move": "드래그하여 이동",
+ "Expand": "펼치기",
+ "Figures.": "그림:",
+ "Float": "떠 있게",
+ "No questions yet. Draw around part of a figure, or select some text, to ask the agent about it.": "아직 질문이 없습니다. 그림의 일부를 둘러싸거나 텍스트를 선택하면 agent에게 물을 수 있습니다.",
+ "Pin on the right": "오른쪽에 고정",
+ "Question #{n} added. Send your questions with \"Ask the agent\" in the questions panel.": "질문 #{n}을(를) 추가했습니다. 질문 패널의 \"agent에게 묻기\"로 함께 보내세요.",
+ "Questions": "질문",
+ "Select some text; an \"Ask the agent\" button appears next to it.": "텍스트를 선택하면 옆에 \"agent에게 묻기\" 버튼이 나타납니다.",
+ "Send.": "보내기:",
+ "Text.": "텍스트:",
+ "View shows the report as pages. Turn pages with the arrow keys. To ask the agent about a figure or a passage, draw around part of the figure or select the text.": "보기 모드는 보고서를 페이지로 보여 주며 화살표 키로 넘깁니다. 그림이나 문단에 대해 agent에게 물으려면 그림의 일부를 둘러싸거나 텍스트를 선택하세요.",
+ "What would you like to ask or change? Ctrl + Enter to send.": "묻거나 고치고 싶은 것은? (Ctrl + Enter로 보내기)",
+ "Your questions wait in the questions panel. Send them together with \"Ask the agent\"; the answers come back there, and you can reply.": "질문은 질문 패널에 모였다가 \"agent에게 묻기\"로 함께 보냅니다. 답도 그곳에 오고, 이어서 답할 수 있습니다.",
+ "{n} open": "미처리 {n}건",
+ "What does this mean?": "이게 무슨 뜻인가요?",
+ "Where does the data come from?": "데이터는 어디서 왔나요?",
+ "How was it computed?": "어떻게 계산했나요?",
+ "Why is it so?": "왜 이렇게 되나요?",
+ "Can it be trusted?": "믿을 수 있나요?",
+ "How does it compare?": "다른 것과 비교하면?",
+ "ui|Side panel": "사이드 패널"
 },
 "es": {
  "_name": "Español",
@@ -3414,7 +3564,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Welcome to Duetsheet": "Te damos la bienvenida a Duetsheet",
  "Duetsheet is a report that you and an AI agent revise together. Every change is recorded with who made it.": "Duetsheet es un informe que revisas junto con un agente de IA. Cada cambio queda registrado con quién lo hizo.",
  "Read.": "Leer.",
- "View shows the report as pages. Turn pages with the arrow keys.": "Lectura muestra el informe por páginas. Pasa de página con las flechas del teclado.",
  "Review.": "Revisar.",
  "In Edit, change text and charts directly. Under each block, write a comment or pick a tag. On a chart, click a point or draw a box or a lasso.": "En Edición, cambia textos y gráficos directamente. Debajo de cada bloque, escribe un comentario o elige una etiqueta. En un gráfico, haz clic en un punto o dibuja un rectángulo o un lazo.",
  "Keep track.": "Seguir los cambios.",
@@ -3463,7 +3612,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Read-only copy. Use the arrow keys or the buttons below to turn pages.": "Copia de solo lectura. Usa las flechas o los botones de abajo para pasar de página.",
  "Reorder (titles only)": "Reordenar (solo títulos)",
  "This file": "Este archivo",
- "What should change here? Ctrl + Enter to send.": "¿Qué debería cambiar aquí? Ctrl + Enter para enviar.",
  "{title} (read-only)": "{title} (solo lectura)",
  "… {n} more": "… {n} más",
  "1 derived file": "1 archivo derivado",
@@ -3688,7 +3836,39 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "To change the data, the columns or the series, or anything else, write it in the comment box below (see Example requests).": "Para cambiar los datos, las columnas, las series o cualquier otra cosa, escríbelo en el cuadro de comentarios de abajo (ver Ejemplos de peticiones).",
  "Draw around points on the chart with the mouse, or click one point.": "Rodea puntos del gráfico arrastrando el ratón, o haz clic en un solo punto.",
  "Draw around a region of the figure with the mouse.": "Rodea una región de la figura arrastrando el ratón.",
- "The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.": "El lanzador de Duetsheet se ha detenido, así que ya no se lee ni se guarda nada. Vuelve a iniciarlo (por ejemplo con el acceso directo del escritorio) y recarga esta página."
+ "The Duetsheet launcher has stopped, so nothing is read or saved any more. Start it again (for example with the desktop shortcut), then reload this page.": "El lanzador de Duetsheet se ha detenido, así que ya no se lee ni se guarda nada. Vuelve a iniciarlo (por ejemplo con el acceso directo del escritorio) y recarga esta página.",
+ "Add to my questions": "Añadir a mis preguntas",
+ "Ask": "Preguntar",
+ "Ask the agent": "Preguntar al agente",
+ "Ask the agent ({n})": "Preguntar al agente ({n})",
+ "Ask while you read": "Pregunta mientras lees",
+ "Change": "Cambiar",
+ "Collapse": "Contraer a una fila",
+ "Drag on a figure to draw around a region, or click a point of a chart.": "Arrastra sobre una figura para rodear una región, o haz clic en un punto de un gráfico.",
+ "Drag on the chart to draw around points, or click one point, to ask the agent about them.": "Arrastra sobre el gráfico para rodear puntos, o haz clic en uno, para preguntar al agente.",
+ "Drag on the figure to draw around a region and ask the agent about it.": "Arrastra sobre la figura para rodear una región y preguntar al agente.",
+ "Drag to move": "Arrastra para mover",
+ "Expand": "Expandir",
+ "Figures.": "Figuras.",
+ "Float": "Flotante",
+ "No questions yet. Draw around part of a figure, or select some text, to ask the agent about it.": "Aún no hay preguntas. Rodea parte de una figura o selecciona texto para preguntar al agente.",
+ "Pin on the right": "Fijar a la derecha",
+ "Question #{n} added. Send your questions with \"Ask the agent\" in the questions panel.": "Pregunta #{n} añadida. Envía tus preguntas con \"Preguntar al agente\" en el panel de preguntas.",
+ "Questions": "Preguntas",
+ "Select some text; an \"Ask the agent\" button appears next to it.": "Selecciona texto; junto a él aparece un botón \"Preguntar al agente\".",
+ "Send.": "Enviar.",
+ "Text.": "Texto.",
+ "View shows the report as pages. Turn pages with the arrow keys. To ask the agent about a figure or a passage, draw around part of the figure or select the text.": "La vista muestra el informe por páginas; pasa de página con las flechas. Para preguntar al agente por una figura o un pasaje, rodea parte de la figura o selecciona el texto.",
+ "What would you like to ask or change? Ctrl + Enter to send.": "¿Qué quieres preguntar o cambiar? Ctrl + Enter para enviar.",
+ "Your questions wait in the questions panel. Send them together with \"Ask the agent\"; the answers come back there, and you can reply.": "Tus preguntas esperan en el panel de preguntas. Envíalas juntas con \"Preguntar al agente\"; las respuestas llegan allí y puedes responder.",
+ "{n} open": "{n} abiertas",
+ "What does this mean?": "¿Qué significa esto?",
+ "Where does the data come from?": "¿De dónde vienen los datos?",
+ "How was it computed?": "¿Cómo se calculó?",
+ "Why is it so?": "¿Por qué es así?",
+ "Can it be trusted?": "¿Es fiable?",
+ "How does it compare?": "¿Cómo se compara?",
+ "ui|Side panel": "Panel lateral"
 }
 }
 </script>
@@ -4076,6 +4256,7 @@ function buildViewBlock(b,interactive){
   else if(b.type==='image')buildImage(b,d,interactive);
   else if(b.type==='outline')d.append(buildOutline(b));
   if(b.caption&&b.type!=='text'&&b.type!=='outline')d.append(h('p',{class:'cap',text:b.caption}));
+  if(interactive&&S.mode==='view'&&(b.type==='chart'||b.type==='image'))d.append(h('p',{class:'chint',text:b.type==='chart'?tr('Drag on the chart to draw around points, or click one point, to ask the agent about them.'):tr('Drag on the figure to draw around a region and ask the agent about it.')}));
   const src=sourceLine(b);if(src)d.append(src);
   return d;
 }
@@ -4136,7 +4317,7 @@ function renderView(){
   const host=$('#pagehost');host.replaceChildren();S.geo={};
   const blocks=S.pages[S.page]||[];
   const pg=h('div',{class:'page'});const inner=h('div',{class:'inner'});pg.append(inner);
-  blockGroups(blocks).forEach(g=>inner.append(...buildGroup(g,false)));
+  blockGroups(blocks).forEach(g=>inner.append(...buildGroup(g,!S.readonly))); // interactive: draw on a figure to ask about it
   pg.append(h('span',{class:'pno',text:`${S.page+1} / ${S.pages.length}`}));
   host.append(pg);
   fitPage(inner,blocks);
@@ -4466,7 +4647,16 @@ const PRESETS={
   table:['Add units','Change sort','Add/remove columns','Highlight key points'],
   image:['Crop','Add labels','Replace image','Add caption']};
 const tagId=label=>label.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-const TAG_LABEL=new Map(Object.values(PRESETS).flat().map(l=>[tagId(l),l]));
+// questions, on every kind of block: the agent answers them in its reply rather than changing anything
+const ASK_TAGS=[['explain','What does this mean?'],['where-from','Where does the data come from?'],['how-computed','How was it computed?'],
+  ['why-so','Why is it so?'],['how-reliable','Can it be trusted?'],['compare','How does it compare?']];
+const TAG_LABEL=new Map([...ASK_TAGS,...Object.values(PRESETS).flat().map(l=>[tagId(l),l])]);
+function tagChips(type,d){ // two rows of tags: ask, then change; they toggle in the draft d
+  const chip=(id,label)=>{const c=h('button',{type:'button',class:'chip','aria-pressed':String(d.tags.includes(id)),text:tr(label)});
+    c.onclick=()=>{d.tags=d.tags.includes(id)?d.tags.filter(x=>x!==id):[...d.tags,id];c.setAttribute('aria-pressed',String(d.tags.includes(id)))};return c};
+  const change=(PRESETS[type]||[]).map(l=>chip(tagId(l),l));
+  return h('div',{class:'chips two'},[h('div',{class:'chiprow'},[h('span',{class:'chipk',text:tr('Ask')}),...ASK_TAGS.map(([id,l])=>chip(id,l))]),
+    change.length?h('div',{class:'chiprow'},[h('span',{class:'chipk',text:tr('Change')}),...change]):null])}
 [['add-data-files','Add these files to the chart'],['replace-data-files','Replace the data with these files']].forEach(([id,l])=>TAG_LABEL.set(id,l)); // requests made from Folder > Data
 // v0.2 stored the visible tag text in the interface language of the time; map any known translation back to its id
 const LEGACY_TAGS={'\u63db\u4e00\u5f35':'replace-image'};
@@ -4484,9 +4674,7 @@ function stopDraw(){S.draw=null;document.body.dataset.draw='';render()}
 function commentBox(b){
   const d=draftOf(b.id),visual=b.type==='chart'||b.type==='image';
   const box=h('div',{class:'cbox'});
-  box.append(h('div',{class:'chips'},(PRESETS[b.type]||[]).map(label=>{const id=tagId(label);
-    const c=h('button',{type:'button',class:'chip','aria-pressed':String(d.tags.includes(id)),text:tr(label)});
-    c.onclick=()=>{d.tags=d.tags.includes(id)?d.tags.filter(x=>x!==id):[...d.tags,id];c.setAttribute('aria-pressed',String(d.tags.includes(id)))};return c})));
+  box.append(tagChips(b.type,d));
   if(d.target&&(d.target.kind!=='block'||d.target.quote))
     box.append(h('p',{class:'ctarget'},[h('span',{text:tr('Location: ')+describe(d.target)}),
       h('button',{type:'button',class:'linkbtn',text:tr('Clear'),onclick:()=>{d.target=null;render()}})]));
@@ -4511,13 +4699,17 @@ async function submitDraft(id){
   if(!text&&!d.tags.length){toast(tr('Write a comment or pick a tag first'));return false}
   const no=S.annos.reduce((m,a)=>Math.max(m,a.no||0),0)+1;
   const a={id:uid('a'),no,target:d.target||{kind:'block',blockId:id},tags:[...d.tags],text,status:'open',reply:'',createdAt:now()};
+  if(!editingMode())a.from='view'; // asked while reading: listed in the questions panel
   if(d.withFiles!==false&&S.fsel&&S.fsel.size){a.files=[...S.fsel].map(normPath).sort();S.fsel.clear()} // the files ticked in Folder > Data
   S.drafts.delete(id);S.annos=[...S.annos,a];
   const box=document.activeElement,again=!!box&&box.dataset&&box.dataset.fid===fid({id},'comment'); // sent with Ctrl+Enter: keep typing in a fresh box
   if(again)box.blur();render();if(again){const n=$(`[data-fid="${CSS.escape(fid({id},'comment'))}"]`);if(n)n.focus({preventScroll:true})}
-  await put('annotations/'+a.id,a);toast(tr('Comment sent #')+no);
+  await put('annotations/'+a.id,a);questionAdded(a);
   return true;
 }
+function questionAdded(a){ // after a comment is saved: in view mode it waits in the questions panel
+  if(a.from!=='view'){toast(tr('Comment sent #')+a.no);return}
+  QA.min=false;saveQA();renderQA(true);toast(tr('Question #{n} added. Send your questions with "Ask the agent" in the questions panel.',{n:a.no}))}
 async function submitAndAsk(id){if(await submitDraft(id))await askAgent()}
 
 /* Example requests: general scientific wording the user can insert and edit; [...] marks what to fill in */
@@ -4616,7 +4808,7 @@ async function removeAnno(a){S.annos=S.annos.filter(x=>x.id!==a.id);renderPanel(
 const threadOf=a=>Array.isArray(a.thread)&&a.thread.length?a.thread.filter(m=>m&&m.text):a.reply?[{by:'claude',text:a.reply,at:a.resolvedAt||''}]:[];
 async function replyAnno(a,text){text=String(text||'').trim();if(!text)return;
   const m={...a,thread:[...threadOf(a),{by:'user',text,at:now()}],status:'open',resolvedAt:null}; // answering reopens the comment for the agent
-  S.replyDrafts&&S.replyDrafts.delete(a.id);S.annos=S.annos.map(x=>x.id===a.id?m:x);renderPanel();paintAllOverlays();await put('annotations/'+a.id,m);
+  S.replyDrafts&&S.replyDrafts.delete(a.id);S.annos=S.annos.map(x=>x.id===a.id?m:x);renderPanel();renderQA(true);paintAllOverlays();await put('annotations/'+a.id,m);
   toast(tr('Reply added. Click "Ask the agent to revise" when you are ready.'))}
 function replyBox(a){
   S.replyDrafts=S.replyDrafts||new Map();
@@ -4964,11 +5156,12 @@ function paintAllOverlays(){
 function polyArea(p){let s=0;for(let i=0;i<p.length;i++){const q=p[(i+1)%p.length];s+=p[i][0]*q[1]-q[0]*p[i][1]}return Math.abs(s)/2}
 function decimate(p,n){if(p.length<=n)return p;const st=(p.length-1)/(n-1),o=[];for(let i=0;i<n;i++)o.push(p[Math.round(i*st)]);return o}
 function inPoly(x,y,P){let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const[xi,yi]=P[i],[xj,yj]=P[j];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c}return c}
-// In edit mode, dragging on a figure draws a free-hand lasso that follows the mouse, like a paint program; a click
-// without moving is left to the point click handler. "Box on figure" switches the next drag to a rectangle.
+// Dragging on a figure draws a free-hand lasso that follows the mouse, like a paint program, to comment on it (Edit)
+// or ask about it (View); a click without moving is left to the point click handler. "Box on figure" switches the
+// next drag to a rectangle.
 function bindDraw(G,svg){
   let d=null;
-  const active=()=>S.mode==='edit'&&(!S.draw||S.draw.blockId===G.b.id);
+  const active=()=>(S.mode==='edit'||S.mode==='view'&&!S.readonly)&&(!S.draw||S.draw.blockId===G.b.id);
   const scale=()=>G.space==='image'?G.W/680:1;
   const loc=e=>{const r=svg.getBoundingClientRect();return[clamp((e.clientX-r.left)*G.W/r.width,G.plot.x0,G.plot.x1),clamp((e.clientY-r.top)*G.H/r.height,G.plot.y0,G.plot.y1)]};
   svg.addEventListener('pointerdown',e=>{
@@ -5017,10 +5210,10 @@ function pointLines(b,ds,r,max){
   return lines.length>max?[...lines.slice(0,max),tr('… {n} more',{n:lines.length-max})]:lines}
 // the dataset of a point target: its datasetId, or the chart's first series
 const pointDataset=(b,t)=>S.datasets.get(t.datasetId||(b&&b.chart&&b.chart.dataset));
-// Clicking a data point in edit mode (not while drawing) opens the comment dialog next to it; view mode is for reading
+// Clicking a data point (not while drawing) opens the comment dialog next to it, in Edit and in View
 document.addEventListener('click',e=>{
-  if(S.readonly||S.draw||S.mode!=='edit')return;const pt=e.target.closest&&e.target.closest('#flow .pt');if(!pt||!pt.dataset.row)return;
-  const host=pt.closest('.cw'),id=host&&host.dataset.id;if(!id||!S.blocks.has(id))return;
+  if(S.readonly||S.draw)return;const pt=e.target.closest&&e.target.closest('#flow .pt,#pagehost .pt');if(!pt||!pt.dataset.row)return;
+  const host=pt.closest('.cw,.blk'),id=host&&host.dataset.id;if(!id||!S.blocks.has(id))return;
   const t={kind:'point',blockId:id,rowId:+pt.dataset.row};if(seriesOf(S.blocks.get(id)).length>1&&pt.dataset.ds)t.datasetId=pt.dataset.ds;
   draftOf(id).target=t;
   render();
@@ -5044,17 +5237,17 @@ function closeQuick(clear){const q=S.quick;S.quick=null;$('#qc').hidden=true;
 function renderQuick(){
   const box=$('#qc'),q=S.quick;if(!q){box.hidden=true;return}
   const b=S.blocks.get(q.blockId),d=draftOf(q.blockId),t=d.target;if(!b||!t){closeQuick(false);return}
+  const asking=!editingMode(); // in view mode a question is collected, and sent from the questions panel
   const kids=[h('p',{class:'qwhere',text:describe(t)})];
   if(t.kind==='point'&&b.chart){const ds=pointDataset(b,t),r=ds&&ds.rows.find(r=>r.id===t.rowId);if(r)kids.push(h('p',{class:'qrow',text:pointLines(b,ds,r,8).join('\n')}))}
-  kids.push(h('div',{class:'chips'},(PRESETS[b.type]||[]).map(label=>{const id=tagId(label);
-    const c=h('button',{type:'button',class:'chip','aria-pressed':String(d.tags.includes(id)),text:tr(label)});
-    c.onclick=()=>{d.tags=d.tags.includes(id)?d.tags.filter(x=>x!==id):[...d.tags,id];c.setAttribute('aria-pressed',String(d.tags.includes(id)))};return c})));
-  const ta=h('textarea',{rows:'3',placeholder:tr('What should change here? Ctrl + Enter to send.')});ta.value=d.text;
+  kids.push(tagChips(b.type,d));
+  const ta=h('textarea',{rows:'3',placeholder:tr('What would you like to ask or change? Ctrl + Enter to send.')});ta.value=d.text;
   ta.addEventListener('input',()=>{d.text=ta.value});
   ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();sendQuick()}});
   kids.push(ta,examplesFor(b.type==='chart'?'region':b.type,ta,d)||'',attachRow(d)||'',h('div',{class:'crow'},[h('button',{type:'button',class:'btn small',text:tr('Cancel'),onclick:()=>closeQuick(true)}),h('span',{class:'sp'}),
+    ...(asking?[h('button',{type:'button',class:'btn small primary',text:tr('Add to my questions'),onclick:sendQuick})]:[
     h('button',{type:'button',class:'btn small',text:tr('Send comment'),onclick:sendQuick}),
-    h('button',{type:'button',class:'btn small primary',text:tr('Send and ask the agent'),onclick:async()=>{if(await sendQuick())await askAgent()}})]));
+    h('button',{type:'button',class:'btn small primary',text:tr('Send and ask the agent'),onclick:async()=>{if(await sendQuick())await askAgent()}})])]));
   box.replaceChildren(...kids);box.hidden=false;
   const w=box.offsetWidth,hh=box.offsetHeight;
   box.style.left=Math.max(8,Math.min(q.x+14,innerWidth-w-8))+'px';
@@ -5064,7 +5257,7 @@ async function sendQuick(){const q=S.quick;if(!q)return false;const d=draftOf(q.
   if(!d.text.trim()&&!d.tags.length){toast(tr('Write a comment or pick a tag first'));return false}
   S.quick=null;$('#qc').hidden=true;return submitDraft(q.blockId)}
 // A click elsewhere closes the dialog; the draft is kept unless it is still empty
-document.addEventListener('pointerdown',e=>{if(!S.quick||!(e.target instanceof Element)||e.target.closest('#qc,.pt'))return;
+document.addEventListener('pointerdown',e=>{if(!S.quick||!(e.target instanceof Element)||e.target.closest('#qc,.pt,#asksel'))return;
   const d=draftOf(S.quick.blockId);closeQuick(!d.text.trim()&&!d.tags.length)},true);
 
 /* ---------- Main render ---------- */
@@ -5087,13 +5280,139 @@ document.addEventListener('focusout',()=>setTimeout(()=>{if(S.deferred&&!editing
 
 /* ---------- Modes and buttons ---------- */
 const HINT={view:'Use the arrow keys or the buttons below to turn pages.',edit:'Edit directly; drag ⠿ to reorder; click the divider between blocks to change page breaks; leave comments under each block.'};
+function askTipOnce(){onceOnly('duetsheet-ask-tip',()=>helpModal(tr('Ask while you read'),null,[
+  [tr('Figures.'),tr('Drag on a figure to draw around a region, or click a point of a chart.')],
+  [tr('Text.'),tr('Select some text; an "Ask the agent" button appears next to it.')],
+  [tr('Send.'),tr('Your questions wait in the questions panel. Send them together with "Ask the agent"; the answers come back there, and you can reply.')]]))}
 function setMode(m){leaveField();S.mode=m;document.body.dataset.mode=m;if(S.draw){S.draw=null;document.body.dataset.draw=''}
   $$('#modes button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===m)));
-  document.body.classList.toggle('nopanel',m==='view'&&!S.panelInView);
-  $('#hint').textContent=S.readonly?tr('Read-only copy. Use the arrow keys or the buttons below to turn pages.'):tr(HINT[m]);render()}
+  showPanel();
+  $('#hint').textContent=S.readonly?tr('Read-only copy. Use the arrow keys or the buttons below to turn pages.'):tr(HINT[m]);render();
+  if(!editingMode()&&!S.readonly&&S.meta&&S.welcomed)askTipOnce()}
 $('#modes').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setMode(b.dataset.mode)});
-$('#togglePanel').addEventListener('click',()=>{const hid=document.body.classList.toggle('nopanel');if(S.mode==='view')S.panelInView=!hid;render()});
-$('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b){S.tab=b.dataset.tab;if(S.mode==='view'&&document.body.classList.contains('nopanel')){document.body.classList.remove('nopanel');S.panelInView=true}renderPanel()}});
+// The side panel (comments, changes, style, folder) is for editing: View reads at full width without it
+const editingMode=()=>S.mode==='edit';
+function showPanel(){const ed=editingMode();document.body.classList.toggle('nopanel',!ed||!!S.panelHidden);$('#togglePanel').hidden=!ed;renderAgentBar();placePanel()}
+const PN_KEY='duetsheet-panel';
+let PN=(()=>{const d={pin:false,min:false,x:null,y:null,w:0,h:0};try{const v=JSON.parse(localStorage.getItem(PN_KEY)||'null');
+  if(v&&typeof v==='object'){d.pin=v.pin===true;d.min=v.min===true;['x','y'].forEach(k=>{if(Number.isFinite(v[k]))d[k]=v[k]});['w','h'].forEach(k=>{if(Number.isFinite(v[k])&&v[k]>0)d[k]=v[k]})}}catch(e){}return d})();
+function savePN(){try{localStorage.setItem(PN_KEY,JSON.stringify(PN))}catch(e){}}
+function placePanel(){const b=$('#panel'),fl=!PN.pin;document.body.classList.toggle('pfloat',fl);b.classList.toggle('min',fl&&PN.min);
+  $('#pnTitle').textContent=trc('ui','Side panel');
+  $('#pnPin').textContent=fl?tr('Pin on the right'):tr('Float');$('#pnPin').title=fl?tr('Pin on the right'):tr('Float');
+  $('#pnMin').textContent=PN.min?'▢':'–';$('#pnMin').hidden=!fl;$('#pnMin').title=PN.min?tr('Expand'):tr('Collapse');
+  if(!fl){['left','top','right','width','height','maxHeight'].forEach(k=>b.style[k]='');return}
+  if(!PN.min){b.style.width=PN.w?PN.w+'px':'';b.style.height=PN.h?PN.h+'px':''}
+  if(PN.x==null||PN.y==null){b.style.left='';b.style.top='';b.style.right='';b.style.maxHeight='';return}
+  const w=b.offsetWidth||380,y=clamp(PN.y,4,Math.max(4,innerHeight-60));b.style.right='auto';b.style.left=clamp(PN.x,4,Math.max(4,innerWidth-w-4))+'px';b.style.top=y+'px';
+  b.style.maxHeight=(innerHeight-y-8)+'px'} // the whole panel stays in the window, so its corner can be reached
+addEventListener('resize',()=>{placePanel();const q=$('#qa');if(q&&!q.hidden){placeQA(q);dockQA()}});
+$('#pnPin').addEventListener('click',()=>{PN.pin=!PN.pin;savePN();placePanel();render()});
+$('#pnMin').addEventListener('click',()=>{PN.min=!PN.min;savePN();placePanel()});
+$('#pnh').addEventListener('pointerdown',e=>{if(PN.pin||e.button!==0||e.target.closest('button'))return;e.preventDefault();const head=$('#pnh'),b=$('#panel');try{head.setPointerCapture(e.pointerId)}catch(x){}
+  const r=b.getBoundingClientRect(),dx=e.clientX-r.left,dy=e.clientY-r.top;
+  const mv=ev=>{PN.x=ev.clientX-dx;PN.y=ev.clientY-dy;placePanel()};
+  const up=()=>{head.removeEventListener('pointermove',mv);head.removeEventListener('pointerup',up);head.removeEventListener('pointercancel',up);savePN()};
+  head.addEventListener('pointermove',mv);head.addEventListener('pointerup',up);head.addEventListener('pointercancel',up)});
+$('#panel').addEventListener('pointerdown',e=>{const b=$('#panel'),r=b.getBoundingClientRect();if(!PN.pin&&e.clientX>r.right-18&&e.clientY>r.bottom-18)b.dataset.resized='1'}); // the resize corner
+if(window.ResizeObserver)new ResizeObserver(()=>{const b=$('#panel');if(PN.pin||PN.min||!b.dataset.resized||document.body.classList.contains('nopanel'))return;
+  PN.w=Math.round(b.offsetWidth);PN.h=Math.round(b.offsetHeight);savePN()}).observe($('#panel'));
+/* ---------- The questions panel (View) ----------
+   What was asked while reading (annotations with from: "view") and the agent's answers, with a reply box to go on;
+   the questions are sent together with its "Ask the agent" button. It floats, can be moved by its header, resized
+   from its corner and folded to one line; where it sits is kept in this browser. In its own corner it does not
+   cover the page: the page makes room for it (dockQA). */
+const QA_KEY='duetsheet-qa';
+let QA=(()=>{const d={min:false,x:null,y:null,w:0,h:0};try{const v=JSON.parse(localStorage.getItem(QA_KEY)||'null');
+  if(v&&typeof v==='object'){d.min=v.min===true;['x','y'].forEach(k=>{if(Number.isFinite(v[k]))d[k]=v[k]});['w','h'].forEach(k=>{if(Number.isFinite(v[k])&&v[k]>0)d[k]=v[k]})}}catch(e){}return d})();
+function saveQA(){try{localStorage.setItem(QA_KEY,JSON.stringify(QA))}catch(e){}}
+const viewQuestions=()=>S.annos.filter(a=>a.from==='view').sort((p,q)=>(q.no||0)-(p.no||0));
+function placeQA(box){ // keep it on screen
+  if(QA.x==null||QA.y==null){box.style.left='';box.style.top='';box.style.right='';box.style.bottom='';box.style.maxHeight='';return}
+  box.style.bottom='auto';
+  const w=box.offsetWidth||360,y=clamp(QA.y,4,Math.max(4,innerHeight-60));
+  box.style.right='auto';box.style.left=clamp(QA.x,4,Math.max(4,innerWidth-w-4))+'px';box.style.top=y+'px';box.style.maxHeight=(innerHeight-y-8)+'px'}
+// The page moves left (and shrinks if it must) so that the open panel, in its corner, does not cover it. Not when the
+// panel was moved elsewhere or is folded, nor in a window too narrow to leave a readable page beside it.
+function dockQA(){
+  const box=$('#qa'),m=$('main');if(!box||!m)return;
+  let need=0;
+  if(!box.hidden&&!QA.min&&QA.x==null){const old=m.style.marginRight;m.style.marginRight='';
+    const r=m.getBoundingClientRect(),edge=innerWidth-box.offsetWidth-16-12;
+    need=Math.max(0,Math.ceil(r.right-edge));if(edge-r.left<640)need=0;m.style.marginRight=old}
+  const v=need?need+'px':'';if(m.style.marginRight===v)return;
+  m.style.marginRight=v;clearTimeout(S.dockT);S.dockT=setTimeout(()=>{if(S.mode==='view')render()},0)} // the pages are cut to the new width
+function renderQA(force){
+  const box=$('#qa');if(!box)return;
+  const show=!!S.meta&&!S.readonly&&!editingMode();box.hidden=!show;if(!show){box.dataset.key='';dockQA();return}
+  const qs=viewQuestions(),open=openCount(),v=agentView(),busy=v.state==='sent'||v.state==='working',listening=!!(S.agent&&S.agent.listening);
+  const key=JSON.stringify([QA.min,open,v.state,v.text,listening,!!S.server,document.documentElement.lang,qs.map(a=>[a.id,a.status,a.text,threadOf(a).length])]);
+  if(!force&&key===box.dataset.key)return;
+  const ae=document.activeElement;if(!force&&ae&&box.contains(ae)&&ae.tagName==='TEXTAREA'){S.qaLater=true;return} // typing: redraw on leaving the box
+  box.dataset.key=key;S.qaLater=false;
+  const scroll=$('.qab',box)?$('.qab',box).scrollTop:0;
+  box.classList.toggle('min',QA.min);
+  if(!QA.min){if(QA.w)box.style.width=QA.w+'px';if(QA.h)box.style.height=QA.h+'px'}
+  const waiting=qs.filter(a=>a.status!=='done').length;
+  const head=h('div',{class:'qah',title:tr('Drag to move')},[h('b',{text:tr('Questions')}),
+    h('span',{class:'qan',text:tr('{n} open',{n:waiting})}),h('span',{class:'sp'}),
+    h('button',{type:'button',text:QA.min?'▢':'–',title:QA.min?tr('Expand'):tr('Collapse'),'aria-label':QA.min?tr('Expand'):tr('Collapse'),
+      onclick:()=>{QA.min=!QA.min;saveQA();renderQA(true)}})]);
+  dragQA(head,box);
+  const kids=[head];
+  if(!QA.min){
+    const body=h('div',{class:'qab'});
+    if(!qs.length)body.append(h('p',{class:'empty',text:tr('No questions yet. Draw around part of a figure, or select some text, to ask the agent about it.')}));
+    qs.forEach(a=>{const t=a.target||{},done=a.status==='done';
+      body.append(h('div',{class:'anno'+(done?' is-done':'')},[
+        h('div',{class:'atop'},[h('span',{class:'no',text:String(a.no||'?')}),h('span',{class:'chip2',text:done?tr('Done'):tr('Open')})]),
+        h('p',{class:'where'},[h('button',{type:'button',class:'linkbtn',text:describe(t),title:tr('Jump to'),onclick:()=>jumpTo(t.blockId,a.id)})]),
+        a.tags&&a.tags.length?h('p',{class:'tags'},a.tags.map(x=>h('span',{class:'tag',text:tagText(x)}))):null,
+        a.text?h('p',{class:'txt',text:a.text}):null,
+        ...threadOf(a).map(m=>h('p',{class:'reply'+(m.by==='user'?' me':'')},[h('strong',{text:m.by==='user'?tr('You: '):tr('Agent: ')}),m.text])),
+        threadOf(a).some(m=>m.by!=='user')?replyBox(a):null,
+        h('div',{class:'acts'},[h('button',{type:'button',text:done?tr('Reopen'):tr('Mark done'),onclick:()=>setStatus(a,done?'open':'done')}),
+          h('button',{type:'button',text:tr('Delete'),onclick:()=>removeAnno(a)})])]))});
+    const foot=h('div',{class:'qaf'},[h('span',{class:'conn'},[h('span',{class:'dot'+(listening?' ok':'')}),h('span',{class:'ast',text:listening?tr('Agent listening'):tr('No agent connected')})]),
+      v.text?h('span',{class:'ast'+(v.cls?' '+v.cls:''),text:v.text}):null,h('span',{class:'sp'}),
+      !listening?h('button',{type:'button',class:'linkbtn',text:tr('Get a prompt to paste'),onclick:openAgentPrompt}):null,
+      h('button',{type:'button',class:'btn small primary',text:tr('Ask the agent ({n})',{n:open}),disabled:!open||busy?'':null,
+        title:listening?tr('An agent is listening and will revise the report now.'):tr('No agent is listening. You will get a prompt to paste into your agent.'),onclick:askAgent})]);
+    kids.push(body,foot);
+    requestAnimationFrame(()=>{body.scrollTop=scroll})}
+  box.replaceChildren(...kids);placeQA(box);dockQA()}
+document.addEventListener('focusout',()=>setTimeout(()=>{if(S.qaLater&&!($('#qa').contains(document.activeElement)))renderQA()},0));
+function dragQA(head,box){
+  head.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('button'))return;e.preventDefault();try{head.setPointerCapture(e.pointerId)}catch(x){}
+    const r=box.getBoundingClientRect(),dx=e.clientX-r.left,dy=e.clientY-r.top;
+    const mv=ev=>{QA.x=ev.clientX-dx;QA.y=ev.clientY-dy;placeQA(box)};
+    const up=()=>{head.removeEventListener('pointermove',mv);head.removeEventListener('pointerup',up);head.removeEventListener('pointercancel',up);saveQA();dockQA()};
+    head.addEventListener('pointermove',mv);head.addEventListener('pointerup',up);head.addEventListener('pointercancel',up)})}
+let qaRz;
+if(window.ResizeObserver)new ResizeObserver(()=>{const box=$('#qa');if(box.hidden||QA.min)return;clearTimeout(qaRz);qaRz=setTimeout(dockQA,150);
+  if(!box.style.width&&!box.style.height&&!box.dataset.resized)return;
+  QA.w=Math.round(box.offsetWidth);QA.h=Math.round(box.offsetHeight);saveQA()}).observe($('#qa'));
+$('#qa').addEventListener('pointerdown',e=>{const b=$('#qa'),r=b.getBoundingClientRect();if(e.clientX>r.right-18&&e.clientY>r.bottom-18)b.dataset.resized='1'}); // the resize corner
+// Double-clicking the header puts the panel back in its corner
+$('#qa').addEventListener('dblclick',e=>{if(!e.target.closest('.qah')||e.target.closest('button'))return;QA.x=null;QA.y=null;saveQA();placeQA($('#qa'));dockQA()});
+/* In View, selecting text in a block shows a button that asks the agent about it */
+function selectionAsk(){
+  const btn=$('#asksel'),sel=getSelection(),txt=sel&&!sel.isCollapsed?sel.toString().trim():'';
+  const hide=()=>{btn.hidden=true};
+  if(!txt||editingMode()||S.readonly||!S.meta)return hide();
+  const within=n=>{const e=n&&(n.nodeType===1?n:n.parentElement);return e&&e.closest('#pagehost .blk[data-id]')};
+  const a=within(sel.anchorNode),b=within(sel.focusNode);if(!a||a!==b)return hide();
+  const quote=txt.replace(/\s+/g,' ').slice(0,300),key=a.dataset.id;
+  const rr=sel.getRangeAt(0).getBoundingClientRect();
+  btn.textContent=tr('Ask the agent');btn.hidden=false;
+  btn.style.left=clamp(rr.right-btn.offsetWidth,8,innerWidth-btn.offsetWidth-8)+'px';
+  btn.style.top=(rr.bottom+6+btn.offsetHeight>innerHeight-8?Math.max(8,rr.top-btn.offsetHeight-6):rr.bottom+6)+'px';
+  btn.onpointerdown=e=>e.preventDefault(); // keep the selection
+  btn.onclick=()=>{const r=btn.getBoundingClientRect();hide();draftOf(key).target={kind:'block',blockId:key,quote};openQuick(key,r.left,r.top)}}
+document.addEventListener('selectionchange',()=>{clearTimeout(S.selT);S.selT=setTimeout(selectionAsk,120)});
+addEventListener('scroll',()=>{if(!$('#asksel').hidden)selectionAsk()},{passive:true});
+$('#togglePanel').addEventListener('click',()=>{S.panelHidden=!S.panelHidden;showPanel();render()});
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b){S.tab=b.dataset.tab;renderPanel()}});
 $('#filters').addEventListener('click',e=>{const b=e.target.closest('button');if(b){S.filter=b.dataset.f;renderPanel()}});
 $('#finishRound').addEventListener('click',finishRound);
 $('#toggleHist').addEventListener('click',()=>{S.showHist=!S.showHist;renderPanel()});
@@ -5337,7 +5656,7 @@ async function openFolder(root,ask){
     S.folder=f;S.lastFolder=root;S.caps=folderCaps(dir);S.assetURL=new Map();await loadAssetURLs(dir);
     useDB(f);await loadFolderLangs(dir);
     if(!root.virtual)try{await idb.set('folder',root)}catch(e){}
-    S.tab='folder';S.panelInView=true;document.body.classList.remove('nopanel');
+    S.tab='folder';if(editingMode()){S.panelHidden=false;showPanel()}
     renderLocalBar();refreshFolderFiles();toast(tr('Opened folder {name}',{name:root.name}))}
   catch(e){fail(e&&e.msg?e.msg:tr('Could not open the folder ({m}).',{m:errText(e)||tr('unknown')}),e&&e.detail)}
 }
@@ -6047,7 +6366,8 @@ function agentView(){ // what the bar shows: {state, text, cls}
 function renderAgentBar(){ // the agent strip above the report: connection, progress, and the two round buttons
   const box=$('#agentbar');if(!box)return;
   const open=openCount(),cur=currentChanges().length,v=agentView(),busy=v.state==='sent'||v.state==='working',listening=!!(S.agent&&S.agent.listening);
-  const show=!S.readonly&&!!S.meta&&!!(S.server||open||cur);
+  renderQA();
+  const show=!S.readonly&&!!S.meta&&!!(S.server||open||cur)&&editingMode(); // while reading, the questions panel does this
   const key=show?[open,cur,v.state,v.text,listening,!!S.server].join('|'):'';
   if(key===box.dataset.key)return;box.dataset.key=key;box.replaceChildren();box.hidden=!show;if(!show)return; // rebuilt only when it changes, so a click is never lost
   const B=(t,fn,cls,title)=>h('button',{type:'button',class:'btn small'+(cls?' '+cls:''),text:t,title,onclick:fn});
@@ -6100,7 +6420,7 @@ function openHelp(){
   openModal(tr('Welcome to Duetsheet'),[h('div',{class:'langbox'},[
     h('p',{text:tr('Duetsheet is a report that you and an AI agent revise together. Every change is recorded with who made it.')}),
     h('ol',{},[
-      step(tr('Read.'),tr('View shows the report as pages. Turn pages with the arrow keys.')),
+      step(tr('Read.'),tr('View shows the report as pages. Turn pages with the arrow keys. To ask the agent about a figure or a passage, draw around part of the figure or select the text.')),
       step(tr('Review.'),tr('In Edit, change text and charts directly. Under each block, write a comment or pick a tag. On a chart, click a point or draw a box or a lasso.')),
       step(tr('Keep track.'),tr('The Changes tab lists every change, by you or by the agent. Click "Finish this round" when you are done.')),
       step(tr('Hand it to your agent.'),S.cloud?tr('Go back to Claude and ask it to read the annotations and revise the report.')
@@ -6108,7 +6428,14 @@ function openHelp(){
     h('p',{},[link('/blob/main/docs/tutorial.md',tr('Tutorial with screenshots')),' · ',link('/blob/main/AGENTS.md',tr('AGENTS.md (for agents)'))]),
     h('div',{class:'crow'},[h('span',{class:'sp'}),h('button',{type:'button',class:'btn small primary',text:tr('Got it'),onclick:closeModal})])])]);
 }
-function welcomeOnce(){try{if(localStorage.getItem('duetsheet-welcomed'))return;localStorage.setItem('duetsheet-welcomed','1')}catch(e){return}openHelp()}
+function onceOnly(key,fn){try{if(localStorage.getItem(key))return;localStorage.setItem(key,'1')}catch(e){return}fn()}
+function helpModal(title,intro,steps){ // numbered steps: [bold start, the rest]
+  openModal(title,[h('div',{class:'langbox'},[intro?h('p',{text:intro}):null,
+    h('ol',{},steps.map(([t,d])=>h('li',{},[h('strong',{text:t}),' '+d]))),
+    h('div',{class:'crow'},[h('span',{class:'sp'}),h('button',{type:'button',class:'btn small primary',text:tr('Got it'),onclick:closeModal})])])])}
+function welcomeOnce(){S.welcomed=true;
+  try{if(localStorage.getItem('duetsheet-welcomed')){if(!editingMode()&&!S.readonly)askTipOnce();return}localStorage.setItem('duetsheet-welcomed','1')}catch(e){return}
+  openHelp()} // on a first visit the ask tip waits for the next switch to View
 $('#helpBtn').addEventListener('click',openHelp);
 
 /* ---------- Startup and sync ---------- */

@@ -39,7 +39,8 @@ def main():
         rep['annotations'] = {
             'a1': {'id': 'a1', 'no': 1, 'target': {'kind': 'point', 'blockId': 'b-fig1', 'rowId': 3}, 'tags': ['use-log-scale'], 'text': 'why so low?', 'status': 'open', 'createdAt': '2026-09-24T00:00:00.000Z'},
             'a2': {'id': 'a2', 'no': 2, 'target': {'kind': 'lasso', 'blockId': 'b-fig2', 'space': 'data', 'xKey': 'a', 'yKey': 'b', 'polygon': [[0, 0], [1, 1], [0, 1]],
-                                                   'enclosed': list(range(1, 41))}, 'tags': [], 'text': 'cluster', 'status': 'open', 'createdAt': '2026-09-24T00:00:01.000Z'},
+                                                   'enclosed': list(range(1, 41))}, 'tags': ['how-computed'], 'text': 'cluster', 'status': 'open', 'from': 'view',
+                   'createdAt': '2026-09-24T00:00:01.000Z'},   # a question asked while reading
             'a3': {'id': 'a3', 'no': 3, 'target': {'kind': 'block', 'blockId': 'b-intro'}, 'tags': [], 'text': 'done one', 'status': 'done', 'createdAt': '2026-09-24T00:00:02.000Z'}}
         rep['annotations']['a1']['thread'] = [{'by': 'claude', 'text': 'It is the random start.', 'at': 'x'}, {'by': 'user', 'text': 'Then say so in the caption.', 'at': 'y'}]
         rep.setdefault('style', {})['writing'] = {'rules': [{'text': 'Conclusion first.'}, {'text': 'Numbers with units.'}]}
@@ -52,6 +53,7 @@ def main():
         a1, a2 = j['annotations']
         ok(a1['block']['id'] == 'b-fig1' and a1['dataset']['id'] == 'exp' and a1['targetRows'] == [{'dataset': 'exp', **r} for r in rep['datasets']['exp']['rows'] if r['id'] == 3], 'point: block, dataset and the row')
         ok(len(a2['targetRows']) == 30 and a2['targetRowsNote'] == '10 more rows not shown', 'lasso: 30 rows and a note')
+        ok(a2['annotation'].get('from') == 'view' and a2['annotation']['tags'] == ['how-computed'], 'a question asked while reading keeps from and its question tag')
         ok('rows' not in json.dumps(a1['dataset']) or isinstance(a1['dataset']['rows'], int), 'dataset rows are a count, not the data')
         ok(len(out) < 20000, f'compact output ({len(out)} characters)')
         ok(a1['annotation']['thread'][-1]['text'] == 'Then say so in the caption.', 'the conversation comes with the annotation')

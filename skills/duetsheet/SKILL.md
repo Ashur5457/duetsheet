@@ -27,7 +27,7 @@ Reply in the user's language. Tell the user what you are about to do before each
    It opens the report in the browser, already connected to the folder.
 7. **Listen for the page.** Run this as a second background process:
    `python "${CLAUDE_PLUGIN_ROOT}/duetsheet.py" wait "<folder>"`
-   It costs nothing while it waits and exits when the user clicks **Ask the agent to revise** in the page (or when Duetsheet stops); you are notified when it exits. Tell the user the report is open, that they can review in Edit mode, and that the **Ask the agent to revise** button at the top sends their comments to you, with no need to come back to this conversation.
+   It costs nothing while it waits and exits when the user clicks **Ask the agent to revise** in the page (or **Ask the agent** in the questions panel of View), or when Duetsheet stops; you are notified when it exits. Tell the user the report is open, that they can review in Edit mode, and that the **Ask the agent to revise** button at the top sends their comments to you; while reading in View, they can draw around part of a figure or select text to ask a question, and the questions panel sends them. No need to come back to this conversation.
 
 ## When `wait` exits
 

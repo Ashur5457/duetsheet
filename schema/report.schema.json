@@ -229,6 +229,7 @@
         "files": { "type": "array", "items": { "type": "string" }, "description": "With the tags add-data-files or replace-data-files: the files the user chose, relative to the folder of report.json." },
         "status": { "enum": ["open", "done"] },
         "reply": { "type": "string", "description": "The agent's latest answer (the same text as its last thread message)." },
+        "from": { "enum": ["view"], "description": "view: a question asked while reading (View); the page lists these in its questions panel." },
         "thread": {
           "type": "array",
           "description": "The conversation after the comment, oldest first. A user message sets status back to open.",

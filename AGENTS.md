@@ -163,6 +163,8 @@ Both attach to the block right before in `order`, so put a discussion right afte
 
 `thread` is the conversation after the comment itself (`text`), oldest first. When the user answers you, the page adds their message and sets `status` back to `"open"`. `reply` is kept equal to your latest message, so older pages still show it. Reports without `thread` have at most the one `reply`.
 
+`from: "view"` marks a question the user asked while reading (in View) rather than a comment written while editing. The page lists these questions, with your answers, in a questions panel next to the report, where the user can reply. Handle them like any other comment: often the answer is an explanation in `thread` rather than a change.
+
 `target` is one of:
 
 | `kind` | Fields | Meaning |
@@ -185,6 +187,9 @@ Tags come from preset buttons and are stored as stable ids, whatever the interfa
 **File requests.** In Folder > Data the user ticks files and asks for them to be added to a chart or to replace its data. That makes an annotation on the chart or table with the tag `add-data-files` or `replace-data-files`, the exact list in `files` (paths relative to the folder of `report.json`), and the user's note in `text` (for example "only the CE10 column, one series per round"). To handle it: read the files; combine or convert them with a script in `scripts/` into `derived_data/` and record the step; import the result as a dataset; then add it to the chart as a new series (or a new dataset for a table), or replace the chart's data, keeping the axes and labels unless asked. Never modify the listed files. Any other comment can carry `files` too (the user ticked files and attached them to the comment); the comment text says what to do with them.
 | `table` | `add-units`, `change-sort`, `add-remove-columns`, `highlight-key-points` |
 | `image` | `crop`, `add-labels`, `replace-image`, `add-caption` |
+| any block (questions) | `explain`, `where-from`, `how-computed`, `why-so`, `how-reliable`, `compare` |
+
+The question tags ask for an answer, not a change: answer in `thread` (what it means, where the data comes from and through which steps, how it was computed, why, how far it can be trusted, how it compares), taking the facts from the data chain and the sources, and change the report only if the user also asked for it.
 
 Reports from `duetsheet/0.2` stored the button text instead, in the interface language of the time (for example `Add trend line` or its Chinese translation). Read such a tag by its meaning; do not rewrite old annotations just to change the tag format. A tag that is not in the table above is free text from the user.
 
