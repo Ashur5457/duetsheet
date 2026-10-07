@@ -8,7 +8,7 @@ It is a human-in-the-loop review tool for AI-generated, data-heavy reports: visu
 
 Why the name: in a duet, two performers play from **one sheet of music**. In Duetsheet, a human and an AI agent work from one shared page. Sheet music is also a set of steps that gets **played** again and again: every change is recorded, and every figure can be traced back to the raw files and scripts behind it.
 
-> **Status: v0.6 prototype.** Start it from Claude Code (`/duetsheet`) or with `python duetsheet.py` in your data folder, open it in Chrome or Edge and choose a folder, host it as a [Claude](https://claude.ai) Artifact, or use saved report files in any modern browser. See the [tutorial](docs/tutorial.md) and the [roadmap](#roadmap).
+> **Status: v0.7 prototype.** Start it from Claude Code (`/duetsheet`) or with `python duetsheet.py` in your data folder, open it in Chrome or Edge and choose a folder, host it as a [Claude](https://claude.ai) Artifact, or use saved report files in any modern browser. See the [tutorial](docs/tutorial.md) and the [roadmap](#roadmap).
 
 ![The review loop: the agent writes the report, you review it, one button asks the agent to revise, the agent replies under each comment, you check what changed](docs/review-loop.svg)
 

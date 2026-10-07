@@ -30,7 +30,7 @@ Python 3.8 or later, standard library only.
 """
 import argparse, base64, datetime, glob, hashlib, hmac, http.server, json, mimetypes, os, pathlib, posixpath, re, secrets, shutil, socket, subprocess, sys, tempfile, threading, time, urllib.parse, webbrowser
 
-VERSION = '0.6.0'
+VERSION = '0.7.0'
 SCHEMA = 'duetsheet/0.6'
 HERE = pathlib.Path(__file__).resolve().parent
 PAGE = HERE / 'duetsheet.html'

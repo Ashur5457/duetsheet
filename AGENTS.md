@@ -2,7 +2,7 @@
 
 This file is for AI agents (Claude Code, Claude on claude.ai, Codex, Gemini CLI, Cursor, or any LLM that can read and write files). It explains how a Duetsheet report is stored, how to read the human's feedback, and how to write or revise the report so that every change stays visible, attributable and reversible.
 
-- Format version: `duetsheet/0.6`. Reports from `duetsheet/0.2` to `0.5` are read as they are; nothing needs to be migrated. (0.5 added the `outline` block type and the `beside` value of `breakBefore`; 0.6 added the `steps` collection, the data chain.)
+- Format version: `duetsheet/0.6`. Reports from `duetsheet/0.2` to `0.5` are read as they are; nothing needs to be migrated. (0.5 added the `outline` block type and the `beside` value of `breakBefore`; 0.6 added the `steps` collection, the data chain.) Duetsheet 0.7 keeps this format: it only adds the optional `from` of an annotation (see below).
 - Formal definition: [`schema/report.schema.json`](schema/report.schema.json) (JSON Schema 2020-12).
 - Complete example: [`examples/demo-project/`](examples/demo-project/).
 - The interface can be shown in several languages, but the data never changes with it: field names, tag ids and enum values are always English. Write report content (titles, text, captions, replies) in the language the user works in, and reply to an annotation in its language.
