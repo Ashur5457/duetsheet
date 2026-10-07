@@ -8,11 +8,12 @@ This tutorial follows that loop once, with the demo project in [`examples/demo-p
 
 1. [Install](#1-install) (once)
 2. [Start a report](#2-start-a-report)
-3. [Review: edit, comment, draw around points](#3-review-edit-comment-draw-around-points)
-4. [Ask the agent to revise](#4-ask-the-agent-to-revise)
-5. [Check what changed](#5-check-what-changed)
+3. [Ask while you read](#3-ask-while-you-read)
+4. [Review: edit, comment, draw around points](#4-review-edit-comment-draw-around-points)
+5. [Ask the agent to revise](#5-ask-the-agent-to-revise)
+6. [Check what changed](#6-check-what-changed)
 
-Then, when you need them: [bring in raw data and trace figures back to it](#6-raw-data-and-the-data-chain), [teach it your figure style and your writing](#7-your-figure-style-and-your-writing), [other languages](#8-other-languages), and [what to do when something goes wrong](#when-something-goes-wrong).
+Then, when you need them: [bring in raw data and trace figures back to it](#7-raw-data-and-the-data-chain), [teach it your figure style and your writing](#8-your-figure-style-and-your-writing), [other languages](#9-other-languages), [saving, undo and backups](#10-saving-undo-and-backups), and [what to do when something goes wrong](#when-something-goes-wrong).
 
 You need a desktop computer with Chrome or Edge.
 
@@ -73,6 +74,8 @@ Until a folder is open, a yellow bar reminds you that nothing is saved. Once it 
 
 ![The page before a folder is opened](open-folder.png)
 
+**The top bar.** **View** and **Edit** switch modes. To their right: the **File** menu (snapshot, export, clear comments), the line that says the page [saves by itself](#10-saving-undo-and-backups), and, in Edit, the **Undo** and **Redo** arrows. The **?** button explains the page and lists the names of its parts ("Page bar", "Side panel", "Questions panel", and so on), so you and your agent can talk about them.
+
 **Where files go.** Duetsheet keeps everything it writes in a `duetsheet/` subfolder of your data folder. Your raw data must be *inside* the folder you open but *outside* `duetsheet/`; it is only read, never changed. What is computed from it goes *inside* `duetsheet/`: tables in `derived_data/`, the scripts that compute them in `scripts/`.
 
 ```
@@ -87,15 +90,36 @@ my-experiment/                the folder you open
 
 If some of your data is somewhere else (another drive, your Downloads folder), move or copy it into the folder first; Claude asks you rather than doing it. (The demo project uses a simpler layout, with `report.json` at the top and the raw data in `data/`.)
 
-**View** shows the report as 16:9 pages. Turn pages with the arrow keys or the buttons below.
+**View** shows the report as 16:9 pages, like slides. Turn pages with the arrow keys or the buttons below.
 
 ![View mode with a project folder open](view-mode.png)
 
-**Later, without an agent**: `python path/to/duetsheet.py shortcut "path/to/data-folder"` puts a shortcut on your desktop; double-click it to open the report and keep the window that opens while you use it. To show the report to someone who has nothing installed, click **Export read-only copy** and send them the HTML file from `exports/`; it opens in any browser.
+**Place the page where you like.** Drag the thin bar above the page to move it (the page buttons and thumbnails come along), and drag its bottom right corner to make it smaller or larger. The page is scaled as a whole, so it always holds the same blocks: what is on page 3 for you is on page 3 for your agent and for everyone else, whatever the size of their window. Double-click the bar to put the page back; until you move it, it fits the window and makes room for the questions panel. Where you put it is kept in this browser, not in the report.
 
-## 3. Review: edit, comment, draw around points
+![Moving the page by its bar, making it smaller from its corner, and putting it back](move-page.gif)
 
-Switch to **Edit**. Fix small things yourself, and write down everything else for the agent.
+**Later, without an agent**: `python path/to/duetsheet.py shortcut "path/to/data-folder"` puts a shortcut on your desktop; double-click it to open the report and keep the window that opens while you use it. To show the report to someone who has nothing installed, choose **File > Export read-only copy** and send them the HTML file from `exports/`; it opens in any browser.
+
+## 3. Ask while you read
+
+You do not have to switch to Edit to ask the agent about something you read. In **View**:
+
+- **Draw around a region of a figure.** Hold the mouse button on a chart or an image and draw around what you mean, as in a paint program. On a chart you can also click a single point.
+- **Select some text.** An **Ask the agent** button appears next to the selection.
+
+A small window opens. Pick one of the **Ask** tags (*What does this mean?*, *Where does the data come from?*, *How was it computed?*, *Why is it so?*, *Can it be trusted?*, *How does it compare?*) or type your own question, and click **Add to my questions**.
+
+![A region of a chart circled, the question being written, and the questions panel with an earlier question and the agent's answer](view-ask.png)
+
+![Asking while reading: draw around two points, pick a question, send it, and the answer comes back into the panel](ask-while-reading.gif)
+
+Your questions wait in the **Questions panel** at the bottom right. Drag its header to move it, drag its corner to resize it, and click **–** to fold it to one line; it remembers where you left it, and double-clicking its header puts it back in its corner. It lists each question with what it points at (click it to jump there), and the agent's answer under it; **Reply** goes on with the conversation. **Ask the agent (n)** sends all open questions at once, and the answers come back into the same panel.
+
+The agent answers a question tag in words: what it means, where the number comes from and through which steps, how it was computed, how far it can be trusted. It changes the report only if you also asked for a change.
+
+## 4. Review: edit, comment, draw around points
+
+Switch to **Edit**. The side panel (comments, changes, style, folder) sits on the right; **Float** in its header lets it float over the page instead, to be moved, resized or folded. Fix small things yourself, and write down everything else for the agent.
 
 **Fix it yourself.** Change titles, text and captions directly. **Quick adjustments and download** under a chart changes its type, axis labels, range or log scale, and downloads its data (CSV) or the chart (SVG, PNG). Drag blocks to reorder them; click the dividers between blocks to control page breaks. Every change is recorded.
 
@@ -105,14 +129,14 @@ Switch to **Edit**. Fix small things yourself, and write down everything else fo
 
 **Say what to change.** Under every block there is a comment box:
 
-- pick preset tags such as **Use log scale** or **Highlight key points**, and add words if you like;
+- pick tags: the first row asks (*How was it computed?*, *Can it be trusted?*, ...), the second row asks for a change (**Use log scale**, **Highlight key points**, ...); add words if you like;
 - **Example requests** offers general sentences to start from (for example *Plot […] and […] in this chart, in different colours*), with […] for you to fill in;
 - files you ticked in the Folder tab can be attached, so you never type file names;
 - **Send comment** keeps it for the next round; **Send and ask the agent** sends it and asks the agent at once.
 
 When you have finished a batch of feedback, click **Finish this round** at the top (it appears as soon as you change something), or in the **Changes** tab.
 
-## 4. Ask the agent to revise
+## 5. Ask the agent to revise
 
 **With one button.** If Claude Code started the report (`/duetsheet`), it keeps listening in the background, at no cost. Click **Ask the agent to revise** at the top: it finishes your round and hands your comments to the agent. Next to the button you see *Request sent*, then *The agent is revising the report…*, then *The agent handled N comments*, and the report reloads by itself.
 
@@ -128,9 +152,9 @@ If no agent is listening (for example, you opened the report with a desktop shor
 
 Comments the agent handled are marked **Done** with its reply. A comment it could not settle stays **Open**, with a question for you. To answer, write under its reply and click **Reply**: the comment opens again, and the next **Ask the agent to revise** sends your answer.
 
-## 5. Check what changed
+## 6. Check what changed
 
-The **Changes** tab shows the current round; **Show full history** shows every round. Text changes are shown as inline differences; settings read as "before → after". Each change can be reverted on its own.
+The **Changes** tab shows the current round; **Show full history** shows every round. Text changes are shown as inline differences; settings read as "before → after". Each change can be reverted on its own. To take back your own last changes one at a time, use **Undo** in the top bar ([section 10](#10-saving-undo-and-backups)).
 
 The timeline has one row per block and one column per round. Filled markers are edits (blue: you, purple: the agent), circles are comments. Click a column to see only that round.
 
@@ -138,9 +162,9 @@ The timeline has one row per block and one column per round. Filled markers are 
 
 That is one round. Review again, ask again: the loop goes on until the report says what you mean.
 
-## 6. Raw data and the data chain
+## 7. Raw data and the data chain
 
-**Bring in a file.** Open the **Folder** tab. Data files in the folder are listed with their status; click **Import** next to one (in the demo, `cycle4-runs.csv`). The file becomes a dataset, and Duetsheet records where it came from: the path and a SHA-256 fingerprint of the file. If the file changes later, the Folder tab says "changed since import", charts that use it show a warning in Edit mode, and **Update** imports the new version (the change log keeps both). To plot it, switch to **Edit**, click **Add chart**, open **Chart settings** and pick the dataset.
+**Bring in a file.** Open the **Folder** tab. Data files are listed by folder, as in a file browser: a folder opens when you click it, and what you opened is remembered. The box at the top filters the file names as you type and opens the folders that match. Click **Import** next to a file (in the demo, `cycle4-runs.csv`). The file becomes a dataset, and Duetsheet records where it came from: the path and a SHA-256 fingerprint of the file. If the file changes later, the Folder tab says "changed since import", charts that use it show a warning in Edit mode, and **Update** imports the new version (the change log keeps both). To plot it, switch to **Edit**, click **Add chart**, open **Chart settings** and pick the dataset.
 
 ![The Folder tab after importing a data file](folder-tab.png)
 
@@ -158,7 +182,7 @@ Click the line to see the whole chain, down to the raw files. The Folder tab's *
 
 Raw data can be large. Duetsheet compares size and modification date first and reads a file again only when they differ. `python duetsheet.py check <folder>` reports the same states as warnings; `check --deep` reads every file.
 
-## 7. Your figure style and your writing
+## 8. Your figure style and your writing
 
 The **Folder** tab has two parts: **Data** and **Habits**.
 
@@ -174,11 +198,27 @@ The **Folder** tab has two parts: **Data** and **Habits**.
 
 **Personal habits.** With the launcher, **Save as my personal habits** keeps your figure style and writing rules in `~/.duetsheet/habits/`, and **Load my personal habits** brings them into any new project.
 
-## 8. Other languages
+## 9. Other languages
 
 The interface follows your browser language (English, Traditional Chinese, Simplified Chinese, Japanese, Korean or Spanish). Change it from the menu at the top right, or add your own ([how](translating.md)). The language never changes the report content or the stored data, so people working in different languages can review the same report.
 
 ![The same report with the Japanese interface](language-ja.png)
+
+## 10. Saving, undo and backups
+
+**Nothing to save.** Every change is written at once to `report.json` in the folder, and the top bar says so: *Saving…*, then *Saved automatically* with the time. If a write fails, the bar turns red and says why; if no folder is open, it says *Not saved to a folder*.
+
+**Undo and Redo.** In Edit, the arrows in the top bar (or Ctrl+Z and Ctrl+Y outside a text box, where the browser undoes your typing) take back **your own** changes of the current round, newest first. Hover over an arrow to see what it will undo. The agent's changes are not undone this way; use **Revert** in the Changes tab.
+
+![Switching Figure 1 to a log scale, then Undo and Redo in the top bar](edit-undo.gif)
+
+**The File menu.**
+
+![The File menu: snapshot, export, clear comments](file-menu.png)
+
+- **Take a snapshot** copies `report.json` into `exports/snapshots/<date-time>/`, to go back to later.
+- **Save report file** and **Export read-only copy** (one HTML file for someone who does not use Duetsheet).
+- **Clear the done comments** and **Clear all comments** remove comments, with the agent's answers. Before it removes anything, the page tells you how many there are, how many are not done yet, and takes a snapshot, so a mistake can be undone.
 
 ## When something goes wrong
 
@@ -196,6 +236,4 @@ Errors and warnings do not just flash by: a **⚠** button appears at the top ri
 
 ## Going further: the whole research record
 
-A report tells the finished story. To keep every attempt that led there, the dead ends included, as a tree you and your agent write together and can recompute, see [Duetkifu](https://github.com/Ashur5457/duetkifu). It reads the same `report.json`.
-
-Duetkifu also goes further on the report side: you can ask the agent about a figure or a passage while you only read (draw around part of a figure, or select some text), arrange the page and use a floating side panel, undo your own changes, and take snapshots from a File menu. Its [tutorial](https://github.com/Ashur5457/duetkifu/blob/main/docs/tutorial.md) has short clips of each.
+A report tells the finished story. To keep every attempt that led there, the dead ends included, as a tree you and your agent write together and can recompute, see [Duetkifu](https://github.com/Ashur5457/duetkifu). It reads the same `report.json`, and adds a search inside every file of a large research folder (reports, Word, slides, spreadsheets) for you and your agent.

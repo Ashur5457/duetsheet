@@ -14,6 +14,14 @@ Why the name: in a duet, two performers play from **one sheet of music**. In Due
 
 ![Paginated view mode](docs/view-mode.png)
 
+## In action
+
+| Ask while you read | Place the page |
+|---|---|
+| ![Draw around two points of a chart, pick a question, send it; the answer comes back](docs/ask-while-reading.gif) | ![Move the page by its bar, resize it from its corner, put it back](docs/move-page.gif) |
+
+Changing a chart and taking the change back: ![Switch a chart to a log scale, then Undo and Redo](docs/edit-undo.gif)
+
 > **Keeping the whole research, not only the report?** [Duetkifu](https://github.com/Ashur5457/duetkifu) records every attempt that led to a report, the dead ends included, as a tree you and your agent write together and can recompute. It builds on Duetsheet and reads the same `report.json`.
 
 ## Why
@@ -25,23 +33,25 @@ Describing "the cluster of points in the upper left of the second figure looks o
 ## Features
 
 **Review**
-- **View mode**: clean, paginated 16:9 pages with automatic page breaks. Mark any block as "force a new page", "keep with the previous block", or "beside the previous block", which puts a figure and its discussion side by side. A contents block lists the sections and figures with their page numbers as links. Figures shrink to fit when a page overflows.
-- **Edit mode**: edit titles, text and captions in place; change chart type, dataset, axes, ranges and log scale; crop and resize images; drag blocks to reorder, or switch to **Reorder (titles only)** to see every block as one line, page by page, and drag a figure together with its discussion; add or delete blocks.
+- **View mode**: clean, paginated 16:9 pages with automatic page breaks. Mark any block as "force a new page", "keep with the previous block", or "beside the previous block", which puts a figure and its discussion side by side. A contents block lists the sections and figures with their page numbers as links. Figures shrink to fit when a page overflows. Pages are laid out at one width and scaled like slides, so a page holds the same blocks on every screen; move the page by the bar above it and resize it from its corner.
+- **Ask while you read**: in View, draw around a region of a figure, click a data point, or select some text to ask the agent about it. The questions wait in a floating panel, one button sends them, and the answers come back there to reply to. Question tags (*Where does the data come from?*, *How was it computed?*, *Can it be trusted?*) get an answer, not an edit.
+- **Edit mode**: edit titles, text and captions in place; change chart type, dataset, axes, ranges and log scale; crop and resize images; drag blocks to reorder, or switch to **Reorder (titles only)** to see every block as one line, page by page, and drag a figure together with its discussion; add or delete blocks. The side panel is pinned on the right, or floats over the page.
 - **Visual annotation on figures**: draw around points free-hand with the mouse, as in a paint program, or box-select, on charts and images, or click a single data point in Edit mode (in View mode, pointing at a point shows its values). A small dialog opens right there to say what should change. On charts the annotation stores the **data-space range and the enclosed data points**, not pixels, so the agent knows exactly which measurements you mean.
 - **Ask the agent to revise**: one button at the top sends your comments to the agent that started the report (it waits in the background with `duetsheet.py wait`, at no cost). The page shows when the request is sent, when the agent is working and how many comments it handled, and reloads the revised report by itself. The page never calls a model: the request is only a notice, and the agent reads your comments from the report.
 - **Conversations on comments**: the agent answers under each comment, and you can answer back; your answer reopens the comment for the next round.
 - **Say it in words, not settings**: every comment box has **Example requests**, general scientific sentences to start from and edit (log scale, axis range, only some data, several series, panels, trend line with R², error bars, correlation explained in plain words, export), with […] for what you fill in. Files ticked in the Folder tab can be attached, and **Send and ask the agent** sends the request in one click. Charts keep only quick adjustments (type, axis labels, range, log scale), and download their data as CSV or themselves as SVG or PNG; any dataset downloads as CSV.
-- **Per-block comments** with preset tags ("more concise", "add data", "use log scale", "add trend line", ...) and quotes of selected text.
+- **Per-block comments** with preset tags in two rows, questions ("what does this mean?", "how was it computed?", ...) and changes ("more concise", "add data", "use log scale", "add trend line", ...), and quotes of selected text.
 
 **History**
 - **Change log**: every edit is recorded with before and after values. Text changes are shown as inline diffs; setting changes read as sentences ("Y axis: linear → log"). Each change can be reverted on its own.
 - **Rounds and timeline**: close a round of edits with one click. The timeline shows rows as report blocks and columns as rounds, with human and AI edits colour-coded.
 - **Human vs. AI attribution**: edits made by the agent are recorded separately from yours.
+- **Saved as you go**: every change is written at once, and the top bar says when it last saved; Undo and Redo (Ctrl+Z, Ctrl+Y) take back your own changes; a File menu takes dated snapshots of `report.json`, exports, and clears comments (after a snapshot).
 
 **Data and figures**
 - **Works in your data folder**: start Duetsheet in the folder with your raw data (`/duetsheet` in Claude Code, or `python duetsheet.py`) and the report opens already connected to it, with no folder to pick. The report is saved in a `duetsheet/` subfolder; raw data is only read. Your agent can edit the report while the page is open; the page reloads it and merges by document. In Chrome or Edge you can also open a folder from the page itself.
 - **Raw data with provenance**: import CSV, TSV or JSON files from your data folder and its subfolders. Each dataset records the file path and its SHA-256 fingerprint, and the page tells you when the source file changed after the import.
-- **Data chain, from figure to raw file**: every script run is recorded as a step (script, command, parameters, input and output files with their fingerprints). Under each chart and table a line such as *Source: cells.csv ← make_cells.py ← 72 raw files* opens the whole chain. When a raw file or a script changes, everything computed from it turns red: steps, derived files, datasets, charts. New data is found by itself: drop a new round of files into the folder and the steps whose input patterns match them turn red, with the new files listed. The Folder tab lists every derived file, raw file and script, and answers the reverse question too: click a raw file and see which charts depend on it. Large raw data is only re-read when its size or date changed.
+- **Data chain, from figure to raw file**: every script run is recorded as a step (script, command, parameters, input and output files with their fingerprints). Under each chart and table a line such as *Source: cells.csv ← make_cells.py ← 72 raw files* opens the whole chain. When a raw file or a script changes, everything computed from it turns red: steps, derived files, datasets, charts. New data is found by itself: drop a new round of files into the folder and the steps whose input patterns match them turn red, with the new files listed. The Folder tab lists every derived file, raw file and script as folders that open like in a file browser, with a box that filters the file names, and answers the reverse question too: click a raw file and see which charts depend on it. Large raw data is only re-read when its size or date changed.
 - **Several series in one chart**: compare data from different files or instruments in one chart, each series with its own colour, marker and legend name. Empty cells are left out, not drawn as zero.
 - **Pick files instead of typing names**: tick files in the Folder tab (Shift-click for a range, or a whole folder), then **Add to a chart** or **Replace the data of a chart**. The request goes to your agent as a comment with the exact file list; it combines the files, records the step and updates the chart. Long file names are shortened to the part that differs (`ch001-020` instead of `raw data_ch001-020.xlsx`). The datasets in the report are listed with the charts that use them, and several can be deleted at once.
 - **Figures from any tool, with their source**: upload SVG (kept as vector) or PNG/JPEG/WebP/GIF from Origin, matplotlib, MATLAB, R, Igor Pro, Prism, Excel and others. Each image records which tool made it, the original file name, the plotting script and the raw data, so the agent knows how to regenerate it.
@@ -53,10 +63,13 @@ Describing "the cluster of points in the upper left of the second figure looks o
 - **Habit suggestions**: when you make the same chart change on three charts (for example switching to a log axis), Duetsheet offers to make it the default.
 
 **For everyone**
+- **Names for every part of the page**: the help window lists them ("Page bar", "Side panel", "Questions panel", ...), so you and your agent can talk about the same thing.
 - **Problems you can see**: errors and warnings stay listed under **⚠** at the top (for a broken `report.json`, with the line and column). With the launcher they also reach your agent and are saved in `errors.log`. `NaN` and `Infinity` written by Python are read as empty values instead of breaking the page, and failed saves (for example while OneDrive holds the file) are retried.
 - **Six interface languages, plus your own**: English, Traditional Chinese, Simplified Chinese, Japanese, Korean and Spanish, picked from the browser language. Anyone can add a language or correct a translation from the language menu, with no code. See [docs/translating.md](docs/translating.md).
-- **Read-only copies and shortcuts**: **Export read-only copy** writes one HTML file with the report and its images inside; it opens in any browser, straight into View mode, and can be sent to anyone. `python duetsheet.py shortcut <folder>` puts a desktop shortcut that opens the report with one double-click.
+- **Read-only copies and shortcuts**: **File > Export read-only copy** writes one HTML file with the report and its images inside; it opens in any browser, straight into View mode, and can be sent to anyone. `python duetsheet.py shortcut <folder>` puts a desktop shortcut that opens the report with one double-click.
 - **Open format**: the report is plain JSON with a published [JSON Schema](schema/report.schema.json), so any program or LLM can read, generate and validate it.
+
+![Asking while reading: a region of a chart circled, the question being written, and the questions panel with the agent's answer](docs/view-ask.png)
 
 ![Annotating a chart with a lasso and a data point](docs/edit-annotate.png)
 
@@ -81,7 +94,7 @@ You need Python 3.8 or later (nothing else to install).
    ```bash
    git clone https://github.com/Ashur5457/duetsheet.git && python duetsheet/duetsheet.py install-skill
    ```
-   Updating, removing, and installing without git: [tutorial, section 0](docs/tutorial.md#0-install).
+   Updating, removing, and installing without git: [tutorial, section 1](docs/tutorial.md#1-install).
 2. Open Claude Code in the folder that holds your raw data (CSV, TSV, JSON; Excel is converted by Claude) and type `/duetsheet`, or just say:
    > Start Duetsheet and write a report from the data in this folder.
 
@@ -98,7 +111,7 @@ You need Python 3.8 or later (nothing else to install).
        scripts/make_cells.py     the scripts that compute them
    ```
    Data outside the opened folder cannot be traced; move or copy it in first.
-3. Review in **Edit** mode: change things directly, comment, draw on figures.
+3. Read in **View** and ask about what you read, or review in **Edit** mode: change things directly, comment, draw on figures.
 4. Click **Ask the agent to revise** at the top of the page. Claude, waiting in the background, reads your comments and revises the report; the button shows its progress. You do not need to switch back to Claude. (If no agent is listening, for example when you opened the report from a desktop shortcut, the button gives you a prompt to paste into Claude instead. You can also just tell Claude: *Read my annotations and revise the report.*)
 
    The page picks up Claude's changes within a few seconds. Everything it changed appears in the change log, marked as the agent's. If something goes wrong, the page reports it to Claude (and under **⚠** at the top), so Claude can fix it.
