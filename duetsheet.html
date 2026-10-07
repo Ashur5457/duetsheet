@@ -5645,9 +5645,9 @@ $('#modes').addEventListener('click',e=>{const b=e.target.closest('button');if(b
 // The side panel (comments, changes, style, folder) is for editing: View reads at full width without it
 const editingMode=()=>S.mode==='edit';
 function showPanel(){const ed=editingMode();document.body.classList.toggle('nopanel',!ed||!!S.panelHidden);$('#togglePanel').hidden=!ed;renderAgentBar();placePanel()}
-const PN_KEY='duetsheet-panel';
-let PN=(()=>{const d={pin:false,min:false,x:null,y:null,w:0,h:0};try{const v=JSON.parse(localStorage.getItem(PN_KEY)||'null');
-  if(v&&typeof v==='object'){d.pin=v.pin===true;d.min=v.min===true;['x','y'].forEach(k=>{if(Number.isFinite(v[k]))d[k]=v[k]});['w','h'].forEach(k=>{if(Number.isFinite(v[k])&&v[k]>0)d[k]=v[k]})}}catch(e){}return d})();
+const PN_KEY='duetsheet-side-panel'; // pinned on the right unless the user made it float
+let PN=(()=>{const d={pin:true,min:false,x:null,y:null,w:0,h:0};try{const v=JSON.parse(localStorage.getItem(PN_KEY)||'null');
+  if(v&&typeof v==='object'){d.pin=v.pin!==false;d.min=v.min===true;['x','y'].forEach(k=>{if(Number.isFinite(v[k]))d[k]=v[k]});['w','h'].forEach(k=>{if(Number.isFinite(v[k])&&v[k]>0)d[k]=v[k]})}}catch(e){}return d})();
 function savePN(){try{localStorage.setItem(PN_KEY,JSON.stringify(PN))}catch(e){}}
 function placePanel(){const b=$('#panel'),fl=!PN.pin;document.body.classList.toggle('pfloat',fl);b.classList.toggle('min',fl&&PN.min);
   $('#pnTitle').textContent=trc('ui','Side panel');
