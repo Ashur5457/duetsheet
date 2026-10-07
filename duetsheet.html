@@ -5364,7 +5364,7 @@ function dockQA(){
     const r=m.getBoundingClientRect(),edge=innerWidth-box.offsetWidth-16-12;
     need=Math.max(0,Math.ceil(r.right-edge));if(edge-r.left<640)need=0;m.style.marginRight=old}
   const v=need?need+'px':'';if(m.style.marginRight===v)return;
-  m.style.marginRight=v;clearTimeout(S.dockT);S.dockT=setTimeout(()=>{if(S.mode==='view')render()},0)} // the pages are cut to the new width
+  m.style.marginRight=v;clearTimeout(S.dockT);S.dockT=setTimeout(()=>{if(S.mode==='view')render()},0)} // the page is scaled to the new width
 /* ---------- The page in View: moved and scaled by the reader ----------
    s is the scale of the page (0 = fit the width, and make room for the questions panel); dx, dy move it, with the page
    bar and the thumbnails, from where it would be. Kept in this browser, never in the report. */
