@@ -39,7 +39,8 @@ battery-test-0924/            the folder the user opens
     habits/                   the user's habits: figures/ (SVG, PNG, .mplstyle, plotting scripts),
                               writing/ (their own articles: .md, .txt, .docx, .pdf), profile.json, writing.json
     assets/                   images and files uploaded in the page, named <asset id>.<ext>
-    exports/                  files the page exports (styles, report copies, translation templates)
+    exports/                  files the page exports (styles, report copies, translation templates);
+                              snapshots/<date-time>/ holds the copies of report.json the user took
     lang/                     extra interface translations (optional)
     cache/                    fingerprints of large files, kept by the launcher (safe to delete)
     errors.log                problems the page reported (written by the launcher)

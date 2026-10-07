@@ -49,13 +49,15 @@ button,input,select,textarea{font:inherit;color:inherit}
 
 /* top bar */
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--line)}
-.top .in{max-width:1500px;margin:0 auto;padding:10px 22px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.top .in{max-width:1500px;margin:0 auto;padding:10px 22px;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+#togglePanel{white-space:nowrap}
 .top h1{font-size:18px;margin:0 8px 0 0;white-space:nowrap}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--paper)}
 .seg button{border:0;background:transparent;padding:6px 14px;cursor:pointer}
 .seg button+button{border-left:1px solid var(--line)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
-.hint{color:var(--muted);font-size:13px;flex:1 1 220px}
+.hint{color:var(--muted);font-size:12.5px;flex:1 1 80px;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media (max-width:1180px){.hint{display:none}} /* the ? button explains the mode; the top bar needs the room in Edit */
 #agentbar{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin:0 0 12px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);font-size:13px}
 #agentbar[hidden]{display:none}
 .reply.me{border-left-color:var(--c2)}
@@ -161,6 +163,18 @@ main{min-width:0}
 .chlinks li{display:flex;gap:6px;align-items:center;padding:2px 0 2px 14px}
 .flist details{width:100%}.flist summary{cursor:pointer;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .flist .dot{align-self:center}
+/* the files of the folder as a tree: folders folded until opened; a box filters the names */
+.ftree{list-style:none;margin:6px 0 8px;padding:0}.ftree .ftree{margin:0 0 0 14px}
+.ftree>li.fdir{display:block;border-bottom:0;padding:0}
+.ftree details>summary{list-style:none;display:flex;gap:6px 8px;align-items:center;flex-wrap:wrap;padding:5px 4px;border-bottom:1px solid var(--line);cursor:pointer;font-size:13px}
+.ftree details>summary::-webkit-details-marker{display:none}
+.ftree details>summary::before,.fsec>summary::before{content:"\25B8";color:var(--muted);font-size:20px;line-height:1;width:1.1em;text-align:center;flex:none;display:inline-block}
+.ftree details[open]>summary::before,.fsec[open]>summary::before{content:"\25BE"}
+.ftree details>summary:hover::before,.fsec>summary:hover::before{color:var(--accent)}
+.fsec{margin:4px 0}.fsec>summary{list-style:none;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 2px;cursor:pointer;font-size:13px}
+.fsec>summary::-webkit-details-marker{display:none}
+.ftree .dname,.fsec .dname{font-weight:600;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}
+.fsearch{display:flex;gap:6px;align-items:center;margin:4px 0 8px}.fsearch input{flex:1;min-width:0;font:inherit;font-size:13px;padding:5px 9px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)}
 
 /* page (view) */
 .page{width:var(--pw);height:var(--ph);margin:0 auto;background:var(--paper);border-radius:6px;
@@ -395,6 +409,19 @@ details.round summary{cursor:pointer;font-size:13.5px}
 #qa .qaf .sp{flex:1}#qa .qaf .ast{font-size:12px;color:var(--muted)}#qa .conn{display:inline-flex;gap:6px;align-items:center}
 #qa .anno{margin:0}#qa .empty{color:var(--muted);font-size:12.5px;margin:4px 0}
 #qa .where{margin:2px 0}
+.savest{font-size:12px;color:var(--muted);white-space:nowrap;cursor:help}.savest.ok::before{content:"\2713  ";color:var(--ok)}
+.savest.bad{color:var(--c5);font-weight:600}
+.undobar{display:inline-flex;gap:4px}
+#filemenu{position:fixed;z-index:75;min-width:230px;background:var(--paper);border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.16);padding:4px;font-size:13px}
+#filemenu[hidden]{display:none}
+#filemenu button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--ink);font:inherit;padding:6px 10px;border-radius:6px;cursor:pointer}
+#filemenu button:hover:not(:disabled){background:color-mix(in srgb,var(--accent) 10%,transparent)}#filemenu button:disabled{color:var(--muted);cursor:default}
+#filemenu button.danger{color:var(--c5)}#filemenu hr{border:0;border-top:1px solid var(--line);margin:4px 2px}
+#filemenu .fmn{float:right;color:var(--muted);margin-left:12px}.undobar[hidden]{display:none}.undobar .btn{min-width:30px;font-size:15px;padding:2px 8px}.savest.busy{color:var(--accent)}
+.savehelp{margin:10px 0;font-size:13px}.savehelp summary{cursor:pointer;font-weight:600}.savehelp ul{margin:6px 0 0;padding-left:1.3em}
+.uinames{margin:10px 0;font-size:13px}.uinames summary{cursor:pointer;font-weight:600}
+.uinames dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;margin:8px 0 0}.uinames dt{font-weight:600}.uinames dd{margin:0;color:var(--muted)}
+.kln{font-size:12.5px;color:var(--muted)}.kwarn{color:var(--c2);font-size:13px;margin:0}
 .flowbar{max-width:var(--pw);margin:0 auto 8px;display:flex;justify-content:flex-end}
 #flow.compact .pgsep{font-size:12px;color:var(--muted);margin:14px 0 4px;border-bottom:1px dotted var(--line);padding-bottom:2px}
 #flow.compact .cg{display:flex;gap:10px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:6px 10px;margin:4px 0;cursor:grab}
@@ -418,6 +445,9 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
     <button type="button" data-mode="edit" aria-pressed="false">Edit</button>
   </div>
   <span class="hint" id="hint"></span>
+  <button type="button" class="btn small" id="fileBtn" aria-haspopup="menu" aria-expanded="false">File</button>
+  <span class="savest" id="savest" hidden></span>
+  <span class="undobar" id="undobar" hidden><button type="button" class="btn small" id="undoBtn">&#x21B6;</button><button type="button" class="btn small" id="redoBtn">&#x21B7;</button></span>
   <button type="button" class="btn issues" id="issuesBtn" hidden aria-label="Problems"></button>
   <select id="lang" aria-label="Language"></select>
   <button type="button" class="btn" id="helpBtn" aria-label="Help">?</button>
@@ -491,6 +521,7 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
 <input type="file" id="reportfile" accept=".json,application/json" hidden>
 <div id="tip" hidden></div>
 <div id="qc" hidden role="dialog" aria-label="Comment"></div>
+<div id="filemenu" hidden role="menu"></div>
 <button type="button" class="btn small primary" id="asksel" hidden>Ask the agent</button>
 <aside id="qa" hidden aria-label="Questions"></aside>
 <div id="toast" hidden></div>
@@ -815,7 +846,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "All changes saved.": "所有修改都已儲存。",
  "Could not save ({m}).": "無法儲存（{m}）。",
  "Open another folder": "開啟其他資料夾",
- "Save a copy": "另存一份",
  "Not saved: changes are lost when you close this tab. Open a project folder to save automatically, or save the report as a file.": "尚未儲存：關掉這個分頁後修改就會消失。請開啟專案資料夾自動儲存，或把報告存成檔案。",
  "Not saved: changes are lost when you close this tab. This browser cannot open folders (use Chrome or Edge), but you can save the report as a file and open it again later.": "尚未儲存：關掉這個分頁後修改就會消失。這個瀏覽器無法開啟資料夾（請用 Chrome 或 Edge），但可以把報告存成檔案，之後再開啟。",
  "Open project folder": "開啟專案資料夾",
@@ -1035,7 +1065,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Import all {n}": "全部匯入（{n}）",
  "Import {n} files from {dir}? Each one becomes a dataset in the report.": "要從 {dir} 匯入 {n} 個檔案嗎？每個檔案都會變成報告裡的一個資料集。",
  "Imported {n} files from {dir}.": "已從 {dir} 匯入 {n} 個檔案。",
- "all imported": "都已匯入",
  "Lines that are list items": "清單行的比例",
  "Load habits/writing.json": "載入 habits/writing.json",
  "Load my personal habits": "載入我的個人習慣",
@@ -1175,7 +1204,65 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "How does it compare?": "和其他的比呢？",
  "ui|Side panel": "側欄",
  "Drag to move the page. Drag its corner to make it larger or smaller. Double-click here to put it back.": "拖曳可移動頁面；拖右下角可放大縮小；按兩下這裡還原。",
- "Drag to make the page larger or smaller": "拖曳可放大或縮小頁面"
+ "Drag to make the page larger or smaller": "拖曳可放大或縮小頁面",
+ "Clear all comments": "清除所有註記",
+ "Clear the done comments": "清除已處理的註記",
+ "Could not save": "存檔失敗",
+ "Could not save the snapshot.": "快照存檔失敗。",
+ "Every change is written at once to {where}. There is no Save button; take a snapshot or export a copy from the File menu.": "每次改動都會立即寫進{where}，不需要按存檔。要留一份備份，請用「檔案」選單存快照或匯出。",
+ "File": "檔案",
+ "Names of the parts of the page": "介面各部分的名稱",
+ "No file names match.": "沒有符合的檔名。",
+ "Not saved to a folder": "未存到資料夾",
+ "Nothing to redo": "沒有可以重做的改動",
+ "Nothing to undo": "沒有可以退回的改動",
+ "Open a project folder first.": "請先開啟專案資料夾。",
+ "Redo: {what}": "下一步：{what}",
+ "Redone: {what}": "已重做：{what}",
+ "Remove {n} comments": "刪除 {n} 則註記",
+ "Saved automatically": "已自動儲存",
+ "Saved automatically {t}": "已自動儲存 {t}",
+ "Saving and backups": "存檔與備份",
+ "Search the folder": "搜尋資料夾",
+ "Snapshot saved in {where}": "快照已存到 {where}",
+ "Take a snapshot": "存一份快照",
+ "There are no comments.": "沒有任何註記。",
+ "There are no done comments.": "沒有已處理的註記。",
+ "This report is not in a folder, so no snapshot can be kept: save the report file first if you may need them.": "這份報告不在資料夾裡，無法存快照；如果之後可能還需要，請先儲存報告檔。",
+ "This report is only in this tab. Open a folder, or save the report file (File menu), to keep it.": "這份報告只在這個分頁裡。請開啟資料夾，或用「檔案」選單儲存報告檔，才會保留下來。",
+ "Undo: the arrow in the top bar takes back your last change, one at a time.": "上一步：頂列的箭頭會一步一步退回你最近的改動。",
+ "Undo: {what}": "上一步：{what}",
+ "Undone: {what}": "已退回：{what}",
+ "the report": "報告",
+ "{n} comments removed.": "已刪除 {n} 則註記。",
+ "{n} comments will be removed, the agent's answers with them.": "將刪除 {n} 則註記，連同 agent 的回答。",
+ "{n} of them are not done yet.": "其中 {n} 則還沒處理。",
+ "ui|Top bar": "頂列",
+ "ui|Folder bar": "資料夾列",
+ "ui|Agent bar": "agent 列",
+ "ui|Page": "頁面",
+ "ui|Page bar": "翻頁列",
+ "ui|Thumbnails": "縮圖列",
+ "ui|Content block": "內容區塊",
+ "ui|Add bar": "新增列",
+ "ui|Questions panel": "問答側欄",
+ "The folder the page is connected to.": "頁面目前連接的資料夾。",
+ "A dated copy of report.json in exports/snapshots/": "把 report.json 加上日期，另存到 exports/snapshots/",
+ "A snapshot of report.json is saved in exports/snapshots/ first, so they can be found again.": "會先把 report.json 存一份快照到 exports/snapshots/，之後還找得回來。",
+ "Export: File > Save report file or Export read-only copy, to send or keep elsewhere.": "匯出：「檔案」選單裡的儲存報告檔、匯出唯讀報告，可以寄給別人或另外保存。",
+ "Filter file names": "篩選檔名",
+ "Saved automatically: every change is written at once to report.json in the opened folder. The top bar shows when it last saved.": "自動儲存：每次改動都會立即寫進開啟的資料夾裡的 report.json。頂列會顯示最後一次儲存的時間。",
+ "Snapshot: File > Take a snapshot keeps a dated copy of report.json in exports/, to go back to later.": "快照：「檔案 > 存一份快照」會把 report.json 加上日期，另存到 exports/，之後可以拿回來用。",
+ "{a} in the folder {name}": "資料夾「{name}」裡的 {a}",
+ "Mode buttons, File menu, saving, undo, language, help, and the side panel button.": "模式切換、「檔案」選單、存檔狀態、上一步、語言、說明，以及側欄按鈕。",
+ "Edit: the agent connection, rounds, and \"Ask the agent to revise\".": "編輯：agent 連線、回合，以及「請 agent 修改」。",
+ "View: one page of the report. Move it by the bar above it; resize it from its corner.": "閱覽：報告的一頁。拖上方的橫條可移動，拖右下角可放大縮小。",
+ "View: previous and next page.": "閱覽：上一頁、下一頁。",
+ "View: every page, to jump to.": "閱覽：所有頁面，可直接跳過去。",
+ "Edit: each text, chart, table or image, with its comment box.": "編輯：每段文字、圖表、表格或圖片，連同下方的意見框。",
+ "Edit: the buttons that add a block.": "編輯：新增方塊的那排按鈕。",
+ "Edit: comments, changes, style, folder.": "編輯：註記、修改紀錄、樣式、資料夾。",
+ "View: your questions to the agent and its answers.": "閱覽：你問 agent 的問題和它的回答。"
 },
 "zh-Hans": {
  "_name": "简体中文",
@@ -1493,7 +1580,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "All changes saved.": "所有修改均已保存。",
  "Could not save ({m}).": "无法保存（{m}）。",
  "Open another folder": "打开其他文件夹",
- "Save a copy": "另存一份",
  "Not saved: changes are lost when you close this tab. Open a project folder to save automatically, or save the report as a file.": "尚未保存：关闭此标签页后修改会丢失。请打开项目文件夹自动保存，或将报告保存为文件。",
  "Not saved: changes are lost when you close this tab. This browser cannot open folders (use Chrome or Edge), but you can save the report as a file and open it again later.": "尚未保存：关闭此标签页后修改会丢失。此浏览器无法打开文件夹（请使用 Chrome 或 Edge），但可以将报告保存为文件，以后再打开。",
  "Open project folder": "打开项目文件夹",
@@ -1713,7 +1799,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Import all {n}": "全部导入（{n}）",
  "Import {n} files from {dir}? Each one becomes a dataset in the report.": "要从 {dir} 导入 {n} 个文件吗？每个文件都会变成报告里的一个数据集。",
  "Imported {n} files from {dir}.": "已从 {dir} 导入 {n} 个文件。",
- "all imported": "都已导入",
  "Lines that are list items": "列表行的比例",
  "Load habits/writing.json": "加载 habits/writing.json",
  "Load my personal habits": "加载我的个人习惯",
@@ -1853,7 +1938,65 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "How does it compare?": "和其他的比呢？",
  "ui|Side panel": "侧栏",
  "Drag to move the page. Drag its corner to make it larger or smaller. Double-click here to put it back.": "拖动可移动页面；拖右下角可放大缩小；双击这里还原。",
- "Drag to make the page larger or smaller": "拖动可放大或缩小页面"
+ "Drag to make the page larger or smaller": "拖动可放大或缩小页面",
+ "Clear all comments": "清除所有注记",
+ "Clear the done comments": "清除已处理的注记",
+ "Could not save": "保存失败",
+ "Could not save the snapshot.": "快照保存失败。",
+ "Every change is written at once to {where}. There is no Save button; take a snapshot or export a copy from the File menu.": "每次改动都会立即写进{where}，不需要按保存。要留一份备份，请用“文件”菜单存快照或导出。",
+ "File": "文件",
+ "Names of the parts of the page": "界面各部分的名称",
+ "No file names match.": "没有符合的文件名。",
+ "Not saved to a folder": "未存到文件夹",
+ "Nothing to redo": "没有可以重做的改动",
+ "Nothing to undo": "没有可以退回的改动",
+ "Open a project folder first.": "请先打开项目文件夹。",
+ "Redo: {what}": "下一步：{what}",
+ "Redone: {what}": "已重做：{what}",
+ "Remove {n} comments": "删除 {n} 条注记",
+ "Saved automatically": "已自动保存",
+ "Saved automatically {t}": "已自动保存 {t}",
+ "Saving and backups": "保存与备份",
+ "Search the folder": "搜索文件夹",
+ "Snapshot saved in {where}": "快照已存到 {where}",
+ "Take a snapshot": "存一份快照",
+ "There are no comments.": "没有任何注记。",
+ "There are no done comments.": "没有已处理的注记。",
+ "This report is not in a folder, so no snapshot can be kept: save the report file first if you may need them.": "这份报告不在文件夹里，无法存快照；如果之后可能还需要，请先保存报告文件。",
+ "This report is only in this tab. Open a folder, or save the report file (File menu), to keep it.": "这份报告只在这个标签页里。请打开文件夹，或用“文件”菜单保存报告文件，才会保留下来。",
+ "Undo: the arrow in the top bar takes back your last change, one at a time.": "上一步：顶栏的箭头会一步一步退回你最近的改动。",
+ "Undo: {what}": "上一步：{what}",
+ "Undone: {what}": "已退回：{what}",
+ "the report": "报告",
+ "{n} comments removed.": "已删除 {n} 条注记。",
+ "{n} comments will be removed, the agent's answers with them.": "将删除 {n} 条注记，连同 agent 的回答。",
+ "{n} of them are not done yet.": "其中 {n} 条还没处理。",
+ "ui|Top bar": "顶栏",
+ "ui|Folder bar": "文件夹栏",
+ "ui|Agent bar": "agent 栏",
+ "ui|Page": "页面",
+ "ui|Page bar": "翻页栏",
+ "ui|Thumbnails": "缩略图栏",
+ "ui|Content block": "内容区块",
+ "ui|Add bar": "新增栏",
+ "ui|Questions panel": "问答侧栏",
+ "The folder the page is connected to.": "页面当前连接的文件夹。",
+ "A dated copy of report.json in exports/snapshots/": "把 report.json 加上日期，另存到 exports/snapshots/",
+ "A snapshot of report.json is saved in exports/snapshots/ first, so they can be found again.": "会先把 report.json 存一份快照到 exports/snapshots/，之后还找得回来。",
+ "Export: File > Save report file or Export read-only copy, to send or keep elsewhere.": "导出：“文件”菜单里的保存报告文件、导出只读报告，可以发给别人或另外保存。",
+ "Filter file names": "筛选文件名",
+ "Saved automatically: every change is written at once to report.json in the opened folder. The top bar shows when it last saved.": "自动保存：每次改动都会立即写进打开的文件夹里的 report.json。顶栏会显示最后一次保存的时间。",
+ "Snapshot: File > Take a snapshot keeps a dated copy of report.json in exports/, to go back to later.": "快照：“文件 > 存一份快照”会把 report.json 加上日期，另存到 exports/，之后可以拿回来用。",
+ "{a} in the folder {name}": "文件夹“{name}”里的 {a}",
+ "Mode buttons, File menu, saving, undo, language, help, and the side panel button.": "模式切换、“文件”菜单、保存状态、上一步、语言、说明，以及侧栏按钮。",
+ "Edit: the agent connection, rounds, and \"Ask the agent to revise\".": "编辑：agent 连线、回合，以及“请 agent 修改”。",
+ "View: one page of the report. Move it by the bar above it; resize it from its corner.": "浏览：报告的一页。拖上方的横条可移动，拖右下角可放大缩小。",
+ "View: previous and next page.": "浏览：上一页、下一页。",
+ "View: every page, to jump to.": "浏览：所有页面，可直接跳转。",
+ "Edit: each text, chart, table or image, with its comment box.": "编辑：每段文字、图表、表格或图片，连同下方的意见框。",
+ "Edit: the buttons that add a block.": "编辑：新增区块的那排按钮。",
+ "Edit: comments, changes, style, folder.": "编辑：批注、修改记录、样式、文件夹。",
+ "View: your questions to the agent and its answers.": "浏览：你问 agent 的问题和它的回答。"
 },
 "ja": {
  "_name": "日本語",
@@ -2171,7 +2314,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "All changes saved.": "すべての変更を保存しました。",
  "Could not save ({m}).": "保存できませんでした（{m}）。",
  "Open another folder": "別のフォルダを開く",
- "Save a copy": "コピーを保存",
  "Not saved: changes are lost when you close this tab. Open a project folder to save automatically, or save the report as a file.": "未保存：このタブを閉じると変更は失われます。プロジェクトフォルダを開いて自動保存するか、レポートをファイルに保存してください。",
  "Not saved: changes are lost when you close this tab. This browser cannot open folders (use Chrome or Edge), but you can save the report as a file and open it again later.": "未保存：このタブを閉じると変更は失われます。このブラウザではフォルダを開けません（Chrome か Edge を使ってください）が、レポートをファイルに保存して後で開くことはできます。",
  "Open project folder": "プロジェクトフォルダを開く",
@@ -2391,7 +2533,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Import all {n}": "すべて取り込む（{n}）",
  "Import {n} files from {dir}? Each one becomes a dataset in the report.": "{dir} から {n} 個のファイルを取り込みますか？それぞれがレポートのデータセットになります。",
  "Imported {n} files from {dir}.": "{dir} から {n} 個のファイルを取り込みました。",
- "all imported": "すべて取り込み済み",
  "Lines that are list items": "箇条書きの行の割合",
  "Load habits/writing.json": "habits/writing.json を読み込む",
  "Load my personal habits": "個人の習慣を読み込む",
@@ -2531,7 +2672,65 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "How does it compare?": "ほかと比べると？",
  "ui|Side panel": "サイドパネル",
  "Drag to move the page. Drag its corner to make it larger or smaller. Double-click here to put it back.": "ドラッグでページを移動、右下の角をドラッグで拡大・縮小、ここをダブルクリックで元に戻す。",
- "Drag to make the page larger or smaller": "ドラッグでページを拡大・縮小"
+ "Drag to make the page larger or smaller": "ドラッグでページを拡大・縮小",
+ "Clear all comments": "すべてのコメントを消去",
+ "Clear the done comments": "対応済みのコメントを消去",
+ "Could not save": "保存できませんでした",
+ "Could not save the snapshot.": "スナップショットを保存できませんでした。",
+ "Every change is written at once to {where}. There is no Save button; take a snapshot or export a copy from the File menu.": "変更はすべて、その場で{where}に書き込まれます。保存ボタンはありません。控えを残すには「ファイル」メニューでスナップショットか書き出しを。",
+ "File": "ファイル",
+ "Names of the parts of the page": "画面の各部の名前",
+ "No file names match.": "一致するファイル名はありません。",
+ "Not saved to a folder": "フォルダに未保存",
+ "Nothing to redo": "やり直せる変更はありません",
+ "Nothing to undo": "戻せる変更はありません",
+ "Open a project folder first.": "先にプロジェクトフォルダを開いてください。",
+ "Redo: {what}": "やり直す：{what}",
+ "Redone: {what}": "やり直しました：{what}",
+ "Remove {n} comments": "{n} 件を削除",
+ "Saved automatically": "自動保存済み",
+ "Saved automatically {t}": "自動保存済み {t}",
+ "Saving and backups": "保存とバックアップ",
+ "Search the folder": "フォルダを検索",
+ "Snapshot saved in {where}": "スナップショットを {where} に保存しました",
+ "Take a snapshot": "スナップショットを保存",
+ "There are no comments.": "コメントはありません。",
+ "There are no done comments.": "対応済みのコメントはありません。",
+ "This report is not in a folder, so no snapshot can be kept: save the report file first if you may need them.": "このレポートはフォルダにないため、スナップショットを残せません。後で必要になりそうなら、先にレポートファイルを保存してください。",
+ "This report is only in this tab. Open a folder, or save the report file (File menu), to keep it.": "このレポートはこのタブの中だけにあります。残すにはフォルダを開くか、「ファイル」メニューでレポートファイルを保存してください。",
+ "Undo: the arrow in the top bar takes back your last change, one at a time.": "元に戻す：上部バーの矢印で、直前の自分の変更を一つずつ戻せます。",
+ "Undo: {what}": "元に戻す：{what}",
+ "Undone: {what}": "元に戻しました：{what}",
+ "the report": "レポート",
+ "{n} comments removed.": "{n} 件のコメントを削除しました。",
+ "{n} comments will be removed, the agent's answers with them.": "コメント {n} 件を、agent の回答ごと削除します。",
+ "{n} of them are not done yet.": "そのうち {n} 件はまだ対応していません。",
+ "ui|Top bar": "上部バー",
+ "ui|Folder bar": "フォルダバー",
+ "ui|Agent bar": "agent バー",
+ "ui|Page": "ページ",
+ "ui|Page bar": "ページ送りバー",
+ "ui|Thumbnails": "サムネイル",
+ "ui|Content block": "内容ブロック",
+ "ui|Add bar": "追加バー",
+ "ui|Questions panel": "質問パネル",
+ "The folder the page is connected to.": "ページがつながっているフォルダ。",
+ "A dated copy of report.json in exports/snapshots/": "report.json を日付つきで exports/snapshots/ に残します",
+ "A snapshot of report.json is saved in exports/snapshots/ first, so they can be found again.": "先に report.json のスナップショットを exports/snapshots/ に保存するので、後で取り戻せます。",
+ "Export: File > Save report file or Export read-only copy, to send or keep elsewhere.": "書き出し：「ファイル」メニューのレポートファイル保存、閲覧専用コピーで、人に送ったり別に保管したりできます。",
+ "Filter file names": "ファイル名で絞り込み",
+ "Saved automatically: every change is written at once to report.json in the opened folder. The top bar shows when it last saved.": "自動保存：変更はすべて、開いたフォルダの report.json にその場で書き込まれます。上部バーに最後の保存時刻が出ます。",
+ "Snapshot: File > Take a snapshot keeps a dated copy of report.json in exports/, to go back to later.": "スナップショット：「ファイル > スナップショットを保存」で、report.json を日付つきで exports/ に残します。",
+ "{a} in the folder {name}": "フォルダ「{name}」の {a}",
+ "Mode buttons, File menu, saving, undo, language, help, and the side panel button.": "モード切替、「ファイル」メニュー、保存状態、元に戻す、言語、ヘルプ、サイドパネルのボタン。",
+ "Edit: the agent connection, rounds, and \"Ask the agent to revise\".": "編集：agent の接続、ラウンド、「エージェントに修正を依頼」。",
+ "View: one page of the report. Move it by the bar above it; resize it from its corner.": "閲覧：レポートの1ページ。上のバーをドラッグで移動、右下の角で拡大・縮小。",
+ "View: previous and next page.": "閲覧：前後のページ。",
+ "View: every page, to jump to.": "閲覧：全ページ。クリックで移動。",
+ "Edit: each text, chart, table or image, with its comment box.": "編集：文章・グラフ・表・画像それぞれと、その下のコメント欄。",
+ "Edit: the buttons that add a block.": "編集：ブロックを追加するボタン。",
+ "Edit: comments, changes, style, folder.": "編集：コメント、変更履歴、スタイル、フォルダ。",
+ "View: your questions to the agent and its answers.": "閲覧：agent への質問とその回答。"
 },
 "ko": {
  "_name": "한국어",
@@ -2849,7 +3048,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "All changes saved.": "모든 변경 사항을 저장했습니다.",
  "Could not save ({m}).": "저장하지 못했습니다 ({m}).",
  "Open another folder": "다른 폴더 열기",
- "Save a copy": "사본 저장",
  "Not saved: changes are lost when you close this tab. Open a project folder to save automatically, or save the report as a file.": "저장되지 않음: 이 탭을 닫으면 변경 사항이 사라집니다. 프로젝트 폴더를 열어 자동 저장하거나 보고서를 파일로 저장하세요.",
  "Not saved: changes are lost when you close this tab. This browser cannot open folders (use Chrome or Edge), but you can save the report as a file and open it again later.": "저장되지 않음: 이 탭을 닫으면 변경 사항이 사라집니다. 이 브라우저는 폴더를 열 수 없지만(Chrome이나 Edge를 사용하세요), 보고서를 파일로 저장했다가 나중에 다시 열 수 있습니다.",
  "Open project folder": "프로젝트 폴더 열기",
@@ -3069,7 +3267,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Import all {n}": "모두 가져오기 ({n})",
  "Import {n} files from {dir}? Each one becomes a dataset in the report.": "{dir}에서 파일 {n}개를 가져올까요? 각각 보고서의 데이터셋이 됩니다.",
  "Imported {n} files from {dir}.": "{dir}에서 파일 {n}개를 가져왔습니다.",
- "all imported": "모두 가져옴",
  "Lines that are list items": "목록 항목 줄 비율",
  "Load habits/writing.json": "habits/writing.json 불러오기",
  "Load my personal habits": "내 개인 습관 불러오기",
@@ -3209,7 +3406,65 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "How does it compare?": "다른 것과 비교하면?",
  "ui|Side panel": "사이드 패널",
  "Drag to move the page. Drag its corner to make it larger or smaller. Double-click here to put it back.": "드래그하여 페이지 이동, 오른쪽 아래 모서리를 드래그하여 확대·축소, 여기를 더블클릭하면 원래대로.",
- "Drag to make the page larger or smaller": "드래그하여 페이지 확대·축소"
+ "Drag to make the page larger or smaller": "드래그하여 페이지 확대·축소",
+ "Clear all comments": "모든 댓글 지우기",
+ "Clear the done comments": "처리된 댓글 지우기",
+ "Could not save": "저장 실패",
+ "Could not save the snapshot.": "스냅샷을 저장하지 못했습니다.",
+ "Every change is written at once to {where}. There is no Save button; take a snapshot or export a copy from the File menu.": "모든 변경은 즉시 {where}에 기록됩니다. 저장 버튼은 없습니다. 사본을 남기려면 \"파일\" 메뉴에서 스냅샷이나 내보내기를 하세요.",
+ "File": "파일",
+ "Names of the parts of the page": "화면 각 부분의 이름",
+ "No file names match.": "일치하는 파일 이름이 없습니다.",
+ "Not saved to a folder": "폴더에 저장 안 됨",
+ "Nothing to redo": "다시 할 변경이 없습니다",
+ "Nothing to undo": "되돌릴 변경이 없습니다",
+ "Open a project folder first.": "먼저 프로젝트 폴더를 여세요.",
+ "Redo: {what}": "다시 하기: {what}",
+ "Redone: {what}": "다시 함: {what}",
+ "Remove {n} comments": "{n}개 삭제",
+ "Saved automatically": "자동 저장됨",
+ "Saved automatically {t}": "자동 저장됨 {t}",
+ "Saving and backups": "저장과 백업",
+ "Search the folder": "폴더 검색",
+ "Snapshot saved in {where}": "스냅샷을 {where}에 저장했습니다",
+ "Take a snapshot": "스냅샷 저장",
+ "There are no comments.": "댓글이 없습니다.",
+ "There are no done comments.": "처리된 댓글이 없습니다.",
+ "This report is not in a folder, so no snapshot can be kept: save the report file first if you may need them.": "이 보고서는 폴더에 없어서 스냅샷을 남길 수 없습니다. 나중에 필요할 수 있으면 먼저 보고서 파일을 저장하세요.",
+ "This report is only in this tab. Open a folder, or save the report file (File menu), to keep it.": "이 보고서는 이 탭에만 있습니다. 보관하려면 폴더를 열거나 \"파일\" 메뉴에서 보고서 파일을 저장하세요.",
+ "Undo: the arrow in the top bar takes back your last change, one at a time.": "되돌리기: 상단 바의 화살표로 내 최근 변경을 하나씩 되돌립니다.",
+ "Undo: {what}": "되돌리기: {what}",
+ "Undone: {what}": "되돌림: {what}",
+ "the report": "보고서",
+ "{n} comments removed.": "댓글 {n}개를 삭제했습니다.",
+ "{n} comments will be removed, the agent's answers with them.": "댓글 {n}개를 agent의 답과 함께 삭제합니다.",
+ "{n} of them are not done yet.": "그중 {n}개는 아직 처리되지 않았습니다.",
+ "ui|Top bar": "상단 바",
+ "ui|Folder bar": "폴더 바",
+ "ui|Agent bar": "agent 바",
+ "ui|Page": "페이지",
+ "ui|Page bar": "페이지 넘김 바",
+ "ui|Thumbnails": "썸네일",
+ "ui|Content block": "내용 블록",
+ "ui|Add bar": "추가 바",
+ "ui|Questions panel": "질문 패널",
+ "The folder the page is connected to.": "페이지가 연결된 폴더.",
+ "A dated copy of report.json in exports/snapshots/": "report.json을 날짜를 붙여 exports/snapshots/에 보관",
+ "A snapshot of report.json is saved in exports/snapshots/ first, so they can be found again.": "먼저 report.json의 스냅샷을 exports/snapshots/에 저장하므로 나중에 되찾을 수 있습니다.",
+ "Export: File > Save report file or Export read-only copy, to send or keep elsewhere.": "내보내기: \"파일\" 메뉴의 보고서 파일 저장, 읽기 전용 사본으로 다른 사람에게 보내거나 따로 보관합니다.",
+ "Filter file names": "파일 이름 필터",
+ "Saved automatically: every change is written at once to report.json in the opened folder. The top bar shows when it last saved.": "자동 저장: 모든 변경은 열린 폴더의 report.json에 즉시 기록됩니다. 상단 바에 마지막 저장 시각이 표시됩니다.",
+ "Snapshot: File > Take a snapshot keeps a dated copy of report.json in exports/, to go back to later.": "스냅샷: \"파일 > 스냅샷 저장\"은 report.json을 날짜를 붙여 exports/에 보관합니다.",
+ "{a} in the folder {name}": "폴더 \"{name}\"의 {a}",
+ "Mode buttons, File menu, saving, undo, language, help, and the side panel button.": "모드 전환, \"파일\" 메뉴, 저장 상태, 되돌리기, 언어, 도움말, 사이드 패널 버튼.",
+ "Edit: the agent connection, rounds, and \"Ask the agent to revise\".": "편집: agent 연결, 라운드, \"에이전트에게 수정 요청\".",
+ "View: one page of the report. Move it by the bar above it; resize it from its corner.": "보기: 보고서의 한 페이지. 위쪽 막대를 드래그해 이동하고, 오른쪽 아래 모서리로 크기를 조절합니다.",
+ "View: previous and next page.": "보기: 이전 페이지와 다음 페이지.",
+ "View: every page, to jump to.": "보기: 모든 페이지, 눌러서 이동.",
+ "Edit: each text, chart, table or image, with its comment box.": "편집: 각 텍스트, 차트, 표, 이미지와 그 아래 댓글 상자.",
+ "Edit: the buttons that add a block.": "편집: 블록을 추가하는 버튼들.",
+ "Edit: comments, changes, style, folder.": "편집: 주석, 변경 기록, 스타일, 폴더.",
+ "View: your questions to the agent and its answers.": "보기: agent에게 한 질문과 그 답."
 },
 "es": {
  "_name": "Español",
@@ -3527,7 +3782,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "All changes saved.": "Todos los cambios guardados.",
  "Could not save ({m}).": "No se pudo guardar ({m}).",
  "Open another folder": "Abrir otra carpeta",
- "Save a copy": "Guardar una copia",
  "Not saved: changes are lost when you close this tab. Open a project folder to save automatically, or save the report as a file.": "Sin guardar: los cambios se pierden al cerrar esta pestaña. Abre una carpeta de proyecto para guardar automáticamente o guarda el informe como archivo.",
  "Not saved: changes are lost when you close this tab. This browser cannot open folders (use Chrome or Edge), but you can save the report as a file and open it again later.": "Sin guardar: los cambios se pierden al cerrar esta pestaña. Este navegador no puede abrir carpetas (usa Chrome o Edge), pero puedes guardar el informe como archivo y abrirlo más tarde.",
  "Open project folder": "Abrir carpeta del proyecto",
@@ -3747,7 +4001,6 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "Import all {n}": "Importar todos ({n})",
  "Import {n} files from {dir}? Each one becomes a dataset in the report.": "¿Importar {n} archivos de {dir}? Cada uno será un conjunto de datos del informe.",
  "Imported {n} files from {dir}.": "Se importaron {n} archivos de {dir}.",
- "all imported": "todos importados",
  "Lines that are list items": "Líneas que son elementos de lista",
  "Load habits/writing.json": "Cargar habits/writing.json",
  "Load my personal habits": "Cargar mis hábitos personales",
@@ -3887,7 +4140,65 @@ body.readonly #modes,body.readonly #togglePanel,body.readonly #note-db{display:n
  "How does it compare?": "¿Cómo se compara?",
  "ui|Side panel": "Panel lateral",
  "Drag to move the page. Drag its corner to make it larger or smaller. Double-click here to put it back.": "Arrastra para mover la página; arrastra su esquina para agrandarla o reducirla; doble clic aquí para restablecerla.",
- "Drag to make the page larger or smaller": "Arrastra para agrandar o reducir la página"
+ "Drag to make the page larger or smaller": "Arrastra para agrandar o reducir la página",
+ "Clear all comments": "Borrar todos los comentarios",
+ "Clear the done comments": "Borrar los comentarios resueltos",
+ "Could not save": "No se pudo guardar",
+ "Could not save the snapshot.": "No se pudo guardar la instantánea.",
+ "Every change is written at once to {where}. There is no Save button; take a snapshot or export a copy from the File menu.": "Cada cambio se escribe al instante en {where}. No hay botón Guardar; haz una instantánea o exporta una copia desde el menú Archivo.",
+ "File": "Archivo",
+ "Names of the parts of the page": "Nombres de las partes de la página",
+ "No file names match.": "Ningún nombre de archivo coincide.",
+ "Not saved to a folder": "No guardado en una carpeta",
+ "Nothing to redo": "Nada que rehacer",
+ "Nothing to undo": "Nada que deshacer",
+ "Open a project folder first.": "Abre primero una carpeta de proyecto.",
+ "Redo: {what}": "Rehacer: {what}",
+ "Redone: {what}": "Rehecho: {what}",
+ "Remove {n} comments": "Borrar {n} comentarios",
+ "Saved automatically": "Guardado automáticamente",
+ "Saved automatically {t}": "Guardado automáticamente {t}",
+ "Saving and backups": "Guardado y copias",
+ "Search the folder": "Buscar en la carpeta",
+ "Snapshot saved in {where}": "Instantánea guardada en {where}",
+ "Take a snapshot": "Guardar una instantánea",
+ "There are no comments.": "No hay comentarios.",
+ "There are no done comments.": "No hay comentarios resueltos.",
+ "This report is not in a folder, so no snapshot can be kept: save the report file first if you may need them.": "Este informe no está en una carpeta, así que no se puede guardar una instantánea: guarda antes el archivo del informe si podrías necesitarlos.",
+ "This report is only in this tab. Open a folder, or save the report file (File menu), to keep it.": "Este informe solo está en esta pestaña. Abre una carpeta o guarda el archivo del informe (menú Archivo) para conservarlo.",
+ "Undo: the arrow in the top bar takes back your last change, one at a time.": "Deshacer: la flecha de la barra superior deshace tu último cambio, uno a uno.",
+ "Undo: {what}": "Deshacer: {what}",
+ "Undone: {what}": "Deshecho: {what}",
+ "the report": "el informe",
+ "{n} comments removed.": "{n} comentarios borrados.",
+ "{n} comments will be removed, the agent's answers with them.": "Se borrarán {n} comentarios, con las respuestas del agente.",
+ "{n} of them are not done yet.": "{n} de ellos aún no están resueltos.",
+ "ui|Top bar": "Barra superior",
+ "ui|Folder bar": "Barra de carpeta",
+ "ui|Agent bar": "Barra del agente",
+ "ui|Page": "Página",
+ "ui|Page bar": "Barra de páginas",
+ "ui|Thumbnails": "Miniaturas",
+ "ui|Content block": "Bloque de contenido",
+ "ui|Add bar": "Barra de añadir",
+ "ui|Questions panel": "Panel de preguntas",
+ "The folder the page is connected to.": "La carpeta a la que está conectada la página.",
+ "A dated copy of report.json in exports/snapshots/": "Una copia fechada de report.json en exports/snapshots/",
+ "A snapshot of report.json is saved in exports/snapshots/ first, so they can be found again.": "Antes se guarda una instantánea de report.json en exports/snapshots/, para poder recuperarlos.",
+ "Export: File > Save report file or Export read-only copy, to send or keep elsewhere.": "Exportar: en el menú Archivo, Guardar archivo de informe o Exportar copia de solo lectura, para enviar o guardar aparte.",
+ "Filter file names": "Filtra nombres de archivo",
+ "Saved automatically: every change is written at once to report.json in the opened folder. The top bar shows when it last saved.": "Guardado automático: cada cambio se escribe al instante en report.json de la carpeta abierta. La barra superior muestra cuándo se guardó.",
+ "Snapshot: File > Take a snapshot keeps a dated copy of report.json in exports/, to go back to later.": "Instantánea: Archivo > Guardar una instantánea deja una copia fechada de report.json en exports/.",
+ "{a} in the folder {name}": "{a} en la carpeta {name}",
+ "Mode buttons, File menu, saving, undo, language, help, and the side panel button.": "Botones de modo, menú Archivo, guardado, deshacer, idioma, ayuda y el botón del panel lateral.",
+ "Edit: the agent connection, rounds, and \"Ask the agent to revise\".": "Edición: la conexión del agente, las rondas y \"Pedir al agente que revise\".",
+ "View: one page of the report. Move it by the bar above it; resize it from its corner.": "Lectura: una página del informe. Muévela con la barra de arriba; cambia su tamaño desde la esquina.",
+ "View: previous and next page.": "Lectura: página anterior y siguiente.",
+ "View: every page, to jump to.": "Lectura: todas las páginas, para saltar a una.",
+ "Edit: each text, chart, table or image, with its comment box.": "Edición: cada texto, gráfico, tabla o imagen, con su cuadro de comentario.",
+ "Edit: the buttons that add a block.": "Edición: los botones que añaden un bloque.",
+ "Edit: comments, changes, style, folder.": "Edición: comentarios, cambios, estilo, carpeta.",
+ "View: your questions to the agent and its answers.": "Lectura: tus preguntas al agente y sus respuestas."
 }
 }
 </script>
@@ -4465,8 +4776,23 @@ const strip=b=>{if(!b)return null;const{prev,...rest}=b;return rest};
 function shortTime(iso){if(!iso)return'';const d=new Date(iso);const p=n=>String(n).padStart(2,'0');return`${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`}
 function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,2600)}
 function writeErr(e){const c=e&&e.code;return c==='invalid_argument'?tr('No write permission. This account may be view-only.'):c==='quota_exceeded'?tr('Storage limit reached.'):c==='resource_exhausted'?tr('Too many requests. Please try again shortly.'):tr('Save failed. Please try again.')}
-async function put(path,data){try{await db.doc(path).set(data)}catch(e){fail(writeErr(e),e)}}
-async function drop(path){try{await db.doc(path).delete()}catch(e){fail(writeErr(e),e)}}
+async function put(path,data){return saving(db.doc(path).set(data)).catch(e=>fail(writeErr(e),e))}
+async function drop(path){return saving(db.doc(path).delete()).catch(e=>fail(writeErr(e),e))}
+/* Every change is written to the folder at once; the top bar says so: saving, saved at a time, or a failure */
+const SAVE={busy:0,at:null,err:null};
+function saving(p){SAVE.busy++;showSave();
+  return Promise.resolve(p).then(v=>{SAVE.at=new Date();SAVE.err=null;return v},e=>{SAVE.err=errText(e)||String(e);throw e}).finally(()=>{SAVE.busy--;showSave()})}
+function showSave(){const n=$('#savest');if(!n)return;
+  const where=S.folder?tr('{a} in the folder {name}',{a:S.folder.file,name:S.folder.name}):'';
+  if(!S.meta||S.readonly){n.hidden=true;return}n.hidden=false;
+  if(!S.folder&&!S.cloud){n.className='savest bad';n.textContent=tr('Not saved to a folder');
+    n.title=tr('This report is only in this tab. Open a folder, or save the report file (File menu), to keep it.');return}
+  const err=SAVE.err||(S.saveState==='error'?S.saveError||tr('Could not save'):'');
+  if(err){n.className='savest bad';n.textContent=tr('Could not save');n.title=err;return}
+  if(SAVE.busy||S.saveState==='pending'){n.className='savest busy';n.textContent=tr('Saving…');n.title='';return}
+  n.className='savest ok';n.textContent=SAVE.at?tr('Saved automatically {t}',{t:SAVE.at.toLocaleTimeString(document.documentElement.lang||[],{hour:'2-digit',minute:'2-digit'})}):tr('Saved automatically');
+  n.title=tr('Every change is written at once to {where}. There is no Save button; take a snapshot or export a copy from the File menu.',{where:where||tr('the report')})}
+
 
 /* ---------- Change log: field definitions ---------- */
 const FIELDS=['title','text','caption','breakBefore',
@@ -4525,14 +4851,16 @@ const lastRoundAt=()=>S.rounds.reduce((m,r)=>r.at>m?r.at:m,'');
 const currentChanges=()=>{const t=lastRoundAt();return S.changes.filter(c=>c.at>t)};
 function roundOf(at){const rs=[...S.rounds].sort((a,b)=>a.at<b.at?-1:1);const r=rs.find(r=>at<=r.at);return r?r.id:'current'}
 async function recordChange(e){
+  if(UNDO.undoing)e={...e,undo:true}; // a record made by Undo is not undone again
+  const fresh=()=>{if(!UNDO.busy)UNDO.redo=[]}; // a real new change of yours clears Redo
   const blk=e.blockId&&S.blocks.get(e.blockId);const name=e.name||(blk?blockName(e.blockId):'');
   const ex=currentChanges().find(c=>c.by==='user'&&c.blockId===e.blockId&&c.field===e.field);
   if(ex){const m={...ex,after:clone(e.after),at:now(),name:name||ex.name,revertible:ex.revertible!==false&&e.revertible!==false};
     if(same(m.before,m.after)&&m.field!=='image.src'){S.changes=S.changes.filter(c=>c.id!==ex.id);renderPanel();await drop('changes/'+ex.id)}
-    else{S.changes=S.changes.map(c=>c.id===ex.id?m:c);renderPanel();await put('changes/'+ex.id,m)}
+    else{fresh();S.changes=S.changes.map(c=>c.id===ex.id?m:c);renderPanel();await put('changes/'+ex.id,m)}
     return}
   if(same(e.before,e.after)&&e.field!=='image.src')return;
-  const c={id:uid('c'),by:'user',at:now(),revertible:e.revertible!==false,...e,name};
+  fresh();const c={id:uid('c'),by:'user',at:now(),revertible:e.revertible!==false,...e,name};
   S.changes=[...S.changes,c];renderPanel();await put('changes/'+c.id,c);
 }
 async function finishRound(){
@@ -4922,7 +5250,7 @@ function renderChanges(){
 function renderPanel(){
   S.chainMemo=null;renderAgentBar();
   const open=S.annos.filter(a=>a.status!=='done').length,curN=currentChanges().length;
-  $('#togglePanel').textContent=tr('Panel (comments {a}, changes {b})',{a:open,b:curN});
+  $('#togglePanel').textContent=tr('Panel')+' ('+open+' / '+curN+')';$('#togglePanel').title=tr('Panel (comments {a}, changes {b})',{a:open,b:curN});
   $$('#tabs button').forEach(b=>{b.setAttribute('aria-selected',String(b.dataset.tab===S.tab));
     b.textContent=b.dataset.tab==='annos'?tr('Comments ({n})',{n:open}):b.dataset.tab==='changes'?tr('Changes ({n})',{n:curN}):b.dataset.tab==='folder'?tr('Folder'):tr('Style')});
   if(S.tab==='folder'&&!S.folder)S.tab='annos';$('#tabs button[data-tab=folder]').hidden=!S.folder;
@@ -5292,7 +5620,8 @@ function render(){
   if(editingNow()){S.deferred=true;return}
   S.deferred=false;S.chainMemo=null;
   const focusF=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.fid;
-  paginate();
+  paginate();showSave();showUndo();
+  $('#fileBtn').textContent=tr('File')+' \u25be';$('#fileBtn').hidden=!!S.readonly;
   $('#doc-title').textContent=S.meta.title||'Duetsheet';document.title=(S.meta.title||'Duetsheet')+tr(' | Duetsheet');
   $('#view').hidden=S.mode!=='view';$('#edit').hidden=S.mode!=='edit';
   if(S.mode==='view')renderView();else renderEdit();
@@ -5306,11 +5635,11 @@ const HINT={view:'Use the arrow keys or the buttons below to turn pages.',edit:'
 function askTipOnce(){onceOnly('duetsheet-ask-tip',()=>helpModal(tr('Ask while you read'),null,[
   [tr('Figures.'),tr('Drag on a figure to draw around a region, or click a point of a chart.')],
   [tr('Text.'),tr('Select some text; an "Ask the agent" button appears next to it.')],
-  [tr('Send.'),tr('Your questions wait in the questions panel. Send them together with "Ask the agent"; the answers come back there, and you can reply.')]]))}
+  [tr('Send.'),tr('Your questions wait in the questions panel. Send them together with "Ask the agent"; the answers come back there, and you can reply.')]],true))}
 function setMode(m){leaveField();S.mode=m;document.body.dataset.mode=m;if(S.draw){S.draw=null;document.body.dataset.draw=''}
   $$('#modes button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===m)));
   showPanel();
-  $('#hint').textContent=S.readonly?tr('Read-only copy. Use the arrow keys or the buttons below to turn pages.'):tr(HINT[m]);render();
+  $('#hint').textContent=S.readonly?tr('Read-only copy. Use the arrow keys or the buttons below to turn pages.'):tr(HINT[m]);$('#hint').title=$('#hint').textContent;render();
   if(!editingMode()&&!S.readonly&&S.meta&&S.welcomed)askTipOnce()}
 $('#modes').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setMode(b.dataset.mode)});
 // The side panel (comments, changes, style, folder) is for editing: View reads at full width without it
@@ -5720,7 +6049,7 @@ async function restoreFolder(){
   if(!FS_OK)return;let d=null;try{d=await idb.get('folder')}catch(e){}if(!d)return;S.lastFolder=d;
   try{if(await d.queryPermission({mode:'readwrite'})==='granted'){await openFolder(d,false);return}}catch(e){}
   renderLocalBar()}
-function setSave(state,e){S.saveState=state;S.saveError=e?String(e.message||e.name||e.code||e):'';renderLocalBar()}
+function setSave(state,e){S.saveState=state;S.saveError=e?String(e.message||e.name||e.code||e):'';if(state==='saved')SAVE.at=new Date();renderLocalBar();showSave()}
 function renderLocalBar(){
   if(S.cloud)return;
   if(launcherGone){showNote(tr(LAUNCHER_GONE),[h('button',{type:'button',class:'btn small primary',text:tr('Reload'),onclick:()=>location.reload()})],false);return}
@@ -5729,7 +6058,6 @@ function renderLocalBar(){
     text=tr('Project folder "{name}": changes are saved to {file} automatically.',{name:S.folder.name,file:S.folder.file})+' '+
       ({pending:tr('Saving…'),saved:tr('All changes saved.'),error:tr('Could not save ({m}).',{m:S.saveError})}[S.saveState]||'');
     if(!S.server)acts.push(B(tr('Open another folder'),pickFolder));
-    acts.push(B(tr('Save a copy'),exportReport),B(tr('Export read-only copy'),exportReadonly));
   }else if(S.server){
     text=tr('The report could not be opened. See Problems (⚠) for the reason, fix report.json, then reload this page.');
     acts.push(B(tr('Reload'),()=>location.reload(),true));
@@ -6077,22 +6405,20 @@ function chainSection(){ // Folder tab: every derived file, raw file and script,
       (C.fresh.length&&!S.checking?' '+tr('{n} new raw files not used yet.',{n:C.fresh.length}):'')}),
     h('button',{type:'button',class:'btn small',style:'margin-left:auto',text:tr('Check again'),disabled:S.checking?'':null,onclick:()=>verifyChain()})]));
   const link=(t,fn)=>h('button',{type:'button',class:'linkbtn fname',text:t,onclick:fn});
-  const dl=h('ul',{class:'flist'});
-  C.steps.forEach(s=>{const st=C.stepStatus(s).state,n=inputCount(C,s);
-    s.outputs.filter(r=>r&&r.path&&C.madeBy.get(normPath(r.path))===s).forEach(r=>{const p=normPath(r.path),D=C.downstream([p]);
-      dl.append(h('li',{},[fselBox(p,C.derived),dot(st),link(p,()=>openFile(p)),h('span',{class:'fstat'+(st==='stale'?' stale':''),
-        text:'← '+scriptName(s)+' ← '+tr('{d} derived, {r} raw',{d:n.d,r:n.r})+(D.blocks.length?' · '+tr('used by {n} charts or tables',{n:D.blocks.length}):'')})]))})});
-  sec.append(h('h5',{text:tr('Derived files ← script ← inputs')}),dl);
-  const rl=h('ul',{class:'flist'});
-  groupByFolder([...C.raw,...C.fresh].map(p=>C.refOf.get(p))).forEach(([dir,list])=>{const k=list.filter(r=>C.isNew(r.path)).length,range=list.map(r=>r.path),shorts=shortNames(list.map(r=>baseName(r.path)));
-    rl.append(h('li',{},[lazyDetails(
-    [fselGroupBox(range),dot(worst(list.map(fileDot))),h('span',{class:'fname',text:dir}),h('span',{class:'fstat'+(k?' stale':''),text:tr('{n} files',{n:list.length})+(k?' · '+tr('{n} new',{n:k}):'')})],
-    ()=>[h('button',{type:'button',class:'linkbtn',text:tr('What depends on these {n} files?',{n:list.length}),onclick:()=>openFiles(list.map(r=>r.path),dir)}),
-      h('ul',{class:'chlinks'},list.map((r,i)=>h('li',{class:'fr'},[fselBox(r.path,range),dot(fileDot(r)),h('button',{type:'button',class:'linkbtn fname',text:shorts[i],title:baseName(r.path),onclick:()=>openFile(r.path)}),
-        C.isNew(r.path)?h('span',{class:'fstat stale',text:tr('new, not used yet')}):null,revealBtn(r.path)])))],'raw:'+dir)]))});
-  sec.append(h('h5',{text:tr('Raw data ({n} files): click a folder or file to see what depends on it',{n:C.raw.length})}),rl);
-  if(C.scripts.length)sec.append(h('h5',{text:tr('Scripts ({n})',{n:C.scripts.length})}),
-    h('ul',{class:'flist'},C.scripts.map(p=>h('li',{},[dot(stateOf(fileState(C.refOf.get(p)))),link(p,()=>openFile(p))]))));
+  const shown=p=>p.replace(/^(\.\.\/)+/,''); // the folder names, without the ../ that leads out of the workspace
+  const der=[];C.steps.forEach(s=>{const st=C.stepStatus(s).state,n=inputCount(C,s);
+    s.outputs.filter(r=>r&&r.path&&C.madeBy.get(normPath(r.path))===s).forEach(r=>{const p=normPath(r.path);der.push({path:p,name:shown(p),s,st,n})})});
+  const D=folderTree(der,'chain-derived',(it,range)=>{const Dn=C.downstream([it.path]);return h('li',{},[fselBox(it.path,range),dot(it.st),link(baseName(it.path),()=>openFile(it.path)),
+    h('span',{class:'fstat'+(it.st==='stale'?' stale':''),text:'← '+scriptName(it.s)+' ← '+tr('{d} derived, {r} raw',{d:it.n.d,r:it.n.r})+(Dn.blocks.length?' · '+tr('used by {n} charts or tables',{n:Dn.blocks.length}):'')})])});
+  sec.append(foldSection('chain-derived',tr('Derived files ← script ← inputs'),D.count,D.tree));
+  const raw=[...C.raw,...C.fresh].map(p=>C.refOf.get(p)).filter(Boolean).map(r=>({path:r.path,name:shown(normPath(r.path)),r}));
+  const R=folderTree(raw,'chain-raw',(it,range)=>h('li',{class:'fr'},[fselBox(it.path,range),dot(fileDot(it.r)),h('button',{type:'button',class:'linkbtn fname',text:baseName(it.path),title:it.name,onclick:()=>openFile(it.path)}),
+      C.isNew(it.path)?h('span',{class:'fstat stale',text:tr('new, not used yet')}):null,revealBtn(it.path)]),
+    (list,p)=>{const k=list.filter(it=>C.isNew(it.path)).length;return[dot(worst(list.map(it=>fileDot(it.r)))),k?h('span',{class:'fstat stale',text:tr('{n} new',{n:k})}):null,
+      h('button',{type:'button',class:'linkbtn',text:tr('What depends on these {n} files?',{n:list.length}),onclick:e=>{e.preventDefault();openFiles(list.map(it=>it.path),p)}})]});
+  sec.append(foldSection('chain-raw',tr('Raw data ({n} files): click a folder or file to see what depends on it',{n:C.raw.length}),String(S.fq||'').trim()?R.count:null,R.tree));
+  if(C.scripts.length){const sc=C.scripts.filter(p=>!String(S.fq||'').trim()||p.toLowerCase().includes(String(S.fq).trim().toLowerCase()));
+    sec.append(foldSection('chain-scripts',tr('Scripts ({n})',{n:C.scripts.length}),String(S.fq||'').trim()?sc.length:null,h('ul',{class:'flist'},sc.map(p=>h('li',{},[dot(stateOf(fileState(C.refOf.get(p)))),link(p,()=>openFile(p))])))))}
   return sec;
 }
 /* Checking the files: the launcher answers for all of them at once; in a folder opened in the page, the page reads them */
@@ -6262,21 +6588,47 @@ async function importAll(list,dir){ // every file of one folder that is not impo
   let n=0;for(const f of list)if(await importDataFile(f,true))n++;
   toast(tr('Imported {n} files from {dir}.',{n,dir}));refreshFolderFiles();
 }
-function fileList(files,empty){ // raw or derived data files that can be imported into datasets, grouped by folder
-  const B=(t,fn,cls)=>h('button',{type:'button',class:'btn small'+(cls?' '+cls:''),text:t,onclick:fn}),dl=h('ul',{class:'flist'});
-  if(!files.length){if(empty)dl.append(h('li',{class:'empty',text:empty}));return dl}
-  const groups=new Map();files.forEach(f=>{const i=f.name.lastIndexOf('/'),k=i<0?'':f.name.slice(0,i+1);(groups.get(k)||groups.set(k,[]).get(k)).push(f)});
-  groups.forEach((list,dir)=>{
-    const todo=list.filter(f=>{const ds=datasetOf(f);return!ds||S.stale.has(ds.id)}),range=list.map(f=>f.path);
-    const shorts=shortNames(list.map(f=>dir?f.name.slice(dir.length):f.name));
-    if(groups.size>1||list.length>1)dl.append(h('li',{class:'grp'},[fselGroupBox(range),h('span',{class:'fname',text:dir||'./'}),h('span',{class:'fstat',text:tr('{n} files',{n:list.length})}),
-      todo.length>1?B(tr('Import all {n}',{n:todo.length}),()=>importAll(todo,dir||'./'),'primary'):todo.length?null:h('span',{class:'fstat',text:tr('all imported')})]));
-    list.forEach((f,i)=>{const ds=datasetOf(f),stale=!!ds&&S.stale.has(ds.id);
-      dl.append(h('li',{class:dir?'sub':''},[fselBox(f.path,range),h('span',{class:'fname',text:shorts[i],title:f.name}),
-        h('span',{class:'fstat'+(stale?' stale':''),text:!ds?tr('not imported'):stale?tr('changed since import'):tr('imported as "{t}", {n} rows',{t:ds.title||ds.id,n:ds.rows.length})}),
-        revealBtn(f.path),B(ds?tr('Update'):tr('Import'),()=>importDataFile(f),stale?'primary':'')]))})});
-  return dl;
-}
+const FOPEN_KEY='duetsheet-folders-open';
+let FOPEN=(()=>{try{const v=JSON.parse(localStorage.getItem(FOPEN_KEY)||'[]');return new Set(Array.isArray(v)?v.filter(x=>typeof x==='string'):[])}catch(e){return new Set()}})();
+function saveFopen(){try{localStorage.setItem(FOPEN_KEY,JSON.stringify([...FOPEN].slice(-300)))}catch(e){}}
+function folderTree(items,key,leaf,dirTools){ // items {path, name}: folders folded until opened (kept in this browser); the name filter applies
+  const q=String(S.fq||'').trim().toLowerCase(),shown=q?items.filter(it=>it.name.toLowerCase().includes(q)):items,root={dirs:new Map(),items:[]};
+  shown.forEach(it=>{const parts=it.name.split('/');let n=root;parts.slice(0,-1).forEach(d=>{if(!n.dirs.has(d))n.dirs.set(d,{dirs:new Map(),items:[]});n=n.dirs.get(d)});n.items.push(it)});
+  const all=n=>[...n.items,...[...n.dirs.values()].flatMap(all)];
+  const level=(n,path)=>{const ul=h('ul',{class:'ftree flist'}),range=n.items.map(it=>it.path);
+    [...n.dirs.entries()].sort((x,y)=>x[0]<y[0]?-1:1).forEach(([name,sub])=>{
+      let label=name,p=path+name+'/',d=sub; // a folder that only holds one folder is shown with it: raw/2026/
+      while(!d.items.length&&d.dirs.size===1){const[nn,ns]=[...d.dirs.entries()][0];label+='/'+nn;p+=nn+'/';d=ns}
+      const list=all(d),k=key+':'+p;
+      const det=h('details',{open:q||FOPEN.has(k)?'':null},[h('summary',{},[fselGroupBox(list.map(it=>it.path)),h('span',{class:'dname',text:label+'/'}),
+        h('span',{class:'fstat',text:tr('{n} files',{n:list.length})}),...(dirTools?dirTools(list,p):[])]),level(d,p)]);
+      det.addEventListener('toggle',()=>{if(q)return;if(det.open)FOPEN.add(k);else FOPEN.delete(k);saveFopen()});
+      ul.append(h('li',{class:'fdir'},[det]))});
+    n.items.forEach(it=>ul.append(leaf(it,range)));
+    return ul};
+  return{tree:level(root,''),count:shown.length}}
+function foldSection(key,title,count,body){ // a part of the Folder tab that folds to its title (kept in this browser)
+  const k='sec:'+key,q=String(S.fq||'').trim(),det=h('details',{class:'fsec',open:q||FOPEN.has(k)?'':null},[h('summary',{},[h('span',{class:'dname',text:title}),
+    count!=null?h('span',{class:'fstat',text:tr('{n} files',{n:count})}):null]),body]);
+  det.addEventListener('toggle',()=>{if(q)return;if(det.open)FOPEN.add(k);else FOPEN.delete(k);saveFopen()});return det}
+function fileList(files,empty,key){ // raw or derived data files that can be imported into datasets
+  const B=(t,fn,cls)=>h('button',{type:'button',class:'btn small'+(cls?' '+cls:''),text:t,onclick:fn});
+  const q=String(S.fq||'').trim();
+  const leaf=(f,range)=>{const ds=datasetOf(f),stale=!!ds&&S.stale.has(ds.id);
+    return h('li',{},[fselBox(f.path,range),h('span',{class:'fname',text:f.name.split('/').pop(),title:f.name}),
+      h('span',{class:'fstat'+(stale?' stale':''),text:!ds?tr('not imported'):stale?tr('changed since import'):tr('imported as "{t}", {n} rows',{t:ds.title||ds.id,n:ds.rows.length})}),
+      revealBtn(f.path),B(ds?tr('Update'):tr('Import'),()=>importDataFile(f),stale?'primary':'')])};
+  const T=folderTree(files,key,leaf,(list,p)=>{const todo=list.filter(f=>{const ds=datasetOf(f);return!ds||S.stale.has(ds.id)});
+    return todo.length>1?[h('button',{type:'button',class:'btn small primary',text:tr('Import all {n}',{n:todo.length}),onclick:e=>{e.preventDefault();importAll(todo,p)}})]:[]});
+  if(!T.count){const ul=h('ul',{class:'flist'});ul.append(h('li',{class:'empty',text:q?tr('No file names match.'):empty||''}));return empty||q?ul:h('span')}
+  return T.tree}
+function folderSearch(){ // a box over the file lists: typing filters the names and opens the folders that match
+  const input=h('input',{type:'search',value:S.fq||'',placeholder:tr('Filter file names'),'aria-label':tr('Search the folder'),
+    oninput:e=>{S.fq=e.target.value;refreshFileLists()}});
+  return h('div',{class:'stsec'},[h('div',{class:'fsearch'},[input])])}
+function refreshFileLists(){const F=S.folderFiles||{data:[],derived:[]};
+  const a=$('#tab-folder .fl-data'),b=$('#tab-folder .fl-derived'),c=$('#tab-folder .fl-chain');if(c)c.replaceChildren(chainSection());
+  if(a)a.replaceChildren(fileList(F.data,a.dataset.empty,'data'));if(b)b.replaceChildren(fileList(F.derived||[],'','derived'))}
 function renderFolder(){
   const box=$('#tab-folder');box.replaceChildren();if(!S.folder)return;
   const F=S.folderFiles||{data:[],derived:[],habits:[],writing:[]},B=(t,fn,cls,dis)=>h('button',{type:'button',class:'btn small'+(cls?' '+cls:''),text:t,disabled:dis?'':null,onclick:fn});
@@ -6287,11 +6639,13 @@ function renderFolder(){
   if(tab==='habits'){box.append(figureHabitsSection(F,B),writingSection(F,B),personalSection(B));return}
   box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Project folder')}),
     h('p',{class:'cap',text:tr('"{name}". The report is saved to {file} automatically. An agent can read and edit the same folder (see AGENTS.md).',{name:S.folder.name,file:S.folder.file})})]));
-  box.append(chainSection());
+  box.append(folderSearch());
+  box.append(h('div',{class:'fl-chain'},[chainSection()]));
+  const empty=S.folder.prefix==='../'?tr('No CSV, TSV or JSON files in this folder yet. Add some, then click Refresh.'):tr('No files yet. Put CSV, TSV or JSON files in the data/ folder, then click Refresh.');
   box.append(h('div',{class:'stsec'},[h('h4',{text:S.folder.prefix==='../'?tr('Raw data (this folder)'):tr('Raw data (data/)')}),
-    fileList(F.data,S.folder.prefix==='../'?tr('No CSV, TSV or JSON files in this folder yet. Add some, then click Refresh.'):tr('No files yet. Put CSV, TSV or JSON files in the data/ folder, then click Refresh.')),
+    h('div',{class:'fl-data','data-empty':empty},[fileList(F.data,empty,'data')]),
     h('p',{class:'cap',text:tr('Each import records the file path and a fingerprint (SHA-256), so you can see when the file changes. Excel files: save them as CSV, or ask your agent.')})]));
-  if((F.derived||[]).length)box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Derived data (derived_data/)')}),fileList(F.derived,'')]));
+  if((F.derived||[]).length)box.append(h('div',{class:'stsec'},[h('h4',{text:tr('Derived data (derived_data/)')}),h('div',{class:'fl-derived'},[fileList(F.derived,'','derived')])]));
   box.append(datasetsSection(B));
   const bar=fselBar(F,B);if(bar)box.append(bar);
 }
@@ -6481,13 +6835,108 @@ function openHelp(){
       step(tr('Keep track.'),tr('The Changes tab lists every change, by you or by the agent. Click "Finish this round" when you are done.')),
       step(tr('Hand it to your agent.'),S.cloud?tr('Go back to Claude and ask it to read the annotations and revise the report.')
         :tr('Open a project folder. Your agent (Claude Code, Codex, Gemini CLI, ...) edits report.json in the same folder, following AGENTS.md.'))]),
+    saveHelp(),uiNames(),
     h('p',{},[link('/blob/main/docs/tutorial.md',tr('Tutorial with screenshots')),' · ',link('/blob/main/AGENTS.md',tr('AGENTS.md (for agents)'))]),
     h('div',{class:'crow'},[h('span',{class:'sp'}),h('button',{type:'button',class:'btn small primary',text:tr('Got it'),onclick:closeModal})])])]);
 }
 function onceOnly(key,fn){try{if(localStorage.getItem(key))return;localStorage.setItem(key,'1')}catch(e){return}fn()}
-function helpModal(title,intro,steps){ // numbered steps: [bold start, the rest]
+/* ---------- Undo and redo: your own changes, newest first ----------
+   The changes of the current round (one record per block and field, as the Changes tab shows them); undoing one puts
+   the field back, which removes its record. The agent's changes are not undone here (Changes tab). */
+const UNDO={redo:[],busy:false,undoing:false};
+function undoCandidates(){
+  return currentChanges().filter(c=>c.by==='user'&&c.revertible!==false&&!c.undo).map(c=>({kind:'report',c})).sort((a,b)=>(b.c.at||'')<(a.c.at||'')?-1:1)}
+function undoLabel(x){const c=x.c;return tr('{a}, {b}',{a:c.name||blockName(c.blockId),b:fieldLabel(c.field)})}
+async function undoLast(){
+  if(!editingMode()||UNDO.busy)return;const x=undoCandidates()[0];if(!x){toast(tr('Nothing to undo'));return}
+  UNDO.busy=UNDO.undoing=true;
+  try{if(x.c.field==='add'){x.snap=clone(S.blocks.get(x.c.blockId)||null);x.index=orderedBlocks().findIndex(b=>b.id===x.c.blockId)} // kept here for Redo
+    await revertChange(x.c);
+    UNDO.redo.push(x);toast(tr('Undone: {what}',{what:undoLabel(x)}))}
+  finally{UNDO.busy=UNDO.undoing=false;render()}}
+async function redoLast(){
+  if(!editingMode()||UNDO.busy)return;const x=UNDO.redo.pop();if(!x){toast(tr('Nothing to redo'));return}
+  UNDO.busy=true;
+  try{const c=x.c;
+    {
+      if(c.field==='add'){const b=x.snap;if(b&&!S.blocks.has(b.id)){S.blocks.set(b.id,b);const o=orderedBlocks().map(y=>y.id).filter(y=>y!==b.id);
+          o.splice(clamp(x.index<0?o.length:x.index,0,o.length),0,b.id);S.meta={...S.meta,order:o};render();
+          await put('blocks/'+b.id,b);await put('report/meta',S.meta);await recordChange({blockId:b.id,field:'add',before:null,after:typeName(b.type),name:c.name})}}
+      else if(c.field==='delete')await removeBlock(c.blockId);
+      else if(c.field==='order')await saveOrder(c.after);
+      else if(c.field.startsWith('style.'))await saveStyle(setPath(clone(styleNow()),c.field.slice(6),clone(c.after)));
+      else{const b=S.blocks.get(c.blockId);if(b)await saveBlock(setPath(clone(b),c.field,clone(c.after)))}}
+    toast(tr('Redone: {what}',{what:undoLabel(x)}))}
+  finally{UNDO.busy=false;render()}}
+function showUndo(){const bar=$('#undobar');if(!bar)return;const on=!!S.meta&&!S.readonly&&editingMode();bar.hidden=!on;if(!on)return;
+  const x=undoCandidates()[0],y=UNDO.redo[UNDO.redo.length-1];
+  $('#undoBtn').disabled=!x;$('#undoBtn').title=x?tr('Undo: {what}',{what:undoLabel(x)})+' (Ctrl+Z)':tr('Nothing to undo');
+  $('#redoBtn').disabled=!y;$('#redoBtn').title=y?tr('Redo: {what}',{what:undoLabel(y)})+' (Ctrl+Y)':tr('Nothing to redo')}
+$('#undoBtn').addEventListener('click',undoLast);$('#redoBtn').addEventListener('click',redoLast);
+document.addEventListener('keydown',e=>{if(!(e.ctrlKey||e.metaKey)||e.altKey)return;const a=document.activeElement;
+  if(a&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.isContentEditable))return; // in a text box the browser undoes your typing
+  const k=e.key.toLowerCase();if(k==='z'&&!e.shiftKey){e.preventDefault();undoLast()}else if(k==='y'||(k==='z'&&e.shiftKey)){e.preventDefault();redoLast()}});
+/* ---------- The File menu: snapshot, export, clear the comments ---------- */
+const stamp=()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`};
+async function readFolderFile(name){try{return await(await(await S.folder.dir.getFileHandle(name)).getFile()).text()}catch(e){return null}}
+async function takeSnapshot(quiet){ // a dated copy of report.json in exports/snapshots/
+  if(!S.folder){toast(tr('Open a project folder first.'));return null}
+  try{if(S.folder.flush)await S.folder.flush();
+    const name=stamp(),d=await subdir(await subdir(await subdir(S.folder.dir,'exports',true),'snapshots',true),name,true);if(!d)throw new Error('exports/snapshots/'+name);
+    const t=await readFolderFile(S.folder.file);if(t!=null)await saving(writeFile(d,S.folder.file,t));
+    const where='exports/snapshots/'+name+'/';if(!quiet)toast(tr('Snapshot saved in {where}',{where}));return where}
+  catch(e){fail(tr('Could not save the snapshot.'),e);return null}}
+function clearComments(all){ // remove the comments (all, or only the done ones), after a snapshot so they can be found again
+  const list=S.annos.filter(a=>all||a.status==='done'),open=list.filter(a=>a.status!=='done').length;
+  if(!list.length){toast(all?tr('There are no comments.'):tr('There are no done comments.'));return}
+  openModal(all?tr('Clear all comments'):tr('Clear the done comments'),[h('div',{class:'langbox'},[
+    h('p',{text:tr('{n} comments will be removed, the agent\'s answers with them.',{n:list.length})}),
+    open?h('p',{class:'kwarn',text:tr('{n} of them are not done yet.',{n:open})}):null,
+    S.folder?h('p',{class:'kln',text:tr('A snapshot of report.json is saved in exports/snapshots/ first, so they can be found again.')}):
+      h('p',{class:'kwarn',text:tr('This report is not in a folder, so no snapshot can be kept: save the report file first if you may need them.')}),
+    h('div',{class:'crow'},[h('button',{type:'button',class:'btn small',text:tr('Cancel'),onclick:closeModal}),h('span',{class:'sp'}),
+      h('button',{type:'button',class:'btn small primary',text:tr('Remove {n} comments',{n:list.length}),onclick:async()=>{closeModal();
+        if(S.folder&&!await takeSnapshot(true))return;
+        const ids=new Set(list.map(a=>a.id));S.annos=S.annos.filter(a=>!ids.has(a.id));render();paintAllOverlays();
+        for(const id of ids)await drop('annotations/'+id);
+        toast(tr('{n} comments removed.',{n:ids.size}))}})])])])}
+function openFileMenu(){
+  const m=$('#filemenu'),btn=$('#fileBtn');if(!m.hidden){closeFileMenu();return}
+  const done=S.annos.filter(a=>a.status==='done').length,F=!!S.folder;
+  const it=(t,fn,opt)=>h('button',{type:'button',role:'menuitem',class:opt&&opt.cls||null,disabled:opt&&opt.off?'':null,title:opt&&opt.title||null,
+    onclick:()=>{closeFileMenu();fn()}},[t,opt&&opt.n!=null?h('span',{class:'fmn',text:String(opt.n)}):null]);
+  m.replaceChildren(
+    it(tr('Take a snapshot'),()=>takeSnapshot(),{off:!F,title:F?tr('A dated copy of report.json in exports/snapshots/'):tr('Open a project folder first.')}),
+    h('hr'),
+    it(tr('Save report file'),exportReport),it(tr('Export read-only copy'),exportReadonly),
+    h('hr'),
+    it(tr('Clear the done comments'),()=>clearComments(false),{n:done,off:!done}),
+    it(tr('Clear all comments'),()=>clearComments(true),{n:S.annos.length,off:!S.annos.length,cls:'danger'}));
+  const r=btn.getBoundingClientRect();m.hidden=false;m.style.top=(r.bottom+4)+'px';m.style.left=Math.max(8,Math.min(r.left,innerWidth-m.offsetWidth-8))+'px';
+  btn.setAttribute('aria-expanded','true');const f=m.querySelector('button:not(:disabled)');if(f)f.focus()}
+function closeFileMenu(){$('#filemenu').hidden=true;$('#fileBtn').setAttribute('aria-expanded','false')}
+$('#fileBtn').addEventListener('click',openFileMenu);
+document.addEventListener('pointerdown',e=>{if(!$('#filemenu').hidden&&!e.target.closest('#filemenu,#fileBtn'))closeFileMenu()},true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#filemenu').hidden)closeFileMenu()});
+function saveHelp(){return h('details',{class:'savehelp'},[h('summary',{text:tr('Saving and backups')}),h('ul',{},[
+  h('li',{text:tr('Saved automatically: every change is written at once to report.json in the opened folder. The top bar shows when it last saved.')}),
+  h('li',{text:tr('Snapshot: File > Take a snapshot keeps a dated copy of report.json in exports/, to go back to later.')}),
+  h('li',{text:tr('Export: File > Save report file or Export read-only copy, to send or keep elsewhere.')}),
+  h('li',{text:tr('Undo: the arrow in the top bar takes back your last change, one at a time.')})])])}
+/* The names of the parts of the page, so the user and the agent can talk about them */
+const UI_NAMES=[
+  ['Top bar','Mode buttons, File menu, saving, undo, language, help, and the side panel button.'],
+  ['Folder bar','The folder the page is connected to.'],
+  ['Agent bar','Edit: the agent connection, rounds, and "Ask the agent to revise".'],
+  ['Page','View: one page of the report. Move it by the bar above it; resize it from its corner.'],['Page bar','View: previous and next page.'],['Thumbnails','View: every page, to jump to.'],
+  ['Content block','Edit: each text, chart, table or image, with its comment box.'],['Add bar','Edit: the buttons that add a block.'],
+  ['Side panel','Edit: comments, changes, style, folder.'],
+  ['Questions panel','View: your questions to the agent and its answers.']];
+function uiNames(){return h('details',{class:'uinames'},[h('summary',{text:tr('Names of the parts of the page')}),
+  h('dl',{},UI_NAMES.flatMap(([n,d])=>[h('dt',{text:trc('ui',n)}),h('dd',{text:tr(d)})]))])}
+function helpModal(title,intro,steps,short){ // numbered steps: [bold start, the rest]; short: without saving and the names of the parts
   openModal(title,[h('div',{class:'langbox'},[intro?h('p',{text:intro}):null,
-    h('ol',{},steps.map(([t,d])=>h('li',{},[h('strong',{text:t}),' '+d]))),
+    h('ol',{},steps.map(([t,d])=>h('li',{},[h('strong',{text:t}),' '+d]))),short?null:saveHelp(),short?null:uiNames(),
     h('div',{class:'crow'},[h('span',{class:'sp'}),h('button',{type:'button',class:'btn small primary',text:tr('Got it'),onclick:closeModal})])])])}
 function welcomeOnce(){S.welcomed=true;
   try{if(localStorage.getItem('duetsheet-welcomed')){if(!editingMode()&&!S.readonly)askTipOnce();return}localStorage.setItem('duetsheet-welcomed','1')}catch(e){return}
