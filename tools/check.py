@@ -50,6 +50,7 @@ b = src.index('</script>', a)
 block, outside = src[a + len(OPEN):b], src[:a] + src[b:]
 
 # 1. wide characters outside the translation block, in every text file of the repository
+TRANSLATED = ('README.zh-Hant.md', 'README.ja.md')   # the README in Chinese and Japanese: the only other files with non-English text
 for i, line in enumerate(outside.split('\n'), 1):
     if WIDE.search(line):
         err(f'duetsheet.html (outside the translation block), line ~{i}: {line.strip()[:80]}')
@@ -57,7 +58,7 @@ for dirpath, dirnames, files in os.walk(ROOT):
     dirnames[:] = [d for d in dirnames if not d.startswith('.')]
     for f in files:
         p = os.path.join(dirpath, f)
-        if p == HTML or not f.endswith(TEXT_EXT):
+        if p == HTML or not f.endswith(TEXT_EXT) or f in TRANSLATED:
             continue
         try:
             text = open(p, encoding='utf-8').read()
